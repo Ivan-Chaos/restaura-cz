@@ -148,7 +148,7 @@ Next.js App Router inside `apps/frontend`: routes in `app/[locale]/`, feature co
 - [X] T052 [P] Add `.env.example` entries (`NEXT_PUBLIC_SIGNUP_URL=`, `NEXT_PUBLIC_NOTIFY_URL=`, `PEXELS_API_KEY=` commented as dev-only) if the repo has one; otherwise document in `AGENTS.md` only
 - [X] T053 [P] Update `specs/002-marketing-landing-page/checklists/requirements.md` notes with the final decisions (video hero, CTA env vars) and mark spec status `Implemented` in `spec.md`
 - [X] T054 Remove dead code: confirm no references to `HomePage` messages, unused `public/*.svg` boilerplate (`next.svg`, `vercel.svg`, `globe.svg`, `window.svg`) if now unreferenced anywhere including stories (`file.svg` is used by `MenuCover.stories.tsx` — keep)
-- [ ] T055 Full gate run: `pnpm lint && pnpm typecheck && pnpm build && pnpm test`; commit with `feat: marketing landing page (hero, capabilities, pricing)` and open PR to `main` with the quickstart validation results
+- [X] T055 Full gate run: `pnpm lint && pnpm typecheck && pnpm build && pnpm test`; commit with `feat: marketing landing page (hero, capabilities, pricing)` and open PR to `main` with the quickstart validation results
 
 ---
 
