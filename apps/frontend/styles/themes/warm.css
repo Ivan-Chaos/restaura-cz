@@ -50,6 +50,13 @@
   /* Menu semantics ------------------------------------------------------- */
   --price: var(--palette-wine-700);
 
+  /* Media — the scrim over photography. Deliberately identical in light and
+     dark: a photograph is dark underneath either way, so the text on it stays
+     light. This is what keeps a hero headline legible over an image nobody
+     controls, and what a hero falls back to when its media fails to load. */
+  --overlay: var(--palette-cocoa-950);
+  --overlay-foreground: var(--palette-cream-50);
+
   /* Structure ------------------------------------------------------------ */
   --border: var(--palette-linen-500);
   --input: var(--palette-linen-700);
@@ -129,6 +136,10 @@
 
   /* Menu semantics ------------------------------------------------------- */
   --price: var(--palette-terracotta-300);
+
+  /* Media — unchanged from the light block on purpose. */
+  --overlay: var(--palette-cocoa-950);
+  --overlay-foreground: var(--palette-cream-50);
 
   /* Structure ------------------------------------------------------------ */
   --border: var(--palette-cocoa-700);

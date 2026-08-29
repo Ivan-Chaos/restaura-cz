@@ -3,13 +3,130 @@
     "title": "Restaura",
     "description": "Restaura – správa restaurace jednoduše"
   },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — vaše menu na každém stole",
+      "description": "Zveřejněte digitální menu, exportujte PDF pro tisk a vygenerujte QR kódy na stoly. Začátek zdarma."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — domů"
+    },
+    "hero": {
+      "headline": "Vaše menu na každém stole",
+      "subheadline": "Digitální menu, PDF pro tisk a QR kódy na stoly — z jednoho místa, během chvíle.",
+      "cta": "Začít zdarma",
+      "seePricing": "Zobrazit ceník"
+    },
+    "capabilities": {
+      "sectionTitle": "Co získáte",
+      "digitalMenu": {
+        "eyebrow": "Digitální menu",
+        "title": "Menu, které se dobře čte na každém telefonu",
+        "body": "Vaše jídla, ceny a alergeny na stránce, která se otevře okamžitě — bez instalace aplikace a bez přibližování. Cenu změníte jednou a vidí ji každý host.",
+        "demo": "Prohlédnout ukázkové menu"
+      },
+      "pdf": {
+        "eyebrow": "Export do PDF",
+        "title": "Připravené k tisku, vždy aktuální",
+        "body": "Kdykoli kuchyně něco změní, vyexportujete stejné menu jako čisté PDF. Vytisknete, pošlete e‑mailem, předáte dodavateli — bez grafika a bez čekání."
+      },
+      "qr": {
+        "eyebrow": "QR kódy na stoly",
+        "title": "Jedno naskenování od stolu k menu",
+        "body": "Vygenerujte QR kód pro každý stůl a dejte ho tam, kam se hosté stejně dívají. Naskenují, menu se otevře, hotovo."
+      }
+    },
+    "steps": {
+      "title": "Připraveno dřív, než začne provoz",
+      "create": {
+        "title": "Zadejte menu",
+        "body": "Napište kategorie a jídla, nebo je vložte z toho, co už máte."
+      },
+      "generate": {
+        "title": "Vygenerujte PDF a QR kódy",
+        "body": "Jedno kliknutí a máte PDF pro tisk i QR kód pro každý stůl."
+      },
+      "scan": {
+        "title": "Hosté skenují přímo u stolu",
+        "body": "Menu si otevřou na vlastním telefonu — vždy to aktuální."
+      }
+    },
+    "pricing": {
+      "title": "Začněte zdarma. Rozšiřte, až budete potřebovat.",
+      "subtitle": "Tarif Zdarma stačí na to, abyste dnes dostali skutečné menu na stoly. Pro a Pro Plus se chystají.",
+      "comingSoon": "Připravujeme",
+      "recommended": "Doporučujeme",
+      "perMonth": "{price}/měsíc",
+      "free": "Zdarma",
+      "noPriceYet": "Připravujeme",
+      "ctaSignup": "Začít zdarma",
+      "ctaNotify": "Dejte mi vědět"
+    },
+    "plans": {
+      "free": {
+        "name": "Zdarma",
+        "tagline": "Vše potřebné pro jedno menu.",
+        "features": {
+          "oneMenu": "1 menu",
+          "thirtyItems": "Až 30 položek menu",
+          "brandedPdf": "Export do PDF s logem Restaura",
+          "brandedQr": "QR kódy na stoly s logem Restaura"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Pro kuchyni s plným à la carte.",
+        "features": {
+          "fiveMenus": "5 menu",
+          "unlimitedItems": "Neomezený počet položek",
+          "noBranding": "Bez loga Restaura"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "Pro skupiny a podniky, které mění menu denně.",
+        "features": {
+          "menuParsing": "Automatické načtení stávajícího menu",
+          "unlimitedMenus": "Neomezený počet menu",
+          "unlimitedSize": "Neomezená velikost menu",
+          "timeMenus": "Menu podle času (ranní, večerní)",
+          "qrCodes": "QR kódy na stoly",
+          "pdfTemplates": "Export do PDF s neomezenými šablonami"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "Rád bych začal s Restaurou",
+      "mailSubjectNotify": "Dejte mi vědět, až spustíte {plan}"
+    },
+    "assets": {
+      "hero": {
+        "alt": "Restaurační sál v teplém denním světle, stoly prostřené bílými ubrusy a sklenicemi"
+      },
+      "digitalMenu": {
+        "alt": "Detail dvou rukou držících telefon u dřevěného pultu v kavárně"
+      },
+      "pdf": {
+        "alt": "Ruka drží tištěné menu nad kavárenským stolkem s kávou a dortem"
+      },
+      "qr": {
+        "alt": "Stolní stojánek na stole s QR kódem a nápisem Naskenujte pro menu"
+      },
+      "og": {
+        "alt": "Restaurační sál v teplém denním světle, stoly prostřené a připravené k provozu"
+      }
+    },
+    "footer": {
+      "tagline": "Digitální menu pro restaurace.",
+      "legal": "Podmínky",
+      "privacy": "Soukromí",
+      "contact": "Kontakt",
+      "copyright": "© {year} Restaura"
+    }
+  },
   "LocaleSwitcher": {
     "label": "Jazyk"
-  },
-  "HomePage": {
-    "title": "Vítejte v Restaura",
-    "description": "Aplikace je připravena v češtině, angličtině a němčině. Začněte úpravou <code>app/[locale]/page.tsx</code>.",
-    "cta": "Začít"
   },
   "Appearance": {
     "label": "Vzhled",

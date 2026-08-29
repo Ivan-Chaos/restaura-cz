@@ -56,6 +56,11 @@
   /* Menu semantics */
   --color-price: var(--price);
 
+  /* Media. `bg-overlay/60` — an opacity modifier, not an arbitrary value — is
+     how a component scrims a photograph without ever naming a colour. */
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
+
   /* Structure */
   --color-border: var(--border);
   --color-input: var(--input);

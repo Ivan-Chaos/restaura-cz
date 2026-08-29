@@ -55,6 +55,13 @@ These exist because a menu says things shadcn's vocabulary cannot. Overloading
 `--accent` for "chef's pick" would have broken hover states, and `--destructive`
 is about errors, not about a dish being sold out.
 
+`--overlay` is the odd one out: it is the scrim drawn over a photograph or video
+so `--overlay-foreground` text stays legible on top of an image the design system
+does not control — and it is the fallback surface when that media never loads.
+Reach for it only over media (`bg-overlay/60`, `text-overlay-foreground`); on an
+ordinary `background` or `card` surface its foreground is not guaranteed to
+contrast. It is also the one pair that holds the same value in light and dark.
+
 ## Typography
 
 Two roles, so a theme can pair a characterful display face with a workhorse text

@@ -3,13 +3,130 @@
     "title": "Restaura",
     "description": "Restaura – restaurant management made simple"
   },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — your menu, on every table",
+      "description": "Publish a digital menu, export a print-ready PDF and generate table QR codes. Free to start."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — home"
+    },
+    "hero": {
+      "headline": "Your menu, on every table",
+      "subheadline": "A digital menu, a print-ready PDF and table QR codes — from one place, in minutes.",
+      "cta": "Start for free",
+      "seePricing": "See pricing"
+    },
+    "capabilities": {
+      "sectionTitle": "What you get",
+      "digitalMenu": {
+        "eyebrow": "Digital menu",
+        "title": "A menu that reads beautifully on every phone",
+        "body": "Your dishes, prices and allergens in a page that opens instantly — no app to install, no pinching to zoom. Change a price once and every guest sees it.",
+        "demo": "See a live menu"
+      },
+      "pdf": {
+        "eyebrow": "PDF export",
+        "title": "Print-ready, always up to date",
+        "body": "Export the same menu as a clean PDF whenever the kitchen changes. Print it, email it, hand it to a supplier — no designer, no waiting."
+      },
+      "qr": {
+        "eyebrow": "Table QR codes",
+        "title": "One scan from the table to the menu",
+        "body": "Generate a QR code for every table and put it where your guests already look. They scan, the menu opens, you are done."
+      }
+    },
+    "steps": {
+      "title": "Up and running before service",
+      "create": {
+        "title": "Add your menu",
+        "body": "Type in your categories and dishes, or paste them from what you already have."
+      },
+      "generate": {
+        "title": "Generate PDF and QR codes",
+        "body": "One click gives you a print-ready PDF and a QR code for every table."
+      },
+      "scan": {
+        "title": "Guests scan at the table",
+        "body": "They open the menu on their own phone — always the current one."
+      }
+    },
+    "pricing": {
+      "title": "Start free. Grow when you need to.",
+      "subtitle": "The Free plan is enough to put a real menu on your tables today. Pro and Pro Plus are on the way.",
+      "comingSoon": "Coming soon",
+      "recommended": "Recommended",
+      "perMonth": "{price}/month",
+      "free": "Free",
+      "noPriceYet": "Coming soon",
+      "ctaSignup": "Start for free",
+      "ctaNotify": "Notify me"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "tagline": "Everything you need for one menu.",
+        "features": {
+          "oneMenu": "1 menu",
+          "thirtyItems": "Up to 30 menu items",
+          "brandedPdf": "PDF export with Restaura branding",
+          "brandedQr": "Table QR codes with Restaura branding"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "For a full à la carte kitchen.",
+        "features": {
+          "fiveMenus": "5 menus",
+          "unlimitedItems": "Unlimited menu items",
+          "noBranding": "No Restaura branding"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "For groups and venues that change daily.",
+        "features": {
+          "menuParsing": "Import an existing menu automatically",
+          "unlimitedMenus": "Unlimited menus",
+          "unlimitedSize": "Unlimited menu size",
+          "timeMenus": "Time-based menus (morning, evening)",
+          "qrCodes": "Table QR codes",
+          "pdfTemplates": "PDF export with unlimited templates"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "I would like to start with Restaura",
+      "mailSubjectNotify": "Notify me when {plan} launches"
+    },
+    "assets": {
+      "hero": {
+        "alt": "A restaurant dining room in warm daylight, tables laid with white cloths and glassware"
+      },
+      "digitalMenu": {
+        "alt": "Close-up of two hands holding a phone at a wooden café counter"
+      },
+      "pdf": {
+        "alt": "A hand holding a printed menu card above a café table with coffee and cake"
+      },
+      "qr": {
+        "alt": "A table tent card standing on a table, showing a QR code above the words Scan for the menu"
+      },
+      "og": {
+        "alt": "A restaurant dining room in warm daylight, tables laid and ready for service"
+      }
+    },
+    "footer": {
+      "tagline": "Digital menus for restaurants.",
+      "legal": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact",
+      "copyright": "© {year} Restaura"
+    }
+  },
   "LocaleSwitcher": {
     "label": "Language"
-  },
-  "HomePage": {
-    "title": "Welcome to Restaura",
-    "description": "Your app is set up with Czech, English and German. Edit <code>app/[locale]/page.tsx</code> to get started.",
-    "cta": "Get started"
   },
   "Appearance": {
     "label": "Appearance",

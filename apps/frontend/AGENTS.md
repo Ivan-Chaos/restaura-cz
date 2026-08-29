@@ -55,3 +55,14 @@ pnpm test:stories         # every story as a browser test
 pnpm test:e2e             # sample menu on a production build
 pnpm test:e2e:storybook   # built docs site + toolbars
 ```
+
+# Landing page & marketing assets
+
+The public landing page is `app/[locale]/page.tsx` → `components/landing/`. Content lives as typed data in `lib/landing/` (`plans.ts`, `capabilities.ts`, `assets.ts`, `links.ts`) so pricing and copy change without touching components, and so `tests/unit/landing-*.test.ts` can assert the spec's numbers directly. Spec: `specs/002-marketing-landing-page/`.
+
+- **Media is downloaded, never hot-linked.** `lib/landing/assets.ts` is the manifest; `pnpm assets:landing` fetches into `public/landing/` and regenerates `ATTRIBUTION.md`. `--check` validates budgets and dimensions without touching the network (CI path). An asset marked `optional: true` may be absent — the page is built to do without it, and `lib/landing/assets.server.ts#hasAssetFile` decides at build time. `public/landing/hero.mp4` is the current example: Pexels gates its video files, so it must be downloaded by hand.
+- **Never use a stock photo carrying another company's branding.** Two of the QR candidates did; the page draws its own table tent (`components/landing/TableTent.tsx`) instead. Implying an endorsement is a Pexels licence violation, not a style preference.
+- **`overlay` / `overlay-foreground` are the tokens for text on media** — `bg-overlay/60` for a scrim, `text-overlay-foreground` for what sits on it. They are the one pair that is identical in light and dark, and they are *not* safe on ordinary `background`/`card` surfaces.
+- **CTA destinations are configuration**: `NEXT_PUBLIC_SIGNUP_URL` and `NEXT_PUBLIC_NOTIFY_URL` (both support `{locale}` and `{plan}` placeholders) with `mailto:` fallbacks. A call to action must never resolve to `#` — an e2e test enforces it. `NEXT_PUBLIC_SITE_URL` sets `metadataBase`, without which a relative Open Graph image is a build error.
+- **No `motion` on this route.** Reveal-on-scroll is `hooks/use-in-view.ts` + `components/landing/Reveal.tsx`, about 1 KB. Its three states (`idle`/`hidden`/`shown`) exist so nothing is ever hidden that the reader can already see: only an element the browser has confirmed is off-screen is made transparent.
+- **Link-buttons use `buttonVariants` on a real anchor**, not the `Button` primitive with `render`. Base UI's button expects a native `<button>`; given an anchor it either warns or replaces the link's semantics with button ones.

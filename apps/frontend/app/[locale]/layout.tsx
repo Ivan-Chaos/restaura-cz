@@ -39,7 +39,16 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Metadata" });
-  return { title: t("title"), description: t("description") };
+  return {
+    // Open Graph images must be absolute URLs. Declaring the base here lets
+    // every page below write a relative path and lets the deployment decide the
+    // origin; without it, a relative OG image is a build error.
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    title: t("title"),
+    description: t("description"),
+  };
 }
 
 export default async function LocaleLayout({

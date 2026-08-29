@@ -52,7 +52,12 @@ Colours: `--background --foreground --card --card-foreground --popover
 --destructive --destructive-foreground --border --input --ring --success
 --success-foreground --warning --warning-foreground --info --info-foreground
 --highlight --highlight-foreground --price --surface-raised
---surface-raised-foreground`
+--surface-raised-foreground --overlay --overlay-foreground`
+
+`--overlay` / `--overlay-foreground` were added by feature 002 (marketing landing
+page): a scrim over photography plus the light text that sits on it. They are the
+one pair that is deliberately the *same* value in light and dark — a photograph is
+dark underneath either way.
 
 Non-colour: `--radius` (rem) · `--density` (unitless, 0.8–1.2) · `--font-display`
 · `--font-body` · `--shadow-card` · `--shadow-overlay`
@@ -77,6 +82,7 @@ that fails.
 | every `X-foreground` on its `X` | 4.5 : 1 | WCAG 1.4.3 |
 | `--muted-foreground` on `--muted`, `--background`, `--card`, `--surface-raised` | 4.5 : 1 | WCAG 1.4.3 |
 | `--price` on `--background`, `--card`, `--surface-raised` | 4.5 : 1 | WCAG 1.4.3 |
+| `--overlay-foreground` on `--overlay` | 4.5 : 1 | WCAG 1.4.3 |
 | `--ring` on `--background` and `--card` | 3 : 1 | WCAG 1.4.11 |
 | `--input` on `--background` | 3 : 1 | WCAG 1.4.11 |
 | `--primary` on `--background` | 3 : 1 | WCAG 1.4.11 |

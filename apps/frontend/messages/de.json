@@ -3,13 +3,130 @@
     "title": "Restaura",
     "description": "Restaura – Restaurantverwaltung leicht gemacht"
   },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — Ihre Speisekarte auf jedem Tisch",
+      "description": "Digitale Speisekarte veröffentlichen, druckfertiges PDF exportieren und Tisch-QR-Codes erzeugen. Kostenlos starten."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — Startseite"
+    },
+    "hero": {
+      "headline": "Ihre Speisekarte auf jedem Tisch",
+      "subheadline": "Digitale Karte, druckfertiges PDF und Tisch-QR-Codes — an einem Ort, in wenigen Minuten.",
+      "cta": "Kostenlos starten",
+      "seePricing": "Preise ansehen"
+    },
+    "capabilities": {
+      "sectionTitle": "Das bekommen Sie",
+      "digitalMenu": {
+        "eyebrow": "Digitale Speisekarte",
+        "title": "Eine Karte, die sich auf jedem Handy gut liest",
+        "body": "Ihre Gerichte, Preise und Allergene auf einer Seite, die sofort öffnet — ohne App, ohne Zoomen. Sie ändern einen Preis einmal, und jeder Gast sieht ihn.",
+        "demo": "Beispielkarte ansehen"
+      },
+      "pdf": {
+        "eyebrow": "PDF-Export",
+        "title": "Druckfertig und immer aktuell",
+        "body": "Exportieren Sie dieselbe Karte als sauberes PDF, sobald die Küche etwas ändert. Drucken, mailen, dem Lieferanten geben — ohne Grafiker, ohne Warten."
+      },
+      "qr": {
+        "eyebrow": "Tisch-QR-Codes",
+        "title": "Ein Scan vom Tisch zur Karte",
+        "body": "Erzeugen Sie einen QR-Code für jeden Tisch und platzieren Sie ihn dort, wo Ihre Gäste ohnehin hinschauen. Scannen, Karte öffnet sich, fertig."
+      }
+    },
+    "steps": {
+      "title": "Fertig, bevor der Service beginnt",
+      "create": {
+        "title": "Karte anlegen",
+        "body": "Kategorien und Gerichte eintippen oder aus dem übernehmen, was Sie schon haben."
+      },
+      "generate": {
+        "title": "PDF und QR-Codes erzeugen",
+        "body": "Ein Klick liefert ein druckfertiges PDF und einen QR-Code für jeden Tisch."
+      },
+      "scan": {
+        "title": "Gäste scannen am Tisch",
+        "body": "Sie öffnen die Karte auf dem eigenen Handy — immer die aktuelle."
+      }
+    },
+    "pricing": {
+      "title": "Kostenlos starten. Wachsen, wenn es nötig wird.",
+      "subtitle": "Der Free-Tarif reicht, um heute eine echte Karte auf Ihre Tische zu bringen. Pro und Pro Plus kommen bald.",
+      "comingSoon": "Demnächst",
+      "recommended": "Empfohlen",
+      "perMonth": "{price}/Monat",
+      "free": "Kostenlos",
+      "noPriceYet": "Demnächst",
+      "ctaSignup": "Kostenlos starten",
+      "ctaNotify": "Benachrichtigen"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "tagline": "Alles, was eine Karte braucht.",
+        "features": {
+          "oneMenu": "1 Speisekarte",
+          "thirtyItems": "Bis zu 30 Gerichte",
+          "brandedPdf": "PDF-Export mit Restaura-Branding",
+          "brandedQr": "Tisch-QR-Codes mit Restaura-Branding"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Für eine volle À-la-carte-Küche.",
+        "features": {
+          "fiveMenus": "5 Speisekarten",
+          "unlimitedItems": "Unbegrenzt viele Gerichte",
+          "noBranding": "Kein Restaura-Branding"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "Für Gruppen und Häuser, die täglich wechseln.",
+        "features": {
+          "menuParsing": "Bestehende Karte automatisch übernehmen",
+          "unlimitedMenus": "Unbegrenzt viele Speisekarten",
+          "unlimitedSize": "Unbegrenzte Kartengröße",
+          "timeMenus": "Zeitabhängige Karten (morgens, abends)",
+          "qrCodes": "Tisch-QR-Codes",
+          "pdfTemplates": "PDF-Export mit unbegrenzten Vorlagen"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "Ich möchte mit Restaura starten",
+      "mailSubjectNotify": "Benachrichtigen Sie mich zum Start von {plan}"
+    },
+    "assets": {
+      "hero": {
+        "alt": "Ein Gastraum im warmen Tageslicht, Tische mit weißen Decken und Gläsern eingedeckt"
+      },
+      "digitalMenu": {
+        "alt": "Nahaufnahme zweier Hände, die ein Handy an einem hölzernen Cafétresen halten"
+      },
+      "pdf": {
+        "alt": "Eine Hand hält eine gedruckte Speisekarte über einem Cafétisch mit Kaffee und Kuchen"
+      },
+      "qr": {
+        "alt": "Ein Tischaufsteller mit QR-Code und dem Hinweis Für die Karte scannen"
+      },
+      "og": {
+        "alt": "Ein Gastraum im warmen Tageslicht, Tische eingedeckt und bereit für den Service"
+      }
+    },
+    "footer": {
+      "tagline": "Digitale Speisekarten für Restaurants.",
+      "legal": "AGB",
+      "privacy": "Datenschutz",
+      "contact": "Kontakt",
+      "copyright": "© {year} Restaura"
+    }
+  },
   "LocaleSwitcher": {
     "label": "Sprache"
-  },
-  "HomePage": {
-    "title": "Willkommen bei Restaura",
-    "description": "Ihre App ist mit Tschechisch, Englisch und Deutsch eingerichtet. Bearbeiten Sie <code>app/[locale]/page.tsx</code>, um loszulegen.",
-    "cta": "Loslegen"
   },
   "Appearance": {
     "label": "Erscheinungsbild",
