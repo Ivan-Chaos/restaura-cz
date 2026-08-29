@@ -1,3 +1,8 @@
 allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  # esbuild ships a prebuilt platform binary and needs its install script to
+  # link it. Required by Vite/Vitest (dev + test only).
+  esbuild: true
   sharp: false
   unrs-resolver: false

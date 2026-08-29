@@ -1,0 +1,102 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { ContrastContractTable, ThemeList } from "./TokenTable";
+
+<Meta title="Documentation/Theming" />
+
+# Theming
+
+A menu belongs to a restaurant, not to us. The system is built so a rustic
+trattoria, a modern café and a fine-dining room can each have their own look
+while sharing one set of components.
+
+## Two independent axes
+
+|            | What it is                | How it is applied                        | Who controls it |
+| ---------- | ------------------------- | ---------------------------------------- | --------------- |
+| Theme      | The restaurant's identity | `data-theme="slate"` on any element      | The restaurant  |
+| Appearance | Light or dark             | `.dark` class on `<html>` (`next-themes`)| The guest       |
+
+They are orthogonal: **any theme × any appearance is valid**. Both redefine the
+*same* semantic tokens, which is why they compose without knowing about each
+other.
+
+```
+:root                       → warm light   (the ambient default)
+.dark                       → warm dark
+[data-theme="slate"]        → slate light  (scoped to a subtree)
+.dark [data-theme="slate"]  → slate dark   (wins on specificity)
+```
+
+## Scoping a theme
+
+`ThemeScope` renders a `data-theme` attribute and nothing else — no context, no
+JavaScript, no hydration flash. It works in Server Components and nests, so a
+restaurant's menu can sit inside service chrome that stays on the default theme.
+
+```tsx
+import { ThemeScope } from "@/components/theme/ThemeScope";
+
+<ThemeScope theme={restaurant.themeId}>
+  <SampleMenu {...menu} />
+</ThemeScope>
+```
+
+It defaults to `display: contents`, so it adds a DOM node but no box and cannot
+disturb the layout it wraps. An unrecognised id falls back to the default theme
+rather than rendering an unstyled page.
+
+## Registered themes
+
+<ThemeList />
+
+`warm` is the default and therefore owns `:root` as well as
+`[data-theme="warm"]`, both declared by a single rule so the two can never drift.
+`slate` exists to prove the architecture: it is deliberately the opposite of warm
+on every axis — cool, sharp, tighter, one type family — so that any value a
+component hard-codes instead of tokenising is obvious the moment you switch.
+
+## Adding a theme
+
+1. Copy `styles/themes/warm.css` to `styles/themes/<id>.css` and change the
+   selectors to `[data-theme="<id>"]` and
+   `.dark [data-theme="<id>"], [data-theme="<id>"].dark`. Do **not** include
+   `:root` — only the default theme owns the ambient scope.
+2. Add any palette steps you need to `styles/palette.css`.
+3. Set **every required token** for both appearances. See
+   **Foundations** for the catalogue and what each token is for.
+4. `@import` the file from `app/globals.css`.
+5. Register it in `lib/design-system/themes.ts`.
+6. Add its display name to `messages/{cs,en,de}.json` under `Themes`.
+7. Run `pnpm test:unit`.
+
+Step 7 is the point of the whole exercise. The tests will tell you, by name and
+by measured ratio, if you have missed a token, invented one, referenced a palette
+step that does not exist, asked for a font the layout does not load, or produced
+a colour pair a guest could not read.
+
+## The accessibility contract
+
+A theme is not valid until it passes this, in **both** appearances:
+
+<ContrastContractTable />
+
+Thresholds follow WCAG 2.1 AA: 4.5:1 for text (1.4.3) and 3:1 for the boundary
+of interactive controls and focus indicators (1.4.11).
+
+`--border` is deliberately held to a lower bar. Hairlines and separators are
+decorative and are not required by 1.4.11 to reach 3:1; forcing it would mean a
+harsh line that fights the soft register a warm menu wants. 1.5:1 keeps it
+perceptible without making it shout. `--input`, which *is* a control boundary,
+gets the full 3:1.
+
+## Limits worth knowing
+
+- **Fonts must be loaded by the root layout.** A theme's `--font-display` points
+  at a variable `next/font` publishes in `app/[locale]/layout.tsx`. Naming a face
+  nobody loads silently falls through to the generic family —
+  `tests/unit/themes.test.ts` catches exactly this.
+- **A theme may not invent tokens.** New tokens are a foundations change that
+  must land in every theme at once (spec FR-026), otherwise a menu in one theme
+  renders a component the others cannot style.
+- **Density has a sane range.** `--density` outside roughly 0.8–1.2 starts
+  breaking touch-target sizes.

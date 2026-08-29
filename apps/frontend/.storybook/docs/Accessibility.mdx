@@ -1,0 +1,81 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Accessibility" />
+
+# Accessibility
+
+A menu is read by someone hungry, on a phone, in a dim room, sometimes with a
+screen reader and sometimes with the font scaled to 200%. Accessibility here is
+not a compliance exercise — it is the product working.
+
+Everything below is enforced, not merely encouraged: the a11y addon runs axe
+against **every story** and a violation fails the test run.
+
+## Colour is never the only signal
+
+A sold-out dish is dimmed *and* says "Sold out". A vegan marker is a green leaf
+*and* carries the word "Vegan" for assistive technology. An allergen is a number
+*and* a label.
+
+This matters beyond colour blindness: a guest glancing at a phone in bright
+sunlight loses subtle colour differences entirely.
+
+## Contrast
+
+Every theme is measured against the contract in **Theming** before it can ship —
+in both appearances, by an automated test that reads the CSS itself rather than
+trusting a design review. Body text clears 4.5:1; focus rings and control
+boundaries clear 3:1.
+
+## Keyboard
+
+| Component        | Keys                                                                 |
+| ---------------- | -------------------------------------------------------------------- |
+| `CategoryNav`    | `←` `→` move between categories, `Enter`/`Space` jumps to the section |
+| `Tabs`           | `←` `→` move, `Home`/`End` jump to first/last                         |
+| `Accordion`      | `Enter`/`Space` toggles, `↑` `↓` move between headers                 |
+| `Dialog`         | Focus moves in on open, is trapped, `Esc` closes, returns to trigger  |
+| `Sheet`          | As dialog; on mobile it opens from the bottom                         |
+| `Select`         | `Space` opens, `↑` `↓` move, `Enter` selects, `Esc` closes            |
+| `QuantityStepper`| `↑` `↓` change the value; buttons disable at the bounds               |
+| `Switch`         | `Space` toggles                                                       |
+
+Every interactive element shows a visible focus ring drawn from `--ring`, which
+each theme must keep at 3:1 against its surfaces. Focus is never removed, only
+restyled.
+
+## Structure
+
+- One `<h1>` per page — the establishment name.
+- Each menu category is a `<section>` labelled by its `<h2>`, so a screen-reader
+  user can jump between categories instead of scrolling every dish.
+- `<header>` and `<footer>` are real landmarks.
+- The page `lang` is set per locale, so the correct voice and hyphenation apply
+  to Czech, English and German.
+
+## Images
+
+Dish photography carries a description of the dish. The placeholder shown when a
+dish has no photo is decorative and is hidden from assistive technology — it says
+nothing a guest needs.
+
+## Motion
+
+`prefers-reduced-motion` is honoured in two places: `MotionConfig
+reducedMotion="user"` covers `motion` animations, and a global CSS block reduces
+transitions and disables smooth scrolling. Nothing that conveys state depends on
+movement to be perceived.
+
+## Text size and zoom
+
+Layouts hold from 320px to 1920px and survive the browser font size at 200%
+without clipping or horizontal scrolling. German is the length benchmark — it
+runs roughly 30% longer than English, and every story can be viewed in it from
+the locale toolbar.
+
+## Reading the a11y panel
+
+The **Accessibility** tab reports violations for the story as rendered, in the
+current theme and appearance. Check both appearances and both themes: a contrast
+failure often appears in only one of the four combinations. The test suite runs
+warm/light/cs and slate/dark/de for exactly that reason.

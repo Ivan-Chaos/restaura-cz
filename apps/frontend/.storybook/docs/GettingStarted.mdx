@@ -1,0 +1,134 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documentation/Getting Started" />
+
+# Getting started
+
+This is the design system for Restaura's digital menus. A restaurant publishes a
+menu; a guest opens it from a link or a QR code at the table. Everything here
+serves that.
+
+## The shape of it
+
+```
+styles/palette.css          raw colour ramps — the only literals in the system
+styles/themes/*.css         semantic tokens, one file per theme
+app/globals.css             exposes tokens as Tailwind utilities
+lib/design-system/          types, price formatting, dietary/allergen data, themes
+components/ui/              shadcn primitives (CLI-generated — do not hand-edit)
+components/layout/          Container, Stack, Grid, Section
+components/menu/            the menu vocabulary: DishCard, Price, DietaryMarker …
+components/ordering/        future-facing; documented but not shipped
+components/theme/           ThemeScope, AppearanceProvider, AppearanceToggle
+```
+
+## Building a menu section
+
+A worked example — "daily specials" — using nothing but existing pieces:
+
+```tsx
+import { Container } from "@/components/layout/Container";
+import { Grid } from "@/components/layout/Grid";
+import { Section } from "@/components/layout/Section";
+import { DishCard } from "@/components/menu/DishCard";
+
+export function DailySpecials({ items }: { items: MenuItem[] }) {
+  const t = useTranslations("Menu");
+
+  if (items.length === 0) return null;
+
+  return (
+    <Container size="md">
+      <Section id="specials" title={t("specials")}>
+        <Grid cols={{ base: 1, md: 2, lg: 3 }} gap={4}>
+          {items.map((item) => (
+            <DishCard key={item.id} item={item} />
+          ))}
+        </Grid>
+      </Section>
+    </Container>
+  );
+}
+```
+
+Note what is *not* there: no colours, no pixel values, no strings. That is the
+whole idea — the component describes structure and meaning, and the theme
+decides how it looks.
+
+## The three rules
+
+**1. Never write a literal visual value.**
+
+```tsx
+// ✗ fails `pnpm lint`
+<div className="bg-[#f3e9d8] p-[13px] text-[#5b3a29]">
+
+// ✓
+<div className="bg-surface-raised p-3 text-foreground">
+```
+
+`scripts/check-design-tokens.mjs` scans `components/` and `app/` for hex
+colours, `rgb()/oklch()` calls and Tailwind arbitrary values, and fails the
+build with the file and line. A literal cannot respond to a theme, so a menu in
+any other theme is quietly broken by it.
+
+If you genuinely need an exception, put
+`// design-tokens-ignore-next-line -- <reason>` above the line. The reason is
+required.
+
+**2. Never write a user-visible string in a component.**
+
+```tsx
+// ✗
+<span>Sold out</span>
+
+// ✓
+const t = useTranslations("Availability");
+<span>{t("soldOut")}</span>
+```
+
+New keys go into `messages/cs.json`, `en.json` **and** `de.json` in the same
+change; `scripts/check-messages.mjs` fails the build if one is missing. `en.json`
+is the type source, so TypeScript will also complain about an unknown namespace.
+
+**3. Reuse before you create.**
+
+Check `components/ui` (primitives), `components/layout` (structure) and
+`components/menu` (domain) before writing anything. Add a missing shadcn
+primitive through the CLI, never by hand:
+
+```bash
+pnpm dlx shadcn@latest add <component>
+```
+
+The style is `base-nova`, built on `@base-ui/react` — **not** Radix. APIs differ
+from Radix-based shadcn you may have seen elsewhere; read the generated source
+before using a component. Composition uses a `render` prop rather than
+`asChild`:
+
+```tsx
+<Button render={<Link href="/menu" />}>View the menu</Button>
+```
+
+## Navigation and locale
+
+Import `Link`, `useRouter`, `usePathname` and `redirect` from `@/i18n/navigation`
+— never from `next/link` or `next/navigation`. Routes are always locale-prefixed
+(`/cs/...`), and only the locale-aware versions rewrite the prefix correctly.
+
+## Working on a component
+
+```bash
+pnpm storybook                 # the workbench
+pnpm test:stories              # runs every story as a browser test, with axe
+pnpm test:unit                 # theme contrast, token contract, price formatting
+pnpm lint && pnpm typecheck
+```
+
+Write the story as you write the component. Stories are the documentation *and*
+the test suite — a component without one is neither documented nor tested, and
+the two cannot drift apart because they are the same artefact.
+
+Check your work in both appearances and both themes using the toolbar. The
+automated suite runs warm/light/cs and slate/dark/de; the second combination is
+the one that catches hard-coded colours and English-length assumptions.

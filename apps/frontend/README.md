@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaura — frontend
 
-## Getting Started
+Digital menus for restaurants. A restaurant publishes a menu; a guest opens it
+from a link or a QR code at the table. Czech, English and German; light and dark;
+and a theme per restaurant.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev          # http://localhost:3000 → redirects to /cs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The sample menu — a complete guest experience built only from the design system —
+is at [`/cs/sample-menu`](http://localhost:3000/cs/sample-menu), with the
+alternative theme at `/cs/sample-menu/slate`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Design system
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The visual layer is token-driven: no component contains a colour, a font size or
+a spacing value of its own, which is what lets one CSS file re-skin an entire
+menu.
 
-## Learn More
+```bash
+pnpm storybook    # http://localhost:6006 — the design system handbook
+```
 
-To learn more about Next.js, take a look at the following resources:
+Start with **Documentation → Getting Started**, then **Foundations** (the token
+catalogue, live in whichever theme you select) and **Theming** (how to author a
+new restaurant theme).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Conventions and the rules CI enforces are in [`AGENTS.md`](./AGENTS.md).
+The full specification lives in
+[`specs/001-menu-design-system/`](./specs/001-menu-design-system/) — including
+[`quickstart.md`](./specs/001-menu-design-system/quickstart.md), which lists the
+validation scenarios and how to run each one.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Checks
 
-## Deploy on Vercel
+```bash
+pnpm lint                 # eslint + design-token gate + translation-key parity
+pnpm typecheck
+pnpm test:unit            # theme contrast, token contract, price formatting
+pnpm test:stories         # every story as a browser test, with axe
+pnpm test:e2e             # the sample menu on a production build
+pnpm test:e2e:storybook   # the built docs site and its toolbars
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Two rules the tooling will fail you on, both deliberate:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **No literal visual values** in `components/` or `app/` — no hex, no `oklch()`,
+  no Tailwind arbitrary values like `p-[13px]`. A literal cannot respond to a
+  theme, so it is treated as a defect.
+- **No hard-coded user-visible text** — every string comes from `next-intl` and
+  must exist in all three locales.
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 ·
+shadcn (`base-nova`, on `@base-ui/react` — not Radix) · next-intl · next-themes ·
+Storybook 10 · Vitest 4 · Playwright
