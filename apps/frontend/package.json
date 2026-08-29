@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint && node scripts/check-design-tokens.mjs && node scripts/check-messages.mjs",
     "assets:landing": "node scripts/fetch-landing-assets.mjs",
+    "assets:favicon": "node scripts/generate-favicon.mjs",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
