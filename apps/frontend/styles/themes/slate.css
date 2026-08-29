@@ -1,0 +1,156 @@
+/**
+ * Slate theme — the example alternative theme.
+ *
+ * Its job is to prove FR-006/FR-007: a completely different look with **zero**
+ * component changes. It is deliberately the opposite of `warm` on every axis —
+ * cool instead of warm, sharp instead of soft, tighter rhythm, one type family
+ * instead of two — so that any colour or spacing a component hard-coded instead
+ * of tokenising is immediately obvious in a screenshot.
+ *
+ * Note there is no `:root` here: a non-default theme only ever applies inside a
+ * `<ThemeScope theme="slate">` subtree.
+ *
+ * Contract: `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="slate"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-graphite-100);
+  --foreground: var(--palette-graphite-900);
+  --card: var(--palette-graphite-50);
+  --card-foreground: var(--palette-graphite-900);
+  --popover: var(--palette-graphite-50);
+  --popover-foreground: var(--palette-graphite-900);
+  --surface-raised: var(--palette-graphite-50);
+  --surface-raised-foreground: var(--palette-graphite-900);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-cobalt-600);
+  --primary-foreground: var(--palette-graphite-50);
+  --secondary: var(--palette-graphite-200);
+  --secondary-foreground: var(--palette-graphite-800);
+  --muted: var(--palette-graphite-200);
+  --muted-foreground: var(--palette-graphite-700);
+  --accent: var(--palette-graphite-300);
+  --accent-foreground: var(--palette-graphite-900);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-graphite-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-graphite-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-graphite-50);
+  --info: var(--palette-graphite-700);
+  --info-foreground: var(--palette-graphite-50);
+  --highlight: var(--palette-cobalt-200);
+  --highlight-foreground: var(--palette-cobalt-900);
+
+  /* Menu semantics — slate treats price as plain body text, no emphasis
+     colour. Proving a theme may legitimately collapse a distinction. */
+  --price: var(--palette-graphite-900);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-graphite-400);
+  --input: var(--palette-graphite-600);
+  --ring: var(--palette-cobalt-600);
+
+  /* Shape and rhythm — sharp corners, 10% tighter than warm -------------- */
+  --radius: 0.25rem;
+  --density: 0.9;
+
+  /* Typography — one family for everything ------------------------------- */
+  --font-display: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — cool, flatter than warm ---------------------------------- */
+  --shadow-card: 0 1px 2px oklch(0.26 0.018 255 / 0.08);
+  --shadow-overlay: 0 6px 24px oklch(0.26 0.018 255 / 0.22);
+
+  /* Motion — snappier ---------------------------------------------------- */
+  --motion-fast: 90ms;
+  --motion-base: 150ms;
+  --motion-slow: 240ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-cobalt-500);
+  --chart-2: var(--palette-graphite-500);
+  --chart-3: var(--palette-herb-600);
+  --chart-4: var(--palette-honey-600);
+  --chart-5: var(--palette-paprika-600);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-graphite-100);
+  --sidebar-foreground: var(--palette-graphite-900);
+  --sidebar-primary: var(--palette-cobalt-600);
+  --sidebar-primary-foreground: var(--palette-graphite-50);
+  --sidebar-accent: var(--palette-graphite-300);
+  --sidebar-accent-foreground: var(--palette-graphite-900);
+  --sidebar-border: var(--palette-graphite-400);
+  --sidebar-ring: var(--palette-cobalt-600);
+}
+
+.dark [data-theme="slate"],
+[data-theme="slate"].dark {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-graphite-950);
+  --foreground: var(--palette-graphite-100);
+  --card: var(--palette-graphite-900);
+  --card-foreground: var(--palette-graphite-100);
+  --popover: var(--palette-graphite-900);
+  --popover-foreground: var(--palette-graphite-100);
+  --surface-raised: var(--palette-graphite-900);
+  --surface-raised-foreground: var(--palette-graphite-100);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-cobalt-400);
+  --primary-foreground: var(--palette-graphite-950);
+  --secondary: var(--palette-graphite-800);
+  --secondary-foreground: var(--palette-graphite-100);
+  --muted: var(--palette-graphite-800);
+  --muted-foreground: var(--palette-graphite-400);
+  --accent: var(--palette-graphite-800);
+  --accent-foreground: var(--palette-graphite-100);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-graphite-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-graphite-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-graphite-950);
+  --info: var(--palette-graphite-300);
+  --info-foreground: var(--palette-graphite-950);
+  --highlight: var(--palette-cobalt-300);
+  --highlight-foreground: var(--palette-cobalt-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-graphite-100);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-graphite-700);
+  --input: var(--palette-graphite-600);
+  --ring: var(--palette-cobalt-400);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.5);
+  --shadow-overlay: 0 6px 24px oklch(0 0 0 / 0.6);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-cobalt-400);
+  --chart-2: var(--palette-graphite-400);
+  --chart-3: var(--palette-herb-400);
+  --chart-4: var(--palette-honey-400);
+  --chart-5: var(--palette-paprika-400);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-graphite-900);
+  --sidebar-foreground: var(--palette-graphite-100);
+  --sidebar-primary: var(--palette-cobalt-400);
+  --sidebar-primary-foreground: var(--palette-graphite-950);
+  --sidebar-accent: var(--palette-graphite-800);
+  --sidebar-accent-foreground: var(--palette-graphite-100);
+  --sidebar-border: var(--palette-graphite-700);
+  --sidebar-ring: var(--palette-cobalt-400);
+}

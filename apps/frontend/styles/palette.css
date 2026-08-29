@@ -1,0 +1,178 @@
+/**
+ * Layer 1 — Palette tokens.
+ *
+ * Raw colour ramps in oklch. These are the *only* place literal colour values
+ * are allowed. Components MUST NOT reference `--palette-*` directly; they use
+ * the semantic tokens in `styles/tokens.css` / `styles/themes/*.css`, which are
+ * assigned from this palette.
+ *
+ * Warm families (the restaurant/food register):
+ *   cream, parchment, linen  — surfaces (page, card, raised)
+ *   cocoa                    — warm charcoal text + warm dark-mode surfaces
+ *   terracotta, paprika, wine — accent, danger, price
+ *   olive, herb              — positive / available / vegetarian
+ *   honey                    — highlight, warning, "chef's pick"
+ *
+ * Cool families (only used by the `slate` example theme):
+ *   graphite, cobalt
+ */
+
+:root {
+  /* ---------------------------------------------------------------- cream */
+  --palette-cream-50: oklch(0.995 0.004 85);
+  --palette-cream-100: oklch(0.985 0.008 85);
+  --palette-cream-200: oklch(0.965 0.014 85);
+  --palette-cream-300: oklch(0.94 0.02 85);
+  --palette-cream-400: oklch(0.9 0.026 85);
+  --palette-cream-500: oklch(0.85 0.032 85);
+  --palette-cream-600: oklch(0.76 0.034 85);
+  --palette-cream-700: oklch(0.66 0.032 85);
+  --palette-cream-800: oklch(0.54 0.028 85);
+  --palette-cream-900: oklch(0.4 0.022 85);
+  --palette-cream-950: oklch(0.28 0.016 85);
+
+  /* ------------------------------------------------------------ parchment */
+  --palette-parchment-50: oklch(0.992 0.006 78);
+  --palette-parchment-100: oklch(0.975 0.012 78);
+  --palette-parchment-200: oklch(0.95 0.019 78);
+  --palette-parchment-300: oklch(0.92 0.026 78);
+  --palette-parchment-400: oklch(0.88 0.032 78);
+  --palette-parchment-500: oklch(0.82 0.038 78);
+  --palette-parchment-600: oklch(0.74 0.04 78);
+  --palette-parchment-700: oklch(0.64 0.038 78);
+  --palette-parchment-800: oklch(0.52 0.032 78);
+  --palette-parchment-900: oklch(0.39 0.026 78);
+  --palette-parchment-950: oklch(0.27 0.02 78);
+
+  /* ---------------------------------------------------------------- linen */
+  --palette-linen-50: oklch(0.99 0.005 70);
+  --palette-linen-100: oklch(0.968 0.011 70);
+  --palette-linen-200: oklch(0.94 0.018 70);
+  --palette-linen-300: oklch(0.9 0.024 70);
+  --palette-linen-400: oklch(0.86 0.029 70);
+  --palette-linen-500: oklch(0.8 0.034 70);
+  --palette-linen-600: oklch(0.72 0.036 70);
+  --palette-linen-700: oklch(0.62 0.034 70);
+  --palette-linen-800: oklch(0.5 0.03 70);
+  --palette-linen-900: oklch(0.38 0.024 70);
+  --palette-linen-950: oklch(0.26 0.018 70);
+
+  /* ---------------------------------------------------------------- cocoa */
+  /* Warm charcoal: body text in light, every surface in dark. */
+  --palette-cocoa-50: oklch(0.97 0.006 55);
+  --palette-cocoa-100: oklch(0.93 0.011 55);
+  --palette-cocoa-200: oklch(0.87 0.016 55);
+  --palette-cocoa-300: oklch(0.79 0.021 55);
+  --palette-cocoa-400: oklch(0.72 0.024 55);
+  --palette-cocoa-500: oklch(0.62 0.026 55);
+  --palette-cocoa-600: oklch(0.56 0.027 55);
+  --palette-cocoa-700: oklch(0.5 0.028 55);
+  --palette-cocoa-800: oklch(0.38 0.026 55);
+  --palette-cocoa-900: oklch(0.26 0.022 55);
+  --palette-cocoa-950: oklch(0.17 0.017 55);
+
+  /* ----------------------------------------------------------- terracotta */
+  --palette-terracotta-50: oklch(0.975 0.012 42);
+  --palette-terracotta-100: oklch(0.95 0.025 42);
+  --palette-terracotta-200: oklch(0.9 0.05 42);
+  --palette-terracotta-300: oklch(0.83 0.08 42);
+  --palette-terracotta-400: oklch(0.74 0.11 42);
+  --palette-terracotta-500: oklch(0.65 0.135 42);
+  --palette-terracotta-600: oklch(0.55 0.145 42);
+  --palette-terracotta-700: oklch(0.47 0.13 42);
+  --palette-terracotta-800: oklch(0.39 0.11 42);
+  --palette-terracotta-900: oklch(0.31 0.085 42);
+  --palette-terracotta-950: oklch(0.23 0.06 42);
+
+  /* -------------------------------------------------------------- paprika */
+  --palette-paprika-50: oklch(0.975 0.012 32);
+  --palette-paprika-100: oklch(0.95 0.025 32);
+  --palette-paprika-200: oklch(0.9 0.05 32);
+  --palette-paprika-300: oklch(0.83 0.085 32);
+  --palette-paprika-400: oklch(0.74 0.12 32);
+  --palette-paprika-500: oklch(0.65 0.15 32);
+  --palette-paprika-600: oklch(0.55 0.16 32);
+  --palette-paprika-700: oklch(0.47 0.145 32);
+  --palette-paprika-800: oklch(0.39 0.12 32);
+  --palette-paprika-900: oklch(0.31 0.095 32);
+  --palette-paprika-950: oklch(0.23 0.07 32);
+
+  /* ----------------------------------------------------------------- wine */
+  --palette-wine-50: oklch(0.975 0.012 18);
+  --palette-wine-100: oklch(0.95 0.024 18);
+  --palette-wine-200: oklch(0.9 0.048 18);
+  --palette-wine-300: oklch(0.83 0.078 18);
+  --palette-wine-400: oklch(0.74 0.105 18);
+  --palette-wine-500: oklch(0.65 0.13 18);
+  --palette-wine-600: oklch(0.55 0.14 18);
+  --palette-wine-700: oklch(0.45 0.125 18);
+  --palette-wine-800: oklch(0.37 0.105 18);
+  --palette-wine-900: oklch(0.3 0.085 18);
+  --palette-wine-950: oklch(0.22 0.06 18);
+
+  /* ---------------------------------------------------------------- olive */
+  --palette-olive-50: oklch(0.975 0.012 118);
+  --palette-olive-100: oklch(0.95 0.024 118);
+  --palette-olive-200: oklch(0.9 0.045 118);
+  --palette-olive-300: oklch(0.83 0.07 118);
+  --palette-olive-400: oklch(0.74 0.095 118);
+  --palette-olive-500: oklch(0.65 0.11 118);
+  --palette-olive-600: oklch(0.55 0.115 118);
+  --palette-olive-700: oklch(0.47 0.1 118);
+  --palette-olive-800: oklch(0.39 0.085 118);
+  --palette-olive-900: oklch(0.31 0.065 118);
+  --palette-olive-950: oklch(0.23 0.048 118);
+
+  /* ----------------------------------------------------------------- herb */
+  --palette-herb-50: oklch(0.975 0.014 150);
+  --palette-herb-100: oklch(0.95 0.028 150);
+  --palette-herb-200: oklch(0.9 0.05 150);
+  --palette-herb-300: oklch(0.83 0.08 150);
+  --palette-herb-400: oklch(0.74 0.105 150);
+  --palette-herb-500: oklch(0.65 0.12 150);
+  --palette-herb-600: oklch(0.55 0.125 150);
+  --palette-herb-700: oklch(0.47 0.11 150);
+  --palette-herb-800: oklch(0.39 0.09 150);
+  --palette-herb-900: oklch(0.31 0.07 150);
+  --palette-herb-950: oklch(0.23 0.05 150);
+
+  /* ---------------------------------------------------------------- honey */
+  --palette-honey-50: oklch(0.98 0.014 82);
+  --palette-honey-100: oklch(0.96 0.03 82);
+  --palette-honey-200: oklch(0.93 0.06 82);
+  --palette-honey-300: oklch(0.88 0.095 82);
+  --palette-honey-400: oklch(0.8 0.12 82);
+  --palette-honey-500: oklch(0.7 0.13 82);
+  --palette-honey-600: oklch(0.6 0.125 82);
+  --palette-honey-700: oklch(0.52 0.11 82);
+  --palette-honey-800: oklch(0.43 0.095 82);
+  --palette-honey-900: oklch(0.34 0.075 82);
+  --palette-honey-950: oklch(0.25 0.055 82);
+
+  /* ------------------------------------------------------------- graphite */
+  /* Cool neutral — `slate` theme only. */
+  --palette-graphite-50: oklch(0.985 0.003 255);
+  --palette-graphite-100: oklch(0.965 0.005 255);
+  --palette-graphite-200: oklch(0.93 0.008 255);
+  --palette-graphite-300: oklch(0.88 0.011 255);
+  --palette-graphite-400: oklch(0.82 0.014 255);
+  --palette-graphite-500: oklch(0.72 0.017 255);
+  --palette-graphite-600: oklch(0.62 0.019 255);
+  --palette-graphite-700: oklch(0.5 0.021 255);
+  --palette-graphite-800: oklch(0.38 0.02 255);
+  --palette-graphite-900: oklch(0.26 0.018 255);
+  --palette-graphite-950: oklch(0.17 0.014 255);
+
+  /* --------------------------------------------------------------- cobalt */
+  --palette-cobalt-50: oklch(0.97 0.014 258);
+  --palette-cobalt-100: oklch(0.94 0.03 258);
+  --palette-cobalt-200: oklch(0.89 0.055 258);
+  --palette-cobalt-300: oklch(0.82 0.09 258);
+  --palette-cobalt-400: oklch(0.72 0.13 258);
+  --palette-cobalt-500: oklch(0.62 0.16 258);
+  --palette-cobalt-600: oklch(0.53 0.17 258);
+  --palette-cobalt-700: oklch(0.45 0.15 258);
+  --palette-cobalt-800: oklch(0.37 0.125 258);
+  --palette-cobalt-900: oklch(0.29 0.1 258);
+  --palette-cobalt-950: oklch(0.21 0.075 258);
+}

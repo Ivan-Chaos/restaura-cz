@@ -8,7 +8,186 @@
   },
   "HomePage": {
     "title": "Willkommen bei Restaura",
-    "description": "Ihre App ist auf Tschechisch, Englisch und Deutsch eingerichtet. Bearbeiten Sie <code>app/[locale]/page.tsx</code>, um loszulegen.",
+    "description": "Ihre App ist mit Tschechisch, Englisch und Deutsch eingerichtet. Bearbeiten Sie <code>app/[locale]/page.tsx</code>, um loszulegen.",
     "cta": "Loslegen"
+  },
+  "Appearance": {
+    "label": "Erscheinungsbild",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "Systemeinstellung"
+  },
+  "Themes": {
+    "warm": "Warm",
+    "slate": "Schiefer"
+  },
+  "Menu": {
+    "viewMenu": "Speisekarte ansehen",
+    "share": "Teilen",
+    "copyLink": "Link kopieren",
+    "copied": "Link kopiert",
+    "copyFailed": "Link konnte nicht kopiert werden",
+    "scanToOpen": "Scannen, um die Speisekarte zu öffnen",
+    "openingHours": "Öffnungszeiten",
+    "contact": "Kontakt",
+    "serviceNotes": "Gut zu wissen",
+    "allergenLegend": "Allergene und Ernährungshinweise",
+    "emptyCategory": "Hier steht noch nichts auf der Karte",
+    "emptyCategoryHint": "Dieser Bereich wird gerade vorbereitet. Fragen Sie bitte unser Personal.",
+    "moreItems": "und {count, plural, one {# weiteres Gericht} other {# weitere Gerichte}}",
+    "spiceLevel": "Schärfegrad {level} von 3",
+    "highlights": {
+      "chefsPick": "Empfehlung des Küchenchefs",
+      "new": "Neu",
+      "seasonal": "Saisonal",
+      "popular": "Beliebt"
+    }
+  },
+  "Availability": {
+    "available": "Verfügbar",
+    "limited": "Nur noch wenige",
+    "soldOut": "Ausverkauft"
+  },
+  "Price": {
+    "from": "ab {price}",
+    "marketPrice": "Tagespreis",
+    "askServer": "Fragen Sie unser Personal",
+    "variants": "Größen"
+  },
+  "DietaryMarkers": {
+    "vegetarian": "Vegetarisch",
+    "vegan": "Vegan",
+    "glutenFree": "Glutenfrei",
+    "lactoseFree": "Laktosefrei",
+    "halal": "Halal",
+    "kosher": "Koscher",
+    "spicy": "Scharf",
+    "more": "{count, plural, one {# weitere Kennzeichnung} other {# weitere Kennzeichnungen}}"
+  },
+  "Allergens": {
+    "title": "Allergene",
+    "legendHint": "Die Nummern folgen der EU-Allergenliste (1–14).",
+    "gluten": "Glutenhaltiges Getreide",
+    "crustaceans": "Krebstiere",
+    "eggs": "Eier",
+    "fish": "Fisch",
+    "peanuts": "Erdnüsse",
+    "soy": "Sojabohnen",
+    "milk": "Milch",
+    "nuts": "Schalenfrüchte",
+    "celery": "Sellerie",
+    "mustard": "Senf",
+    "sesame": "Sesamsamen",
+    "sulphites": "Schwefeldioxid und Sulphite",
+    "lupin": "Lupinen",
+    "molluscs": "Weichtiere"
+  },
+  "Ordering": {
+    "quantity": "Menge",
+    "increase": "Eins hinzufügen",
+    "decrease": "Eins entfernen",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "selected": "Ausgewählt",
+    "subtotal": "Zwischensumme",
+    "total": "Gesamt",
+    "note": "Hinweis für die Küche",
+    "notePlaceholder": "Allergien, Vorlieben, sonstige Wünsche",
+    "charactersLeft": "{count, plural, one {noch # Zeichen} other {noch # Zeichen}}",
+    "required": "Erforderlich",
+    "chooseOne": "Wählen Sie eine Option",
+    "chooseBetween": "Wählen Sie zwischen {min} und {max} Optionen",
+    "unavailable": "Nicht verfügbar",
+    "review": "Auswahl prüfen",
+    "items": "{count, plural, one {# Position} other {# Positionen}}",
+    "status": {
+      "received": "Eingegangen",
+      "preparing": "In Zubereitung",
+      "ready": "Fertig",
+      "served": "Serviert",
+      "cancelled": "Storniert"
+    }
+  },
+  "Forms": {
+    "name": "Name des Gerichts",
+    "description": "Beschreibung",
+    "category": "Kategorie",
+    "image": "Foto",
+    "price": "Preis",
+    "dietary": "Ernährung und Allergene",
+    "availability": "Verfügbarkeit",
+    "save": "Gericht speichern",
+    "saving": "Wird gespeichert…",
+    "saved": "Gericht gespeichert",
+    "saveFailed": "Gericht konnte nicht gespeichert werden",
+    "required": "Dieses Feld ist erforderlich",
+    "selectCategory": "Kategorie auswählen"
+  },
+  "SampleMenu": {
+    "metaTitle": "Speisekarte – Zum Goldenen Löffel",
+    "metaDescription": "Die komplette Speisekarte vom Goldenen Löffel: böhmische Klassiker, Desserts und Getränke.",
+    "establishment": {
+      "name": "Zum Goldenen Löffel",
+      "tagline": "Ehrliche böhmische Küche seit 1932",
+      "welcome": "Nehmen Sie Platz und lassen Sie sich Zeit. Alles wird frisch zubereitet.",
+      "address": "Nerudova 14, 118 00 Prag 1",
+      "phone": "+420 257 531 108",
+      "website": "uzlatelzice.cz",
+      "hoursWeekdays": "Mo–Fr",
+      "hoursWeekdaysValue": "11:00 – 23:00",
+      "hoursWeekend": "Sa–So",
+      "hoursWeekendValue": "12:00 – 22:00",
+      "noteVat": "Alle Preise verstehen sich inklusive Mehrwertsteuer.",
+      "noteAllergens": "Die Allergennummern folgen der EU-Liste. Fragen Sie uns jederzeit.",
+      "noteTip": "Bedienung ist nicht inbegriffen."
+    },
+    "categories": {
+      "starters": "Vorspeisen",
+      "startersDescription": "Kleine Gerichte und Suppen für den Anfang",
+      "mains": "Hauptgerichte",
+      "mainsDescription": "Langsam geschmorte Klassiker, mit Beilage serviert",
+      "desserts": "Desserts",
+      "dessertsDescription": "Jeden Morgen im Haus gebacken",
+      "drinks": "Getränke",
+      "drinksDescription": "Tankbier, Wein und hausgemachte Limonaden"
+    },
+    "specials": "Tagesempfehlungen",
+    "dishes": {
+      "bramboracka": "Kartoffelsuppe",
+      "bramborackaDescription": "Kräftige Suppe mit Majoran, Waldpilzen und Knoblauch, im Brotlaib serviert.",
+      "utopenec": "Eingelegte Bratwurst",
+      "utopenecDescription": "In Essig eingelegte Wurst mit Zwiebeln, Paprika und Roggenbrot.",
+      "tatarak": "Rindertatar",
+      "tatarakDescription": "Handgeschnittenes Rindfleisch, am Tisch gewürzt, mit geröstetem Brot und rohem Knoblauch.",
+      "svickova": "Lendenbraten in Rahmsauce",
+      "svickovaDescription": "Der Sonntagsklassiker: cremige Wurzelgemüsesauce, Semmelknödel, Preiselbeeren und ein Löffel Schlagsahne.",
+      "gulas": "Rindergulasch",
+      "gulasDescription": "Langsam in dunklem Bier geschmorte Beinscheibe mit Zwiebeln und Majoran.",
+      "smazenysyr": "Gebackener Edamer",
+      "smazenysyrDescription": "Panierter Käse mit Kartoffeln und hausgemachter Remoulade.",
+      "kachna": "Entenbraten",
+      "kachnaDescription": "Ente mit knuspriger Haut, Rotkohl und zweierlei Knödeln.",
+      "rizek": "Schweineschnitzel",
+      "rizekDescription": "Dünn geklopft, in Butter gebraten, mit Kartoffelsalat.",
+      "koleno": "Gebratene Schweinshaxe in dunklem Bier geschmort mit Kren, Senf und frisch geriebenem Meerrettich auf einem Holzbrett serviert",
+      "kolenoDescription": "Für zwei Personen oder einen sehr entschlossenen Gast. Bitte rechnen Sie mit 40 Minuten.",
+      "knedliky": "Zwetschgenknödel",
+      "knedlikyDescription": "Mit Quark bestreut, mit zerlassener Butter und Puderzucker.",
+      "medovnik": "Honigkuchen",
+      "palacinky": "Palatschinken",
+      "palacinkyDescription": "Mit Aprikosenmarmelade, Walnüssen und Sahne.",
+      "pivo": "Tanklager",
+      "pivoDescription": "Unpasteurisiert, direkt aus dem Tank im Keller gezapft.",
+      "limonada": "Hausgemachte Limonade",
+      "limonadaDescription": "Holunder, Minze und Zitrone. Fragen Sie nach der heutigen Sorte."
+    },
+    "variants": {
+      "small": "0,3 l",
+      "large": "0,5 l",
+      "half": "Halbe",
+      "whole": "Ganze",
+      "portion": "Portion",
+      "double": "Große Portion"
+    }
   }
 }

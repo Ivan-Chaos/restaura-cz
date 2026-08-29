@@ -15,3 +15,43 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Use `useTranslations("Namespace")` in components (server or client), `getTranslations()` in `generateMetadata`/server utilities. Rich text via `t.rich(...)`.
 - Import `Link`, `useRouter`, `usePathname`, `redirect` from `@/i18n/navigation`, not from `next/link` / `next/navigation`.
 - In every page/layout under `[locale]`, validate with `hasLocale(routing.locales, locale)` and call `setRequestLocale(locale)` to keep static rendering.
+
+# Design system & theming
+
+The visual layer is token-driven so a restaurant's menu can be re-skinned without touching components. Full docs: `pnpm storybook` → **Documentation**. Spec: `specs/001-menu-design-system/`.
+
+## Three layers
+
+- `styles/palette.css` — raw oklch ramps (`--palette-terracotta-600`). **The only place a literal colour may appear.** Components never reference these.
+- `styles/themes/<id>.css` — semantic tokens named by purpose (`--price`, `--surface-raised`, `--success`). `warm.css` is the default and owns `:root`/`.dark` *and* `[data-theme="warm"]` in one rule, so there is no second copy to drift. Non-default themes only declare `[data-theme="<id>"]`.
+- `app/globals.css` — exposes every token as a Tailwind utility via `@theme inline`. `inline` is load-bearing: it inlines the value into the utility, so `bg-card` resolves against whatever `[data-theme]` scope it renders in.
+
+`lib/design-system/tokens.ts` is the authoritative catalogue (`REQUIRED_TOKENS`, `TOKEN_PURPOSE`, `CONTRAST_PAIRS`) and drives both the docs tables and the tests.
+
+## Two independent axes
+
+- **Theme** (the restaurant's look): `<ThemeScope theme="slate">` sets `data-theme` on a subtree. Server Component, no JS, nests.
+- **Appearance** (light/dark): `next-themes` class strategy, `.dark` on `<html>`, via `AppearanceProvider`.
+
+Any theme × any appearance is valid. Never couple them.
+
+## Rules (all enforced by `pnpm lint` / `pnpm test`)
+
+- **No literal visual values in `components/` or `app/`** — no hex, no `rgb()/oklch()`, no Tailwind arbitrary values (`p-[13px]`, `bg-[#fff]`). `scripts/check-design-tokens.mjs` fails the build with file:line. Escape hatch: `// design-tokens-ignore-next-line -- <reason>`.
+- Ordinary spacing utilities already scale with the theme: `--spacing` is multiplied by `--density`.
+- **No hard-coded user-visible text** — everything through `next-intl`. `scripts/check-messages.mjs` fails if a key is missing from any of `cs`/`en`/`de`.
+- **Adding a token is a foundations change**: add it to `tokens.ts` *and* every theme in the same commit (`tests/unit/themes.test.ts` enforces).
+- **shadcn primitives come from the CLI only** (`pnpm dlx shadcn@latest add <name>`); never hand-edit `components/ui/`. Style is `base-nova` on `@base-ui/react`, **not Radix** — read the generated source before use; composition uses a `render` prop, not `asChild`.
+- **Ordering components are documentation-only** in this phase. An ESLint rule blocks `app/**` from importing `@/components/ordering/*`, an e2e test asserts the guest menu renders zero `[data-ordering]` elements, and `tests/unit/ordering-boundary.test.ts` proves the rule still fires. Delete all three when ordering ships.
+
+## Stories are the tests
+
+Every component has a colocated `*.stories.tsx`. The Vitest browser project runs each story **twice** — `warm/light/cs` and `slate/dark/de` — with axe assertions that fail on violation. The second pass is the one that catches hard-coded colours and English-length assumptions.
+
+```
+pnpm storybook            # workbench
+pnpm test:unit            # contrast + token contract + price formatting
+pnpm test:stories         # every story as a browser test
+pnpm test:e2e             # sample menu on a production build
+pnpm test:e2e:storybook   # built docs site + toolbars
+```

@@ -1,0 +1,158 @@
+/**
+ * Warm theme — the DEFAULT theme, and the layer-2 semantic token contract.
+ *
+ * The selector list does double duty: `:root` makes warm the ambient theme, so
+ * every shadcn primitive is warm with no wrapper, and `[data-theme="warm"]`
+ * makes the same values scopable, so a warm menu can be nested inside a page
+ * themed differently. Declaring both in one rule keeps a single source of truth
+ * — there is no second copy of these values to drift out of sync.
+ *
+ * Values are assigned from `styles/palette.css`. Never write a literal colour
+ * here — pick a palette step, or add one.
+ *
+ * Contract: `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+:root,
+[data-theme="warm"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-parchment-100);
+  --foreground: var(--palette-cocoa-900);
+  --card: var(--palette-cream-50);
+  --card-foreground: var(--palette-cocoa-900);
+  --popover: var(--palette-cream-50);
+  --popover-foreground: var(--palette-cocoa-900);
+  --surface-raised: var(--palette-linen-50);
+  --surface-raised-foreground: var(--palette-cocoa-900);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-terracotta-600);
+  --primary-foreground: var(--palette-cream-50);
+  --secondary: var(--palette-linen-200);
+  --secondary-foreground: var(--palette-cocoa-800);
+  --muted: var(--palette-linen-200);
+  --muted-foreground: var(--palette-cocoa-700);
+  --accent: var(--palette-linen-300);
+  --accent-foreground: var(--palette-cocoa-900);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-cream-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-cream-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-cream-50);
+  --info: var(--palette-cocoa-700);
+  --info-foreground: var(--palette-cream-50);
+  --highlight: var(--palette-honey-300);
+  --highlight-foreground: var(--palette-cocoa-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-wine-700);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-linen-500);
+  --input: var(--palette-linen-700);
+  --ring: var(--palette-terracotta-600);
+
+  /* Shape and rhythm ----------------------------------------------------- */
+  --radius: 0.75rem;
+  --density: 1;
+
+  /* Typography ----------------------------------------------------------- */
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-body: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — warm-tinted, never neutral black ------------------------- */
+  --shadow-card: 0 1px 2px oklch(0.26 0.022 55 / 0.06),
+    0 4px 12px oklch(0.26 0.022 55 / 0.08);
+  --shadow-overlay: 0 8px 30px oklch(0.26 0.022 55 / 0.18);
+
+  /* Motion --------------------------------------------------------------- */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-terracotta-500);
+  --chart-2: var(--palette-honey-500);
+  --chart-3: var(--palette-herb-600);
+  --chart-4: var(--palette-wine-600);
+  --chart-5: var(--palette-cocoa-500);
+
+  /* Sidebar (shadcn contract; unused by the guest menu) ------------------ */
+  --sidebar: var(--palette-linen-100);
+  --sidebar-foreground: var(--palette-cocoa-900);
+  --sidebar-primary: var(--palette-terracotta-600);
+  --sidebar-primary-foreground: var(--palette-cream-50);
+  --sidebar-accent: var(--palette-linen-300);
+  --sidebar-accent-foreground: var(--palette-cocoa-900);
+  --sidebar-border: var(--palette-linen-500);
+  --sidebar-ring: var(--palette-terracotta-600);
+}
+
+.dark,
+.dark [data-theme="warm"],
+[data-theme="warm"].dark {
+  /* Surfaces — warm browns, deliberately not neutral grey ---------------- */
+  --background: var(--palette-cocoa-950);
+  --foreground: var(--palette-cream-100);
+  --card: var(--palette-cocoa-900);
+  --card-foreground: var(--palette-cream-100);
+  --popover: var(--palette-cocoa-900);
+  --popover-foreground: var(--palette-cream-100);
+  --surface-raised: var(--palette-cocoa-900);
+  --surface-raised-foreground: var(--palette-cream-100);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-terracotta-400);
+  --primary-foreground: var(--palette-cocoa-950);
+  --secondary: var(--palette-cocoa-800);
+  --secondary-foreground: var(--palette-cream-100);
+  --muted: var(--palette-cocoa-800);
+  --muted-foreground: var(--palette-cocoa-300);
+  --accent: var(--palette-cocoa-800);
+  --accent-foreground: var(--palette-cream-100);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-cocoa-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-cocoa-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-cocoa-950);
+  --info: var(--palette-cocoa-300);
+  --info-foreground: var(--palette-cocoa-950);
+  --highlight: var(--palette-honey-400);
+  --highlight-foreground: var(--palette-cocoa-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-terracotta-300);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-cocoa-700);
+  --input: var(--palette-cocoa-600);
+  --ring: var(--palette-terracotta-400);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.4), 0 4px 12px oklch(0 0 0 / 0.35);
+  --shadow-overlay: 0 8px 30px oklch(0 0 0 / 0.55);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-terracotta-400);
+  --chart-2: var(--palette-honey-400);
+  --chart-3: var(--palette-herb-400);
+  --chart-4: var(--palette-wine-400);
+  --chart-5: var(--palette-cocoa-300);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-cocoa-900);
+  --sidebar-foreground: var(--palette-cream-100);
+  --sidebar-primary: var(--palette-terracotta-400);
+  --sidebar-primary-foreground: var(--palette-cocoa-950);
+  --sidebar-accent: var(--palette-cocoa-800);
+  --sidebar-accent-foreground: var(--palette-cream-100);
+  --sidebar-border: var(--palette-cocoa-700);
+  --sidebar-ring: var(--palette-terracotta-400);
+}

@@ -1,0 +1,107 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import {
+  CoreColorTable,
+  MenuColorTable,
+  NonColorTable,
+  OptionalTokenList,
+  TypeScale,
+  SpacingScale,
+  RadiusScale,
+  ElevationScale,
+} from "./TokenTable";
+
+<Meta title="Documentation/Foundations" />
+
+# Foundations
+
+Everything visual in this design system resolves to a **token**. No component
+contains a colour, a font size or a spacing value of its own — that is what lets
+one CSS file re-skin the entire menu for a restaurant without touching a single
+component.
+
+> Use the toolbar above to switch **theme** (warm / slate) and **appearance**
+> (light / dark). Every swatch and specimen on this page is live: it reads the
+> same CSS variables the components read, so what you see here is exactly what a
+> component would get.
+
+## The three layers
+
+1. **Palette** — `styles/palette.css`. Raw oklch ramps (`--palette-terracotta-600`).
+   The only place a literal colour may appear. Components must never reference
+   these directly: a palette step has no meaning, so it cannot be re-themed.
+2. **Semantic tokens** — `styles/themes/<theme>.css`. Named by *purpose*
+   (`--price`, `--surface-raised`, `--success`), assigned from the palette. This
+   is the layer a theme redefines.
+3. **Utilities** — `app/globals.css` exposes each semantic token through
+   `@theme inline`, giving `bg-card`, `text-price`, `font-display`, `rounded-lg`.
+   `inline` is the important part: the value is inlined into the utility instead
+   of being re-declared globally, so a utility resolves against whatever
+   `[data-theme]` scope it renders inside.
+
+## Colour
+
+Tokens are named for the job they do, not for what they look like. `--price` is
+deep wine in the warm theme and plain body ink in slate; a component asking for
+`text-price` gets the right answer in both without knowing either.
+
+<CoreColorTable />
+
+These are the shadcn tokens, so every generated primitive in `components/ui`
+picks up the theme with no adaptation layer.
+
+<MenuColorTable />
+
+These exist because a menu says things shadcn's vocabulary cannot. Overloading
+`--accent` for "chef's pick" would have broken hover states, and `--destructive`
+is about errors, not about a dish being sold out.
+
+## Typography
+
+Two roles, so a theme can pair a characterful display face with a workhorse text
+face — or collapse both onto one, as `slate` does.
+
+<TypeScale />
+
+Specimens use Czech and German text on purpose: both fonts are loaded with the
+`latin-ext` subset, without which `Svíčková` and `Zwetschgenknödel` fall back
+mid-word.
+
+## Spacing and density
+
+The spacing scale is `--spacing` multiplied by the theme's `--density`. A theme
+setting `--density: 0.9` tightens every `p-*`, `gap-*` and `m-*` in the system at
+once — no component opts in, and none can accidentally opt out.
+
+<SpacingScale />
+
+## Radius
+
+<RadiusScale />
+
+The whole scale derives from a single `--radius`. Warm uses `0.75rem` for a soft,
+hospitable feel; slate uses `0.25rem` and looks like a different product.
+
+## Elevation
+
+<ElevationScale />
+
+Shadows are warm-tinted rather than neutral black — a grey shadow on a cream
+surface reads as dirt.
+
+## Non-colour and optional tokens
+
+<NonColorTable />
+
+A theme *may* also set these; otherwise it inherits the default theme's values.
+
+<OptionalTokenList />
+
+## Rules
+
+- Adding a token is a foundations change: add it to
+  `lib/design-system/tokens.ts` **and** to every theme in the same commit.
+  `tests/unit/themes.test.ts` fails otherwise.
+- `pnpm lint` runs `scripts/check-design-tokens.mjs`, which fails the build on
+  any hex colour, `rgb()/oklch()` call, or Tailwind arbitrary value inside
+  `components/` or `app/`. A literal cannot respond to a theme, so it is treated
+  as a defect rather than a style preference.

@@ -1,0 +1,21 @@
+/**
+ * Storybook-only font wiring.
+ *
+ * In the app, `next/font` injects `--font-fraunces` / `--font-nunito-sans` onto
+ * `<html>` from the root layout. Storybook renders components without that
+ * layout, so the same two variables are published here against the webfonts
+ * loaded in `preview-head.html`. The names must match
+ * `lib/design-system/themes.ts#FONT_VARIABLES` — that is the contract the theme
+ * CSS resolves against.
+ */
+:root {
+  --font-fraunces: "Fraunces";
+  --font-nunito-sans: "Nunito Sans";
+}
+
+/* Stories are rendered on the theme's own page colour rather than Storybook's
+   default white, so a dark or slate story is judged against its real ground. */
+body {
+  background: var(--background);
+  color: var(--foreground);
+}

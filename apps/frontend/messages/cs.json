@@ -7,8 +7,187 @@
     "label": "Jazyk"
   },
   "HomePage": {
-    "title": "Vítejte v Restauře",
-    "description": "Aplikace je připravena v češtině, angličtině a němčině. Začněte úpravou souboru <code>app/[locale]/page.tsx</code>.",
+    "title": "Vítejte v Restaura",
+    "description": "Aplikace je připravena v češtině, angličtině a němčině. Začněte úpravou <code>app/[locale]/page.tsx</code>.",
     "cta": "Začít"
+  },
+  "Appearance": {
+    "label": "Vzhled",
+    "light": "Světlý",
+    "dark": "Tmavý",
+    "system": "Podle systému"
+  },
+  "Themes": {
+    "warm": "Teplý",
+    "slate": "Břidlicový"
+  },
+  "Menu": {
+    "viewMenu": "Zobrazit jídelní lístek",
+    "share": "Sdílet",
+    "copyLink": "Kopírovat odkaz",
+    "copied": "Odkaz zkopírován",
+    "copyFailed": "Odkaz se nepodařilo zkopírovat",
+    "scanToOpen": "Naskenujte pro otevření lístku",
+    "openingHours": "Otevírací doba",
+    "contact": "Kontakt",
+    "serviceNotes": "Dobré vědět",
+    "allergenLegend": "Alergeny a dietní informace",
+    "emptyCategory": "Zde zatím nic není",
+    "emptyCategoryHint": "Tato část se připravuje. Zeptejte se prosím obsluhy.",
+    "moreItems": "a {count, plural, one {# další jídlo} few {# další jídla} other {# dalších jídel}}",
+    "spiceLevel": "Pálivost {level} ze 3",
+    "highlights": {
+      "chefsPick": "Tip šéfkuchaře",
+      "new": "Novinka",
+      "seasonal": "Sezónní",
+      "popular": "Oblíbené"
+    }
+  },
+  "Availability": {
+    "available": "K dispozici",
+    "limited": "Poslední kusy",
+    "soldOut": "Vyprodáno"
+  },
+  "Price": {
+    "from": "od {price}",
+    "marketPrice": "Denní cena",
+    "askServer": "Zeptejte se obsluhy",
+    "variants": "Velikosti"
+  },
+  "DietaryMarkers": {
+    "vegetarian": "Vegetariánské",
+    "vegan": "Veganské",
+    "glutenFree": "Bez lepku",
+    "lactoseFree": "Bez laktózy",
+    "halal": "Halal",
+    "kosher": "Košer",
+    "spicy": "Pálivé",
+    "more": "{count, plural, one {# další označení} few {# další označení} other {# dalších označení}}"
+  },
+  "Allergens": {
+    "title": "Alergeny",
+    "legendHint": "Čísla odpovídají seznamu alergenů EU (1–14).",
+    "gluten": "Obiloviny obsahující lepek",
+    "crustaceans": "Korýši",
+    "eggs": "Vejce",
+    "fish": "Ryby",
+    "peanuts": "Arašídy",
+    "soy": "Sójové boby",
+    "milk": "Mléko",
+    "nuts": "Skořápkové plody",
+    "celery": "Celer",
+    "mustard": "Hořčice",
+    "sesame": "Sezamová semena",
+    "sulphites": "Oxid siřičitý a siřičitany",
+    "lupin": "Vlčí bob",
+    "molluscs": "Měkkýši"
+  },
+  "Ordering": {
+    "quantity": "Množství",
+    "increase": "Přidat jeden",
+    "decrease": "Ubrat jeden",
+    "add": "Přidat",
+    "remove": "Odebrat",
+    "selected": "Vybráno",
+    "subtotal": "Mezisoučet",
+    "total": "Celkem",
+    "note": "Poznámka pro kuchyni",
+    "notePlaceholder": "Alergie, preference, cokoliv dalšího",
+    "charactersLeft": "{count, plural, one {zbývá # znak} few {zbývají # znaky} other {zbývá # znaků}}",
+    "required": "Povinné",
+    "chooseOne": "Vyberte jednu možnost",
+    "chooseBetween": "Vyberte {min} až {max} možností",
+    "unavailable": "Nedostupné",
+    "review": "Zkontrolujte výběr",
+    "items": "{count, plural, one {# položka} few {# položky} other {# položek}}",
+    "status": {
+      "received": "Přijato",
+      "preparing": "Připravuje se",
+      "ready": "Připraveno",
+      "served": "Podáno",
+      "cancelled": "Zrušeno"
+    }
+  },
+  "Forms": {
+    "name": "Název jídla",
+    "description": "Popis",
+    "category": "Kategorie",
+    "image": "Fotografie",
+    "price": "Cena",
+    "dietary": "Dieta a alergeny",
+    "availability": "Dostupnost",
+    "save": "Uložit jídlo",
+    "saving": "Ukládá se…",
+    "saved": "Jídlo uloženo",
+    "saveFailed": "Jídlo se nepodařilo uložit",
+    "required": "Toto pole je povinné",
+    "selectCategory": "Vyberte kategorii"
+  },
+  "SampleMenu": {
+    "metaTitle": "Jídelní lístek – U Zlaté Lžíce",
+    "metaDescription": "Kompletní jídelní lístek restaurace U Zlaté Lžíce: české klasiky, dezerty a nápoje.",
+    "establishment": {
+      "name": "U Zlaté Lžíce",
+      "tagline": "Poctivá česká kuchyně od roku 1932",
+      "welcome": "Posaďte se a nespěchejte. Vše připravujeme na objednávku.",
+      "address": "Nerudova 14, 118 00 Praha 1",
+      "phone": "+420 257 531 108",
+      "website": "uzlatelzice.cz",
+      "hoursWeekdays": "Po–Pá",
+      "hoursWeekdaysValue": "11:00 – 23:00",
+      "hoursWeekend": "So–Ne",
+      "hoursWeekendValue": "12:00 – 22:00",
+      "noteVat": "Všechny ceny jsou včetně DPH.",
+      "noteAllergens": "Čísla alergenů odpovídají seznamu EU. Na cokoliv se zeptejte.",
+      "noteTip": "Obsluha není zahrnuta v ceně."
+    },
+    "categories": {
+      "starters": "Předkrmy",
+      "startersDescription": "Malá jídla a polévky na začátek",
+      "mains": "Hlavní jídla",
+      "mainsDescription": "Pomalu vařené klasiky s přílohou",
+      "desserts": "Dezerty",
+      "dessertsDescription": "Pečeme každé ráno u nás",
+      "drinks": "Nápoje",
+      "drinksDescription": "Tankové pivo, víno a domácí limonády"
+    },
+    "specials": "Dnešní nabídka",
+    "dishes": {
+      "bramboracka": "Bramboračka",
+      "bramborackaDescription": "Hustá polévka s majoránkou, sušenými houbami a česnekem, podávaná v chlebu.",
+      "utopenec": "Utopenec",
+      "utopenecDescription": "Špekáček naložený v octě s cibulí, paprikou a žitným chlebem.",
+      "tatarak": "Tatarský biftek",
+      "tatarakDescription": "Ručně sekané hovězí, dochucené u stolu, s topinkami a syrovým česnekem.",
+      "svickova": "Svíčková na smetaně",
+      "svickovaDescription": "Nedělní klasika: krémová omáčka z kořenové zeleniny, houskové knedlíky, brusinky a lžíce šlehačky.",
+      "gulas": "Hovězí guláš",
+      "gulasDescription": "Kližka dušená v tmavém pivě s cibulí a majoránkou.",
+      "smazenysyr": "Smažený eidam",
+      "smazenysyrDescription": "Sýr ve strouhance s bramborem a domácí tatarkou.",
+      "kachna": "Pečená kachna",
+      "kachnaDescription": "Kachna s křupavou kůží, červené zelí a dva druhy knedlíků.",
+      "rizek": "Vepřový řízek",
+      "rizekDescription": "Naklepaný natenko, smažený na másle, s bramborovým salátem.",
+      "koleno": "Pečené vepřové koleno dušené na tmavém pivě s křenem, hořčicí a čerstvě strouhaným křenem podávané na dřevěném prkénku",
+      "kolenoDescription": "Pro dva, nebo pro jednoho velmi odhodlaného hosta. Počítejte prosím se 40 minutami.",
+      "knedliky": "Švestkové knedlíky",
+      "knedlikyDescription": "Sypané tvarohem, přelité máslem a moučkovým cukrem.",
+      "medovnik": "Medovník",
+      "palacinky": "Palačinky",
+      "palacinkyDescription": "S meruňkovou marmeládou, vlašskými ořechy a šlehačkou.",
+      "pivo": "Tankový ležák",
+      "pivoDescription": "Nepasterizovaný, čepovaný z tanku ve sklepě.",
+      "limonada": "Domácí limonáda",
+      "limonadaDescription": "Bezinka, máta a citron. Zeptejte se na dnešní příchuť."
+    },
+    "variants": {
+      "small": "0,3 l",
+      "large": "0,5 l",
+      "half": "Půlka",
+      "whole": "Celá",
+      "portion": "Porce",
+      "double": "Velká porce"
+    }
   }
 }
