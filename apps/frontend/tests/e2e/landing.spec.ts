@@ -46,6 +46,33 @@ async function expectNoHorizontalScroll(page: Page) {
   ).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
+/**
+ * Walks the page so every reveal has fired, then waits for the transitions to
+ * finish.
+ *
+ * Without this, an audit can run while content below the fold is still at
+ * `opacity: 0` — and axe, quite correctly, reports transparent text as failing
+ * contrast. That is a true statement about a transient state and a false one
+ * about the page, and whether it happens depends on how loaded the machine is,
+ * which is the definition of a flaky test. Settling first audits the page a
+ * reader actually ends up looking at.
+ */
+async function settleReveals(page: Page) {
+  await page.evaluate(async () => {
+    const step = Math.max(window.innerHeight, 1);
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    window.scrollTo(0, 0);
+  });
+
+  await expect(page.locator('[data-reveal="hidden"]')).toHaveCount(0);
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== "running"),
+  );
+}
+
 async function expectNoAxeViolations(page: Page, context: string) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -251,6 +278,7 @@ test.describe("@us3 language, appearance and motion", () => {
       await page.emulateMedia({ colorScheme });
       await page.setViewportSize({ width: 375, height: 812 });
       await page.goto(path("de"));
+      await settleReveals(page);
       await expectNoAxeViolations(page, `de / ${colorScheme}`);
     }
   });

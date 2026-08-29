@@ -39,6 +39,8 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Metadata" });
+  const name = t("title");
+
   return {
     // Open Graph images must be absolute URLs. Declaring the base here lets
     // every page below write a relative path and lets the deployment decide the
@@ -46,8 +48,19 @@ export async function generateMetadata({
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
     ),
-    title: t("title"),
+    title: {
+      default: name,
+      // Pages below inherit "<their title> | Restaura". A page that is not ours
+      // to brand — a restaurant's own menu — opts out with `title.absolute`.
+      template: `%s | ${name}`,
+    },
     description: t("description"),
+    applicationName: name,
+    openGraph: {
+      siteName: name,
+      type: "website",
+      locale,
+    },
   };
 }
 

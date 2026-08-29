@@ -27,11 +27,16 @@ export async function generateMetadata({
   const og = getAsset("og");
 
   return {
-    title: t("meta.title"),
+    // Absolute: this title already carries the brand, and "Restaura — your
+    // menu, on every table | Restaura" is not a sentence anyone wrote.
+    title: { absolute: t("meta.title") },
     description: t("meta.description"),
     openGraph: {
       title: t("meta.title"),
       description: t("meta.description"),
+      // Next replaces `openGraph` wholesale rather than merging it, so the
+      // layout's siteName has to be restated here or the link preview loses it.
+      siteName: t("brand.name"),
       type: "website",
       locale,
       images: [
