@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "title": "Restaura",
+    "description": "Restaura – restaurant management made simple"
+  },
+  "LocaleSwitcher": {
+    "label": "Language"
+  },
+  "HomePage": {
+    "title": "Welcome to Restaura",
+    "description": "Your app is set up with Czech, English and German. Edit <code>app/[locale]/page.tsx</code> to get started.",
+    "cta": "Get started"
+  }
+}
