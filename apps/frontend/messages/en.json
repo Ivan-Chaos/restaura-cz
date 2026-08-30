@@ -122,7 +122,258 @@
       "legal": "Terms",
       "privacy": "Privacy",
       "contact": "Contact",
-      "copyright": "© {year} Restaura"
+      "copyright": "© {year} Restaura",
+      "cookies": "Cookies"
+    }
+  },
+  "Legal": {
+    "updated": "Last updated {date}",
+    "backHome": "Back to home",
+    "draftNotice": {
+      "title": "Draft — not yet in force",
+      "body": "The operator's registered details have not been configured for this deployment, so this document is incomplete and should not be relied on. Set the NEXT_PUBLIC_LEGAL_* environment variables and have the text reviewed by a lawyer before publishing."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "meta": {
+        "title": "Privacy policy",
+        "description": "What Restaura does with personal data: what we collect, why, who else is involved, and the rights you have."
+      },
+      "sections": {
+        "who": {
+          "title": "Who is responsible",
+          "body": [
+            "This service is operated by {name}, company number {companyId}, registered at {address}. For anything in this policy, write to {email}.",
+            "It covers the Restaura website and the digital menus published through it. It does not cover a restaurant's own website, or anything that happens after you follow a link away from ours."
+          ]
+        },
+        "whatWeCollect": {
+          "title": "What we collect",
+          "body": [
+            "Browsing this site: our hosting provider processes the technical data any web server receives — your IP address, the page requested, the time, and your browser's user-agent string — in order to deliver the page and keep the service secure.",
+            "Your preferences: the language you pick and whether you prefer a light or dark appearance are stored on your own device. They are not sent to us.",
+            "Writing to us: if you email us we process your address and whatever you tell us, in order to reply.",
+            "We use no analytics, no advertising and no tracking of any kind. We do not profile visitors, and we never sell personal data or hand it to anyone for their own purposes."
+          ]
+        },
+        "legalBasis": {
+          "title": "Why we are allowed to",
+          "body": [
+            "Delivering and securing the site rests on our legitimate interest in running a service that works and is not abused — Article 6(1)(f) GDPR.",
+            "Answering your enquiry rests on taking steps at your request before entering a contract, or on our legitimate interest in replying to people who write to us — Article 6(1)(b) and (f).",
+            "Anything that is not strictly necessary would rest on your consent under Article 6(1)(a), which you could withdraw at any time. Nothing on this site currently needs it."
+          ]
+        },
+        "storage": {
+          "title": "What we store on your device",
+          "body": [
+            "Three things, all first-party, none of which can follow you to another website: the language you chose, your light or dark preference, and a record of the answer you gave to our cookie notice.",
+            "The cookie policy lists each one, what it does and how long it lasts."
+          ]
+        },
+        "processors": {
+          "title": "Who else is involved",
+          "body": [
+            "Hosting: the site is served by our hosting provider, which processes connection data on our behalf under a data-processing agreement.",
+            "Media delivery: the video on our home page is served from Cloudflare R2, so requesting it means your IP address reaches Cloudflare, acting as our processor. That request is not made at all if your browser or system asks for reduced data or reduced motion, or if your screen is small.",
+            "Fonts are served from our own domain. No request is made to Google or any other font provider when you visit."
+          ]
+        },
+        "transfers": {
+          "title": "Transfers outside the EEA",
+          "body": [
+            "Cloudflare runs a global network, so media requests may be served from or routed through servers outside the European Economic Area. Those transfers rely on the European Commission's standard contractual clauses."
+          ]
+        },
+        "retention": {
+          "title": "How long we keep it",
+          "body": [
+            "Server logs are kept only as long as needed to operate and secure the service, then deleted or aggregated.",
+            "Email correspondence is kept as long as needed to deal with the matter, and afterwards only for as long as we are required to keep records.",
+            "Anything stored on your device stays until it expires or you clear it; the cookie policy gives the lifetimes."
+          ]
+        },
+        "rights": {
+          "title": "Your rights",
+          "body": [
+            "You may ask us for a copy of your personal data, to correct it, to erase it, to restrict or object to how we use it, and to receive it in a portable form. Where we rely on consent you may withdraw it at any time, without affecting what was lawful beforehand.",
+            "Write to {email} and we will answer within one month.",
+            "If you believe we have got it wrong you may complain to the {authority} ({authorityUrl}), or to the supervisory authority where you live."
+          ]
+        },
+        "children": {
+          "title": "Children",
+          "body": [
+            "This is a service for businesses. It is not directed at children and we do not knowingly collect their personal data."
+          ]
+        },
+        "changes": {
+          "title": "Changes",
+          "body": [
+            "If this policy changes materially we will update the date at the top, and where the change affects existing users we will tell them directly."
+          ]
+        }
+      }
+    },
+    "terms": {
+      "title": "Terms and conditions",
+      "meta": {
+        "title": "Terms and conditions",
+        "description": "The terms on which Restaura provides digital menus, PDF export and table QR codes."
+      },
+      "sections": {
+        "scope": {
+          "title": "These terms",
+          "body": [
+            "These terms govern your use of Restaura, operated by {name}, company number {companyId}, registered at {address}. By using the service you accept them.",
+            "If you are using the service for a business, you confirm you are entitled to accept these terms on its behalf."
+          ]
+        },
+        "service": {
+          "title": "What the service does",
+          "body": [
+            "Restaura lets a restaurant publish a digital menu, export the same menu as a printable PDF, and generate QR codes that open it at the table.",
+            "Anything described on our site as coming soon is a statement of intent, not a promise. It may change, arrive later than expected, or not arrive at all."
+          ]
+        },
+        "eligibility": {
+          "title": "Who may use it",
+          "body": [
+            "The service is intended for hospitality businesses and the people acting for them. You must be capable of entering into a contract."
+          ]
+        },
+        "yourContent": {
+          "title": "Your menu stays yours",
+          "body": [
+            "Everything you put into the service — dish names, descriptions, prices, photographs, your trade marks — remains yours. You grant us only the permission we need to host it, show it to your guests, and render it into the PDFs and QR codes you ask for.",
+            "You are responsible for having the right to use what you upload, and for what your menu says. Allergen information and prices in particular are yours to get right.",
+            "The Free plan includes a Restaura mark on generated PDFs and QR codes. Paid plans remove it."
+          ]
+        },
+        "acceptableUse": {
+          "title": "What you must not do",
+          "body": [
+            "Do not publish anything unlawful, misleading or infringing through the service. Do not attempt to break, overload, probe or reverse-engineer it, and do not resell it as your own.",
+            "We may suspend access that is doing any of these, and will tell you why."
+          ]
+        },
+        "plans": {
+          "title": "Plans and payment",
+          "body": [
+            "The Free plan is available now at no cost, within the limits shown on our pricing page.",
+            "Pro and Pro Plus are not yet available and cannot be purchased. Prices shown for them are indicative and may change before launch. The applicable price, billing terms and VAT treatment will be stated before any payment is taken."
+          ]
+        },
+        "availability": {
+          "title": "Availability",
+          "body": [
+            "We work to keep the service available, but we do not promise that it will be uninterrupted or free of errors. We may change, suspend or withdraw features, and will give reasonable notice where a change materially reduces something you rely on.",
+            "The service is early in its life. Please keep your own copy of your menu."
+          ]
+        },
+        "liability": {
+          "title": "Liability",
+          "body": [
+            "Nothing here limits liability that cannot be limited by law, including for damage caused intentionally or by gross negligence, and for harm to life or health.",
+            "Otherwise, and so far as Czech law permits, we are not liable for indirect or consequential loss, lost profit, lost custom or lost data, and our total liability for any claim is limited to the amount you paid us for the service in the twelve months before the claim arose."
+          ]
+        },
+        "termination": {
+          "title": "Ending it",
+          "body": [
+            "You may stop using the service and delete your menus at any time. We may end the arrangement on reasonable notice, or immediately if these terms are seriously breached.",
+            "After termination we will keep your menu content available to you for a reasonable period before deleting it."
+          ]
+        },
+        "changes": {
+          "title": "Changes to these terms",
+          "body": [
+            "We may update these terms. Where a change materially affects you we will give notice before it takes effect; continuing to use the service after that means you accept it."
+          ]
+        },
+        "law": {
+          "title": "Law and disputes",
+          "body": [
+            "These terms are governed by Czech law and the Czech courts have jurisdiction. If you are a consumer, this does not deprive you of the protection of the mandatory rules of the country where you live.",
+            "Consumers may also use the European Commission's online dispute resolution platform."
+          ]
+        }
+      }
+    },
+    "cookies": {
+      "title": "Cookie policy",
+      "meta": {
+        "title": "Cookie policy",
+        "description": "Exactly what Restaura stores on your device: three first-party items, no analytics and no tracking."
+      },
+      "sections": {
+        "what": {
+          "title": "What we store, and why so little",
+          "body": [
+            "We use no analytics, advertising or tracking cookies. Nothing we store can follow you to another website.",
+            "What we do store is limited to remembering choices you made yourself, and remembering the answer you gave to our cookie notice."
+          ]
+        },
+        "necessary": {
+          "title": "Strictly necessary storage",
+          "body": [
+            "These exist because you asked for something that needs them, so European law does not require us to ask permission first. All are first-party and none is shared."
+          ]
+        },
+        "analytics": {
+          "title": "Analytics and marketing",
+          "body": [
+            "None, today. If we ever add anything of the kind it will not run until you have actively agreed, and this page and the notice will describe what it does before you decide."
+          ]
+        },
+        "thirdParty": {
+          "title": "Third parties",
+          "body": [
+            "No third party stores anything on your device through this site. One third party does see a request: the video on our home page is served from Cloudflare, which receives your IP address in order to send it.",
+            "That video is not requested at all if your browser or system asks for reduced data or reduced motion, or if your screen is small."
+          ]
+        },
+        "managing": {
+          "title": "Changing your mind",
+          "body": [
+            "You can clear cookies and site data for this site at any time in your browser's settings, which also resets the choices remembered here.",
+            "You can withdraw or change the answer you gave to our notice with the button below."
+          ]
+        }
+      },
+      "table": {
+        "caption": "Everything this site stores on your device",
+        "name": "Name",
+        "purpose": "Purpose",
+        "type": "Type",
+        "duration": "Duration",
+        "category": "Category"
+      },
+      "entries": {
+        "locale": "Remembers the language you chose, so you are not sent back to the default on your next visit.",
+        "appearance": "Remembers whether you chose a light or dark appearance.",
+        "consent": "Remembers the answer you gave to the cookie notice, so we do not ask again."
+      },
+      "durations": {
+        "session": "Until you close the tab",
+        "persistent": "6 months"
+      },
+      "categories": {
+        "necessary": "Strictly necessary",
+        "analytics": "Analytics"
+      },
+      "reset": "Change my cookie choice",
+      "resetDone": "Your choice has been cleared. The notice will appear again."
+    },
+    "banner": {
+      "label": "Cookie notice",
+      "title": "About cookies on this site",
+      "noticeBody": "We store only what is needed to remember your language, your light or dark preference, and this choice. No analytics, no advertising, no tracking.",
+      "consentBody": "We would like to use optional cookies to understand how the site is used. They are not set unless you agree, and you can change your mind at any time.",
+      "acknowledge": "Got it",
+      "accept": "Accept optional",
+      "reject": "Reject optional",
+      "more": "Read the cookie policy"
     }
   },
   "LocaleSwitcher": {

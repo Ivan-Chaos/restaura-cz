@@ -122,7 +122,258 @@
       "legal": "AGB",
       "privacy": "Datenschutz",
       "contact": "Kontakt",
-      "copyright": "© {year} Restaura"
+      "copyright": "© {year} Restaura",
+      "cookies": "Cookies"
+    }
+  },
+  "Legal": {
+    "updated": "Zuletzt aktualisiert am {date}",
+    "backHome": "Zurück zur Startseite",
+    "draftNotice": {
+      "title": "Entwurf — noch nicht in Kraft",
+      "body": "Die Registerangaben des Betreibers sind für diese Installation nicht konfiguriert. Das Dokument ist daher unvollständig und nicht belastbar. Setzen Sie die Umgebungsvariablen NEXT_PUBLIC_LEGAL_* und lassen Sie den Text vor der Veröffentlichung anwaltlich prüfen."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "meta": {
+        "title": "Datenschutzerklärung",
+        "description": "Was Restaura mit personenbezogenen Daten macht: was wir verarbeiten, warum, wer sonst beteiligt ist und welche Rechte Sie haben."
+      },
+      "sections": {
+        "who": {
+          "title": "Wer verantwortlich ist",
+          "body": [
+            "Diesen Dienst betreibt {name}, Handelsregisternummer {companyId}, mit Sitz in {address}. Bei Fragen zu dieser Erklärung schreiben Sie an {email}.",
+            "Sie gilt für die Website von Restaura und die darüber veröffentlichten digitalen Speisekarten. Nicht erfasst sind die eigene Website eines Restaurants und alles, was nach dem Verlassen unserer Seiten geschieht."
+          ]
+        },
+        "whatWeCollect": {
+          "title": "Was wir verarbeiten",
+          "body": [
+            "Besuch der Website: Unser Hosting-Anbieter verarbeitet die technischen Daten, die jeder Webserver erhält — Ihre IP-Adresse, die angeforderte Seite, den Zeitpunkt und die Kennung Ihres Browsers — um die Seite auszuliefern und den Dienst abzusichern.",
+            "Ihre Einstellungen: Die gewählte Sprache und die Vorliebe für helles oder dunkles Erscheinungsbild werden auf Ihrem Gerät gespeichert. An uns übermittelt werden sie nicht.",
+            "Wenn Sie uns schreiben: Wir verarbeiten Ihre Adresse und den Inhalt Ihrer Nachricht, um zu antworten.",
+            "Wir setzen keinerlei Analyse, Werbung oder Tracking ein. Wir erstellen keine Profile und verkaufen personenbezogene Daten nicht und geben sie niemandem für dessen eigene Zwecke weiter."
+          ]
+        },
+        "legalBasis": {
+          "title": "Auf welcher Grundlage",
+          "body": [
+            "Auslieferung und Absicherung der Website stützen sich auf unser berechtigtes Interesse an einem funktionierenden und nicht missbrauchten Dienst — Art. 6 Abs. 1 lit. f DSGVO.",
+            "Die Beantwortung Ihrer Anfrage stützt sich auf vorvertragliche Maßnahmen auf Ihre Anfrage hin oder auf unser berechtigtes Interesse, Schreibenden zu antworten — Art. 6 Abs. 1 lit. b und f.",
+            "Alles, was nicht unbedingt erforderlich ist, würde auf Ihrer Einwilligung nach Art. 6 Abs. 1 lit. a beruhen, die Sie jederzeit widerrufen könnten. Derzeit erfordert nichts auf dieser Website eine solche."
+          ]
+        },
+        "storage": {
+          "title": "Was wir auf Ihrem Gerät speichern",
+          "body": [
+            "Drei Dinge, alle von uns selbst gesetzt, und keines davon kann Ihnen auf eine andere Website folgen: die gewählte Sprache, die Vorliebe für helles oder dunkles Erscheinungsbild und die Antwort auf unseren Cookie-Hinweis.",
+            "Die Cookie-Richtlinie führt zu jedem Eintrag auf, wozu er dient und wie lange er bleibt."
+          ]
+        },
+        "processors": {
+          "title": "Wer sonst beteiligt ist",
+          "body": [
+            "Hosting: Die Website wird von unserem Hosting-Anbieter ausgeliefert, der Verbindungsdaten in unserem Auftrag auf Grundlage eines Auftragsverarbeitungsvertrags verarbeitet.",
+            "Medienauslieferung: Das Video auf unserer Startseite wird aus Cloudflare R2 gestreamt. Beim Abruf gelangt Ihre IP-Adresse zu Cloudflare, das als unser Auftragsverarbeiter handelt. Dieser Abruf unterbleibt vollständig, wenn Ihr Browser oder System reduzierte Daten oder reduzierte Bewegung anfordert oder Ihr Bildschirm klein ist.",
+            "Schriften liefern wir von unserer eigenen Domain aus. Beim Besuch geht keine Anfrage an Google oder einen anderen Schriftanbieter."
+          ]
+        },
+        "transfers": {
+          "title": "Übermittlungen außerhalb des EWR",
+          "body": [
+            "Cloudflare betreibt ein globales Netz, daher können Medienanfragen von Servern außerhalb des Europäischen Wirtschaftsraums beantwortet oder über solche geleitet werden. Diese Übermittlungen stützen sich auf die Standardvertragsklauseln der Europäischen Kommission."
+          ]
+        },
+        "retention": {
+          "title": "Wie lange wir speichern",
+          "body": [
+            "Serverprotokolle bewahren wir nur so lange auf, wie es für Betrieb und Sicherheit nötig ist, danach werden sie gelöscht oder aggregiert.",
+            "E-Mail-Korrespondenz bewahren wir so lange auf, wie es zur Bearbeitung nötig ist, und darüber hinaus nur, soweit Aufbewahrungspflichten bestehen.",
+            "Was auf Ihrem Gerät gespeichert ist, bleibt, bis es abläuft oder Sie es löschen; die Fristen nennt die Cookie-Richtlinie."
+          ]
+        },
+        "rights": {
+          "title": "Ihre Rechte",
+          "body": [
+            "Sie können Auskunft über Ihre personenbezogenen Daten verlangen, deren Berichtigung oder Löschung, die Einschränkung der Verarbeitung, Widerspruch einlegen und Datenübertragbarkeit verlangen. Soweit wir uns auf eine Einwilligung stützen, können Sie diese jederzeit widerrufen, ohne dass die Rechtmäßigkeit der davor erfolgten Verarbeitung berührt wird.",
+            "Schreiben Sie an {email}; wir antworten innerhalb eines Monats.",
+            "Wenn Sie meinen, wir hätten etwas falsch gemacht, können Sie sich bei der {authority} ({authorityUrl}) oder bei der Aufsichtsbehörde Ihres Wohnorts beschweren."
+          ]
+        },
+        "children": {
+          "title": "Kinder",
+          "body": [
+            "Dies ist ein Dienst für Unternehmen. Er richtet sich nicht an Kinder, und wir erheben deren personenbezogene Daten nicht wissentlich."
+          ]
+        },
+        "changes": {
+          "title": "Änderungen",
+          "body": [
+            "Ändert sich diese Erklärung wesentlich, aktualisieren wir das Datum oben und informieren bestehende Nutzer unmittelbar, soweit die Änderung sie betrifft."
+          ]
+        }
+      }
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "meta": {
+        "title": "Allgemeine Geschäftsbedingungen",
+        "description": "Die Bedingungen, zu denen Restaura digitale Speisekarten, PDF-Export und Tisch-QR-Codes bereitstellt."
+      },
+      "sections": {
+        "scope": {
+          "title": "Diese Bedingungen",
+          "body": [
+            "Diese Bedingungen regeln Ihre Nutzung von Restaura, betrieben von {name}, Handelsregisternummer {companyId}, mit Sitz in {address}. Mit der Nutzung des Dienstes nehmen Sie sie an.",
+            "Nutzen Sie den Dienst für ein Unternehmen, bestätigen Sie, dass Sie berechtigt sind, diese Bedingungen für dieses anzunehmen."
+          ]
+        },
+        "service": {
+          "title": "Was der Dienst leistet",
+          "body": [
+            "Restaura ermöglicht es einem Restaurant, eine digitale Speisekarte zu veröffentlichen, dieselbe Karte als druckfertiges PDF zu exportieren und QR-Codes zu erzeugen, die sie am Tisch öffnen.",
+            "Was auf unserer Website als demnächst verfügbar bezeichnet wird, ist eine Absichtserklärung, kein Versprechen. Es kann sich ändern, später kommen oder ganz ausbleiben."
+          ]
+        },
+        "eligibility": {
+          "title": "Wer den Dienst nutzen darf",
+          "body": [
+            "Der Dienst richtet sich an Betriebe des Gastgewerbes und an Personen, die für sie handeln. Sie müssen geschäftsfähig sein."
+          ]
+        },
+        "yourContent": {
+          "title": "Ihre Karte bleibt Ihre",
+          "body": [
+            "Alles, was Sie einstellen — Gerichtsnamen, Beschreibungen, Preise, Fotos, Ihre Marken — bleibt Ihres. Sie räumen uns nur die Rechte ein, die wir brauchen, um es zu hosten, Ihren Gästen anzuzeigen und in die von Ihnen angeforderten PDFs und QR-Codes zu überführen.",
+            "Sie sind dafür verantwortlich, dass Sie die eingestellten Inhalte nutzen dürfen, und für den Inhalt Ihrer Karte. Insbesondere Allergenangaben und Preise liegen in Ihrer Verantwortung.",
+            "Der Free-Tarif enthält eine Restaura-Kennzeichnung auf erzeugten PDFs und QR-Codes. Bezahlte Tarife entfernen sie."
+          ]
+        },
+        "acceptableUse": {
+          "title": "Was untersagt ist",
+          "body": [
+            "Veröffentlichen Sie über den Dienst nichts Rechtswidriges, Irreführendes oder Rechte Verletzendes. Versuchen Sie nicht, ihn zu stören, zu überlasten, auszuspähen oder zurückzuentwickeln, und verkaufen Sie ihn nicht als eigenen weiter.",
+            "Zugänge, über die dies geschieht, können wir sperren; wir nennen Ihnen den Grund."
+          ]
+        },
+        "plans": {
+          "title": "Tarife und Zahlung",
+          "body": [
+            "Der Free-Tarif ist ab sofort kostenlos verfügbar, im Umfang unserer Preisseite.",
+            "Pro und Pro Plus sind noch nicht verfügbar und können nicht erworben werden. Die dafür genannten Preise sind unverbindlich und können sich bis zum Start ändern. Der geltende Preis, die Abrechnungsbedingungen und die umsatzsteuerliche Behandlung werden vor jeder Zahlung mitgeteilt."
+          ]
+        },
+        "availability": {
+          "title": "Verfügbarkeit",
+          "body": [
+            "Wir bemühen uns um Verfügbarkeit, versprechen aber keinen unterbrechungs- oder fehlerfreien Betrieb. Wir können Funktionen ändern, aussetzen oder einstellen und kündigen dies mit angemessener Frist an, wenn eine Änderung etwas wesentlich einschränkt, worauf Sie sich verlassen.",
+            "Der Dienst steht am Anfang. Bitte bewahren Sie eine eigene Kopie Ihrer Karte auf."
+          ]
+        },
+        "liability": {
+          "title": "Haftung",
+          "body": [
+            "Nichts hierin beschränkt eine Haftung, die nicht beschränkt werden kann — insbesondere für vorsätzlich oder grob fahrlässig verursachte Schäden sowie für Schäden an Leben und Gesundheit.",
+            "Im Übrigen und soweit tschechisches Recht dies zulässt, haften wir nicht für mittelbare Schäden oder Folgeschäden, entgangenen Gewinn, entgangene Kundschaft oder Datenverlust; unsere Gesamthaftung für einen Anspruch ist auf den Betrag begrenzt, den Sie uns in den zwölf Monaten vor Entstehen des Anspruchs für den Dienst gezahlt haben."
+          ]
+        },
+        "termination": {
+          "title": "Beendigung",
+          "body": [
+            "Sie können die Nutzung jederzeit beenden und Ihre Karten löschen. Wir können das Verhältnis mit angemessener Frist beenden, bei schwerwiegenden Verstößen gegen diese Bedingungen auch fristlos.",
+            "Nach Beendigung halten wir Ihre Karteninhalte für einen angemessenen Zeitraum für Sie bereit, bevor wir sie löschen."
+          ]
+        },
+        "changes": {
+          "title": "Änderungen dieser Bedingungen",
+          "body": [
+            "Wir können diese Bedingungen aktualisieren. Betrifft eine Änderung Sie wesentlich, kündigen wir sie vor Wirksamwerden an; die weitere Nutzung gilt dann als Annahme."
+          ]
+        },
+        "law": {
+          "title": "Recht und Streitigkeiten",
+          "body": [
+            "Diese Bedingungen unterliegen tschechischem Recht; zuständig sind die tschechischen Gerichte. Sind Sie Verbraucher, entzieht Ihnen das nicht den Schutz der zwingenden Vorschriften Ihres Wohnsitzstaats.",
+            "Verbraucher können zudem die Online-Streitbeilegungsplattform der Europäischen Kommission nutzen."
+          ]
+        }
+      }
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie",
+      "meta": {
+        "title": "Cookie-Richtlinie",
+        "description": "Genau das, was Restaura auf Ihrem Gerät speichert: drei eigene Einträge, keine Analyse, kein Tracking."
+      },
+      "sections": {
+        "what": {
+          "title": "Was wir speichern, und warum so wenig",
+          "body": [
+            "Wir setzen keine Analyse-, Werbe- oder Tracking-Cookies ein. Nichts, was wir speichern, kann Ihnen auf eine andere Website folgen.",
+            "Gespeichert wird nur, was Ihre eigenen Entscheidungen festhält, und die Antwort, die Sie unserem Cookie-Hinweis gegeben haben."
+          ]
+        },
+        "necessary": {
+          "title": "Unbedingt erforderliche Speicherung",
+          "body": [
+            "Diese Einträge bestehen, weil Sie etwas angefordert haben, das sie benötigt; europäisches Recht verlangt daher keine vorherige Einwilligung. Alle stammen von uns selbst und keiner wird geteilt."
+          ]
+        },
+        "analytics": {
+          "title": "Analyse und Marketing",
+          "body": [
+            "Heute keine. Sollten wir je etwas Derartiges einsetzen, läuft es erst, wenn Sie aktiv zugestimmt haben, und diese Seite sowie der Hinweis beschreiben vorher, was es tut."
+          ]
+        },
+        "thirdParty": {
+          "title": "Dritte",
+          "body": [
+            "Kein Dritter speichert über diese Website etwas auf Ihrem Gerät. Ein Dritter sieht allerdings eine Anfrage: Das Video auf unserer Startseite wird von Cloudflare ausgeliefert, das dafür Ihre IP-Adresse erhält.",
+            "Dieses Video wird gar nicht erst angefordert, wenn Ihr Browser oder System reduzierte Daten oder reduzierte Bewegung anfordert oder Ihr Bildschirm klein ist."
+          ]
+        },
+        "managing": {
+          "title": "Meinung ändern",
+          "body": [
+            "Sie können Cookies und Websitedaten für diese Seite jederzeit in den Browsereinstellungen löschen; damit werden auch die hier gemerkten Entscheidungen zurückgesetzt.",
+            "Ihre Antwort auf unseren Hinweis können Sie mit der Schaltfläche unten widerrufen oder ändern."
+          ]
+        }
+      },
+      "table": {
+        "caption": "Alles, was diese Website auf Ihrem Gerät speichert",
+        "name": "Name",
+        "purpose": "Zweck",
+        "type": "Art",
+        "duration": "Dauer",
+        "category": "Kategorie"
+      },
+      "entries": {
+        "locale": "Merkt sich die gewählte Sprache, damit Sie beim nächsten Besuch nicht wieder auf der Standardsprache landen.",
+        "appearance": "Merkt sich, ob Sie helles oder dunkles Erscheinungsbild gewählt haben.",
+        "consent": "Merkt sich Ihre Antwort auf den Cookie-Hinweis, damit wir nicht erneut fragen."
+      },
+      "durations": {
+        "session": "Bis zum Schließen des Tabs",
+        "persistent": "6 Monate"
+      },
+      "categories": {
+        "necessary": "Unbedingt erforderlich",
+        "analytics": "Analyse"
+      },
+      "reset": "Cookie-Auswahl ändern",
+      "resetDone": "Ihre Auswahl wurde gelöscht. Der Hinweis erscheint erneut."
+    },
+    "banner": {
+      "label": "Cookie-Hinweis",
+      "title": "Cookies auf dieser Website",
+      "noticeBody": "Wir speichern nur, was nötig ist, um Ihre Sprache, Ihr helles oder dunkles Erscheinungsbild und diese Auswahl zu merken. Keine Analyse, keine Werbung, kein Tracking.",
+      "consentBody": "Wir würden gern optionale Cookies einsetzen, um zu verstehen, wie die Website genutzt wird. Ohne Ihre Zustimmung werden sie nicht gesetzt, und Sie können Ihre Meinung jederzeit ändern.",
+      "acknowledge": "Verstanden",
+      "accept": "Optionale zulassen",
+      "reject": "Optionale ablehnen",
+      "more": "Cookie-Richtlinie lesen"
     }
   },
   "LocaleSwitcher": {

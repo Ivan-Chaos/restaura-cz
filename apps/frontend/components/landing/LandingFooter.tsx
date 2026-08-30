@@ -2,6 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { CtaButton } from "@/components/landing/CtaButton";
 import { Container } from "@/components/layout/Container";
+import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/menu/LanguageSwitcher";
 import { LANDING_CONTACT_EMAIL, resolveSignupHref } from "@/lib/landing/links";
 import { cn } from "@/lib/utils";
@@ -9,10 +10,15 @@ import { cn } from "@/lib/utils";
 /**
  * The last thing on the page, and the third place a convinced reader can act.
  *
- * The legal links point at a mailbox rather than at `#` or at routes that do
- * not exist: a placeholder that goes nowhere is worse than one that reaches a
- * human. They become real routes the day there are terms to link to.
+ * The legal links are also the only navigation to those documents, which is why
+ * they live in a labelled `<nav>` rather than loose in the markup — a visitor
+ * looking for the privacy policy is usually looking for it deliberately.
  */
+const LEGAL_LINKS = [
+  { href: "/terms", labelKey: "footer.legal" },
+  { href: "/privacy", labelKey: "footer.privacy" },
+  { href: "/cookies", labelKey: "footer.cookies" },
+] as const;
 export interface LandingFooterProps {
   className?: string;
 }
@@ -52,15 +58,21 @@ export function LandingFooter({ className }: LandingFooterProps) {
             aria-label={t("footer.legal")}
             className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm"
           >
-            <a href={contactHref} className="hover:text-foreground underline-offset-4 hover:underline">
+            <a
+              href={contactHref}
+              className="hover:text-foreground underline-offset-4 hover:underline"
+            >
               {t("footer.contact")}
             </a>
-            <a href={contactHref} className="hover:text-foreground underline-offset-4 hover:underline">
-              {t("footer.legal")}
-            </a>
-            <a href={contactHref} className="hover:text-foreground underline-offset-4 hover:underline">
-              {t("footer.privacy")}
-            </a>
+            {LEGAL_LINKS.map(({ href, labelKey }) => (
+              <Link
+                key={href}
+                href={href}
+                className="hover:text-foreground rounded-sm underline-offset-4 hover:underline"
+              >
+                {t(labelKey)}
+              </Link>
+            ))}
           </nav>
 
           <p className="text-muted-foreground text-sm">

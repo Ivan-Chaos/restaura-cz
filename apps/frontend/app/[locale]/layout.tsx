@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { AppearanceProvider } from "@/components/theme/AppearanceProvider";
+import { CookieBanner } from "@/components/legal/CookieBanner";
 import "../globals.css";
 
 /**
@@ -91,7 +92,16 @@ export default async function LocaleLayout({
           Removing it is what brings the shared bundle inside the 200 KB budget.
         */}
         <NextIntlClientProvider>
-          <AppearanceProvider>{children}</AppearanceProvider>
+          <AppearanceProvider>
+            {children}
+            {/*
+              Last in the DOM on purpose: it is fixed to the bottom of the
+              viewport visually, but it comes after the page in reading and tab
+              order, so it never stands between a visitor and the content they
+              came for.
+            */}
+            <CookieBanner />
+          </AppearanceProvider>
         </NextIntlClientProvider>
       </body>
     </html>
