@@ -225,77 +225,110 @@
         "scope": {
           "title": "Tyto podmínky",
           "body": [
-            "Tyto podmínky upravují užívání služby Restaura, kterou provozuje {name}, IČO {companyId}, se sídlem {address}. Užíváním služby je přijímáte.",
-            "Používáte-li službu pro podnikání, potvrzujete, že jste oprávněni tyto podmínky za daný subjekt přijmout."
+            "Tyto podmínky upravují poskytování a užívání služby Restaura, kterou provozuje {name}, IČO {companyId}, se sídlem {address}. Tvoří součást každé smlouvy, na jejímž základě službu poskytujeme, a jejím užíváním s nimi souhlasíte.",
+            "Služba je poskytována výhradně podnikatelům. Užíváním potvrzujete, že jednáte v rámci své podnikatelské činnosti, nikoli jako spotřebitel, a že jste oprávněni tyto podmínky přijmout za subjekt, který zastupujete.",
+            "Jelikož obě strany jednají jako podnikatelé, strany se dohodly, že se na tuto smlouvu nepoužijí ustanovení občanského zákoníku o smlouvách uzavíraných adhezním způsobem."
           ]
         },
         "service": {
           "title": "Co služba dělá",
           "body": [
             "Restaura umožňuje restauraci zveřejnit digitální menu, exportovat totéž menu jako PDF pro tisk a vygenerovat QR kódy, které je otevřou přímo u stolu.",
-            "Cokoli je na našem webu označeno jako připravované, je vyjádřením záměru, nikoli slibem. Může se změnit, přijít později, nebo nepřijít vůbec."
+            "Cokoli je kdekoli na našem webu označeno jako plánované či připravované, je pouze vyjádřením aktuálního záměru. Nejde o závazek, netvoří to součást této smlouvy a může se to změnit nebo být opuštěno bez oznámení."
           ]
         },
         "eligibility": {
-          "title": "Kdo může službu užívat",
+          "title": "Pouze pro podnikatele",
           "body": [
-            "Služba je určena podnikům v pohostinství a osobám, které za ně jednají. Musíte být způsobilí uzavřít smlouvu."
+            "Musíte být způsobilí uzavřít smlouvu a službu užívat k podnikatelským účelům. Spotřebitelům službu nenabízíme a přístup, který se jeví jako užívaný jinak, můžeme odmítnout nebo ukončit.",
+            "Odpovídáte za vše, co je prostřednictvím vašeho přístupu učiněno, včetně jednání vašich zaměstnanců a dalších osob, kterým užívání umožníte."
           ]
         },
         "yourContent": {
           "title": "Vaše menu zůstává vaše",
           "body": [
-            "Vše, co do služby vložíte — názvy jídel, popisy, ceny, fotografie, vaše ochranné známky — zůstává vaše. Udělujete nám pouze oprávnění nezbytné k tomu, abychom obsah hostovali, zobrazili jej vašim hostům a vykreslili do PDF a QR kódů, o které požádáte.",
-            "Odpovídáte za to, že máte právo vložený obsah užít, i za obsah samotného menu. Zejména informace o alergenech a ceny jsou na vás.",
-            "Tarif Zdarma zahrnuje označení Restaura na generovaných PDF a QR kódech. Placené tarify je odstraňují."
+            "Vše, co do služby vložíte — názvy jídel, popisy, ceny, fotografie, vaše ochranné známky — zůstává vaše. Udělujete nám pouze nevýhradní oprávnění nezbytné k tomu, abychom obsah hostovali, zobrazili jej vašim hostům a vykreslili do PDF a QR kódů, o které požádáte, a to po dobu užívání služby.",
+            "Potvrzujete, že k tomuto obsahu máte veškerá potřebná práva a že jeho zveřejněním neporušujete právní předpisy ani práva třetích osob.",
+            "Za obsah menu a za jeho soulad s předpisy o informacích o potravinách, alergenech, značení a uvádění cen odpovídáte výhradně vy. Obsah menu nekontrolujeme, neověřujeme ani neopravujeme a neodpovídáme za něj."
+          ]
+        },
+        "warranties": {
+          "title": "Služba je poskytována tak, jak je",
+          "body": [
+            "Služba je poskytována „tak, jak je“ a „podle dostupnosti“. V nejširším rozsahu, který české právo připouští, neposkytujeme žádné záruky ani ujištění jakéhokoli druhu, výslovné ani mlčky předpokládané, zejména co do jakosti, vhodnosti pro určitý účel, přesnosti či nepřerušovaného a bezchybného provozu.",
+            "Zejména nezaručujeme, že generovaná PDF či QR kódy jsou způsobilé k jakémukoli regulatornímu, smluvnímu nebo obchodnímu účelu, že služba splní vaše požadavky, ani že jakákoli vada bude odstraněna."
           ]
         },
         "acceptableUse": {
           "title": "Co je zakázáno",
           "body": [
-            "Prostřednictvím služby nezveřejňujte nic protiprávního, klamavého ani zasahujícího do práv jiných. Nepokoušejte se službu narušit, přetížit, zkoumat ani zpětně analyzovat a neprodávejte ji dál jako vlastní.",
-            "Přístup, který takto jedná, můžeme pozastavit a sdělíme vám proč."
+            "Prostřednictvím služby nezveřejňujte nic protiprávního, klamavého ani zasahujícího do práv jiných. Nepokoušejte se službu narušit, přetížit, zkoumat, obejít její ochrany ani ji zpětně analyzovat, nevyužívejte ji k vytvoření konkurenčního produktu a neprodávejte ji dál ani neposkytujte podlicence.",
+            "Přístup můžeme okamžitě pozastavit či omezit, bez předchozího oznámení a bez odpovědnosti, máme-li důvodně za to, že došlo k porušení tohoto článku, nebo hrozí-li další újma službě či jiným osobám."
           ]
         },
         "plans": {
           "title": "Tarify a platba",
           "body": [
-            "Tarif Zdarma je dostupný nyní, bezplatně, v rozsahu uvedeném na stránce s ceníkem.",
-            "Pro a Pro Plus zatím nejsou dostupné a nelze je zakoupit. Uvedené ceny jsou orientační a před spuštěním se mohou změnit. Platná cena, fakturační podmínky a režim DPH budou sděleny dříve, než dojde k jakékoli platbě."
+            "Tarif Zdarma je poskytován bezplatně, v rozsahu uvedeném na stránce s ceníkem, a bez jakéhokoli závazku ohledně jeho další dostupnosti.",
+            "Pro a Pro Plus nejsou dostupné a nelze je zakoupit. Uvedené ceny jsou pouze orientační a nezakládají nabídku ani závazek. Budou-li placené tarify zavedeny, bude platná cena, fakturační podmínky a režim DPH sjednán dříve, než dojde k jakékoli platbě."
           ]
         },
         "availability": {
           "title": "Dostupnost",
           "body": [
-            "Usilujeme o dostupnost služby, neslibujeme však provoz bez přerušení či chyb. Funkce můžeme měnit, pozastavit nebo zrušit; pokud změna podstatně omezí něco, na co spoléháte, oznámíme ji s přiměřeným předstihem.",
-            "Služba je na začátku své cesty. Uchovávejte si prosím vlastní kopii menu."
+            "Neposkytujeme žádnou záruku dostupnosti, provozuschopnosti, doby odezvy ani výkonu a žádný závazek úrovně služeb. Službu i kteroukoli její funkci můžeme kdykoli změnit, omezit, pozastavit nebo zrušit.",
+            "Údržbu můžeme provádět kdykoli. Nejsme povinni vaše data uchovávat, zálohovat ani obnovovat; vlastní aktuální kopii obsahu menu si proto uchovávejte trvale."
           ]
         },
         "liability": {
-          "title": "Odpovědnost",
+          "title": "Omezení odpovědnosti",
           "body": [
-            "Nic zde neomezuje odpovědnost, kterou omezit nelze — zejména za újmu způsobenou úmyslně nebo z hrubé nedbalosti a za újmu na životě či zdraví.",
-            "Jinak a v rozsahu, který české právo připouští, neodpovídáme za nepřímou či následnou škodu, ušlý zisk, ztrátu zákazníků ani ztrátu dat; naše celková odpovědnost z jakéhokoli nároku je omezena částkou, kterou jste nám za službu uhradili za dvanáct měsíců předcházejících vzniku nároku."
+            "V nejširším rozsahu, který české právo připouští, neodpovídáme za ušlý zisk, výnosy, obchodní příležitosti, smlouvy, dobrou pověst ani očekávané úspory; za ztrátu či poškození dat; za újmu vzniklou z obsahu menu, včetně nesprávných cen či údajů o alergenech; za újmu vzniklou z nedostupnosti, přerušení či prodlení; ani za jakoukoli nepřímou či následnou škodu, ať vznikne jakkoli.",
+            "Odpovídáme-li přes výše uvedené, je naše celková souhrnná odpovědnost ze všech nároků vzniklých v kterémkoli dvanáctiměsíčním období omezena částkou, kterou jste nám za službu v tomto období skutečně uhradili. Je-li služba poskytována bezplatně, je naše odpovědnost vyloučena v nejširším rozsahu, který právo připouští.",
+            "Nic v těchto podmínkách neomezuje odpovědnost, kterou nelze předem omezit, zejména odpovědnost za újmu způsobenou úmyslně nebo z hrubé nedbalosti a za újmu na přirozených právech člověka, včetně života a zdraví. Tento odstavec nerozšiřuje naši odpovědnost nad rámec toho, co vyžaduje zákon."
+          ]
+        },
+        "indemnity": {
+          "title": "Nároky třetích osob",
+          "body": [
+            "Odškodníte nás za jakýkoli nárok, řízení, ztrátu, škodu, sankci či náklad, včetně přiměřených nákladů právního zastoupení, který uplatní třetí osoba nebo který jí náleží a který vznikne z obsahu vašeho menu, z vašeho užívání služby nebo z porušení těchto podmínek.",
+            "O takovém nároku vás bez zbytečného odkladu vyrozumíme a bez vašeho souhlasu jej nevypořádáme; souhlas neodepřete bez rozumného důvodu."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Okolnosti mimo naši kontrolu",
+          "body": [
+            "Žádná ze stran neodpovídá za nesplnění či prodlení způsobené okolnostmi mimo její rozumnou kontrolu, zejména výpadky hostingu, sítí či jiných dodavatelů, selháním veřejných komunikačních sítí, výpadkem elektřiny, kybernetickým útokem, stávkou, epidemií, aktem orgánu veřejné moci, válkou nebo přírodní událostí."
+          ]
+        },
+        "claims": {
+          "title": "Uplatnění nároku",
+          "body": [
+            "Jakýkoli nárok nám musíte oznámit písemně a s dostatečnými podrobnostmi umožňujícími prošetření, a to do třiceti dnů ode dne, kdy jste se o rozhodných okolnostech dozvěděli.",
+            "Strany se dohodly, že promlčecí lhůta u práv vzniklých z této smlouvy nebo v souvislosti s ní činí jeden rok ode dne, kdy právo mohlo být uplatněno poprvé."
           ]
         },
         "termination": {
           "title": "Ukončení",
           "body": [
-            "Užívání služby můžete kdykoli ukončit a svá menu smazat. My můžeme spolupráci ukončit s přiměřenou výpovědní dobou, při závažném porušení těchto podmínek i okamžitě.",
-            "Po ukončení vám obsah menu po přiměřenou dobu zpřístupníme, než jej smažeme."
+            "Užívání služby můžete kdykoli ukončit a svá menu smazat.",
+            "Přístup k bezplatnému tarifu můžeme kdykoli a z jakéhokoli důvodu ukončit či pozastavit, a to bez odpovědnosti. Je-li sjednán placený tarif, můžeme jej ukončit s třicetidenní výpovědní dobou, při podstatném porušení, úpadku či protiprávním užívání i okamžitě.",
+            "Po ukončení vám obsah menu zpřístupníme po dobu třiceti dnů, poté může být smazán. Ukončením nejsou dotčena práva a povinnosti vzniklé před ním."
           ]
         },
         "changes": {
           "title": "Změny podmínek",
           "body": [
-            "Podmínky můžeme aktualizovat. Pokud se vás změna podstatně dotkne, oznámíme ji před nabytím účinnosti; pokračováním v užívání služby ji přijímáte."
+            "Tyto podmínky můžeme změnit. Aktualizované znění zveřejníme a tam, kde se změna podstatně dotkne vás, vás o ní vyrozumíme před nabytím účinnosti. Pokračováním v užívání služby změnu přijímáte.",
+            "Každá ze stran na sebe přebírá nebezpečí změny okolností ve smyslu občanského zákoníku."
           ]
         },
         "law": {
-          "title": "Rozhodné právo a spory",
+          "title": "Rozhodné právo",
           "body": [
-            "Tyto podmínky se řídí českým právem a k rozhodování sporů jsou příslušné české soudy. Jste-li spotřebitel, nezbavuje vás to ochrany podle kogentních předpisů státu, v němž máte bydliště.",
-            "Spotřebitelé mohou využít také platformu Evropské komise pro řešení sporů online."
+            "Tyto podmínky a vše, co z nich vzniká, se řídí českým právem s vyloučením jeho kolizních norem a Úmluvy OSN o smlouvách o mezinárodní koupi zboží.",
+            "Pokud se něco pokazí, ozvěte se nejdřív nám. Napište na {email} a v dobré víře s vámi budeme hledat nápravu; téměř vše se vyřeší touto cestou.",
+            "Tyto podmínky jsou zveřejněny v češtině, angličtině a němčině. V případě rozporu mezi jazykovými verzemi má přednost verze česká. Co mezi námi vyřešit nelze, spadá do výlučné pravomoci českých soudů příslušných podle našeho sídla."
           ]
         }
       }

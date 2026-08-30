@@ -30,10 +30,14 @@ export type LegalSectionKey =
   | "terms.sections.service"
   | "terms.sections.eligibility"
   | "terms.sections.yourContent"
+  | "terms.sections.warranties"
   | "terms.sections.acceptableUse"
   | "terms.sections.plans"
   | "terms.sections.availability"
   | "terms.sections.liability"
+  | "terms.sections.indemnity"
+  | "terms.sections.forceMajeure"
+  | "terms.sections.claims"
   | "terms.sections.termination"
   | "terms.sections.changes"
   | "terms.sections.law"
@@ -85,10 +89,14 @@ export const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
       "terms.sections.service",
       "terms.sections.eligibility",
       "terms.sections.yourContent",
+      "terms.sections.warranties",
       "terms.sections.acceptableUse",
       "terms.sections.plans",
       "terms.sections.availability",
       "terms.sections.liability",
+      "terms.sections.indemnity",
+      "terms.sections.forceMajeure",
+      "terms.sections.claims",
       "terms.sections.termination",
       "terms.sections.changes",
       "terms.sections.law",

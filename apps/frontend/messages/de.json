@@ -225,77 +225,110 @@
         "scope": {
           "title": "Diese Bedingungen",
           "body": [
-            "Diese Bedingungen regeln Ihre Nutzung von Restaura, betrieben von {name}, Handelsregisternummer {companyId}, mit Sitz in {address}. Mit der Nutzung des Dienstes nehmen Sie sie an.",
-            "Nutzen Sie den Dienst für ein Unternehmen, bestätigen Sie, dass Sie berechtigt sind, diese Bedingungen für dieses anzunehmen."
+            "Diese Bedingungen regeln die Bereitstellung und Nutzung von Restaura, betrieben von {name}, Registernummer {companyId}, mit Sitz in {address}. Sie sind Bestandteil jeder Vereinbarung, auf deren Grundlage wir den Dienst bereitstellen; mit der Nutzung stimmen Sie ihnen zu.",
+            "Der Dienst wird ausschließlich Unternehmern bereitgestellt. Mit der Nutzung bestätigen Sie, dass Sie in Ausübung Ihrer gewerblichen oder beruflichen Tätigkeit und nicht als Verbraucher handeln und dass Sie berechtigt sind, diese Bedingungen für das von Ihnen vertretene Unternehmen anzunehmen.",
+            "Da beide Parteien als Unternehmer handeln, vereinbaren die Parteien, dass die Bestimmungen des tschechischen Bürgerlichen Gesetzbuchs über im Wege des Beitritts geschlossene Verträge auf diese Vereinbarung keine Anwendung finden."
           ]
         },
         "service": {
           "title": "Was der Dienst leistet",
           "body": [
             "Restaura ermöglicht es einem Restaurant, eine digitale Speisekarte zu veröffentlichen, dieselbe Karte als druckfertiges PDF zu exportieren und QR-Codes zu erzeugen, die sie am Tisch öffnen.",
-            "Was auf unserer Website als demnächst verfügbar bezeichnet wird, ist eine Absichtserklärung, kein Versprechen. Es kann sich ändern, später kommen oder ganz ausbleiben."
+            "Was auf unserer Website als geplant oder demnächst verfügbar bezeichnet wird, ist lediglich eine Absichtserklärung. Es ist keine Zusage, wird nicht Bestandteil dieser Vereinbarung und kann sich ohne Ankündigung ändern oder entfallen."
           ]
         },
         "eligibility": {
-          "title": "Wer den Dienst nutzen darf",
+          "title": "Nur für Unternehmen",
           "body": [
-            "Der Dienst richtet sich an Betriebe des Gastgewerbes und an Personen, die für sie handeln. Sie müssen geschäftsfähig sein."
+            "Sie müssen geschäftsfähig sein und den Dienst zu geschäftlichen Zwecken nutzen. Verbrauchern bieten wir den Dienst nicht an; Zugänge, die anderweitig genutzt zu werden scheinen, können wir ablehnen oder beenden.",
+            "Sie sind für alles verantwortlich, was über Ihren Zugang geschieht, einschließlich durch Ihre Mitarbeiter und sonstige Personen, denen Sie die Nutzung gestatten."
           ]
         },
         "yourContent": {
           "title": "Ihre Karte bleibt Ihre",
           "body": [
-            "Alles, was Sie einstellen — Gerichtsnamen, Beschreibungen, Preise, Fotos, Ihre Marken — bleibt Ihres. Sie räumen uns nur die Rechte ein, die wir brauchen, um es zu hosten, Ihren Gästen anzuzeigen und in die von Ihnen angeforderten PDFs und QR-Codes zu überführen.",
-            "Sie sind dafür verantwortlich, dass Sie die eingestellten Inhalte nutzen dürfen, und für den Inhalt Ihrer Karte. Insbesondere Allergenangaben und Preise liegen in Ihrer Verantwortung.",
-            "Der Free-Tarif enthält eine Restaura-Kennzeichnung auf erzeugten PDFs und QR-Codes. Bezahlte Tarife entfernen sie."
+            "Alles, was Sie einstellen — Gerichtsnamen, Beschreibungen, Preise, Fotos, Ihre Marken — bleibt Ihres. Sie räumen uns nur das einfache Recht ein, das wir benötigen, um es zu hosten, Ihren Gästen anzuzeigen und in die von Ihnen angeforderten PDFs und QR-Codes zu überführen, und zwar für die Dauer Ihrer Nutzung.",
+            "Sie bestätigen, dass Ihnen sämtliche für diese Inhalte erforderlichen Rechte zustehen und dass deren Veröffentlichung weder Gesetze noch Rechte Dritter verletzt.",
+            "Für den Inhalt Ihrer Karte und dessen Vereinbarkeit mit den Vorschriften über Lebensmittelinformation, Allergene, Kennzeichnung und Preisangaben sind allein Sie verantwortlich. Wir prüfen, verifizieren und korrigieren Karteninhalte nicht und haften nicht dafür."
+          ]
+        },
+        "warranties": {
+          "title": "Bereitstellung wie besehen",
+          "body": [
+            "Der Dienst wird „wie besehen“ und „nach Verfügbarkeit“ bereitgestellt. Im weitestmöglichen nach tschechischem Recht zulässigen Umfang geben wir keinerlei Gewährleistungen oder Zusicherungen ab, weder ausdrücklich noch stillschweigend, insbesondere nicht hinsichtlich Qualität, Eignung für einen bestimmten Zweck, Richtigkeit oder unterbrechungs- und fehlerfreien Betriebs.",
+            "Insbesondere sichern wir nicht zu, dass erzeugte PDFs oder QR-Codes für regulatorische, vertragliche oder geschäftliche Zwecke geeignet sind, dass der Dienst Ihren Anforderungen entspricht oder dass Mängel behoben werden."
           ]
         },
         "acceptableUse": {
           "title": "Was untersagt ist",
           "body": [
-            "Veröffentlichen Sie über den Dienst nichts Rechtswidriges, Irreführendes oder Rechte Verletzendes. Versuchen Sie nicht, ihn zu stören, zu überlasten, auszuspähen oder zurückzuentwickeln, und verkaufen Sie ihn nicht als eigenen weiter.",
-            "Zugänge, über die dies geschieht, können wir sperren; wir nennen Ihnen den Grund."
+            "Veröffentlichen Sie über den Dienst nichts Rechtswidriges, Irreführendes oder Rechte Verletzendes. Versuchen Sie nicht, ihn zu stören, zu überlasten, auszuspähen, Schutzmaßnahmen zu umgehen oder zurückzuentwickeln, ihn zum Aufbau eines Konkurrenzprodukts zu nutzen, ihn weiterzuverkaufen oder unterzulizenzieren.",
+            "Wir können den Zugang sofort, ohne Ankündigung und ohne Haftung sperren oder einschränken, wenn wir begründet annehmen, dass gegen diesen Abschnitt verstoßen wurde oder eine weitere Nutzung dem Dienst oder Dritten zu schaden droht."
           ]
         },
         "plans": {
           "title": "Tarife und Zahlung",
           "body": [
-            "Der Free-Tarif ist ab sofort kostenlos verfügbar, im Umfang unserer Preisseite.",
-            "Pro und Pro Plus sind noch nicht verfügbar und können nicht erworben werden. Die dafür genannten Preise sind unverbindlich und können sich bis zum Start ändern. Der geltende Preis, die Abrechnungsbedingungen und die umsatzsteuerliche Behandlung werden vor jeder Zahlung mitgeteilt."
+            "Der Free-Tarif wird kostenlos im Umfang unserer Preisseite bereitgestellt, ohne jede Zusage zu seiner weiteren Verfügbarkeit.",
+            "Pro und Pro Plus sind nicht verfügbar und können nicht erworben werden. Dafür genannte Preise sind unverbindlich und begründen weder Angebot noch Verpflichtung. Werden bezahlte Tarife eingeführt, werden Preis, Abrechnungsbedingungen und umsatzsteuerliche Behandlung vor jeder Zahlung vereinbart."
           ]
         },
         "availability": {
           "title": "Verfügbarkeit",
           "body": [
-            "Wir bemühen uns um Verfügbarkeit, versprechen aber keinen unterbrechungs- oder fehlerfreien Betrieb. Wir können Funktionen ändern, aussetzen oder einstellen und kündigen dies mit angemessener Frist an, wenn eine Änderung etwas wesentlich einschränkt, worauf Sie sich verlassen.",
-            "Der Dienst steht am Anfang. Bitte bewahren Sie eine eigene Kopie Ihrer Karte auf."
+            "Wir sagen keine Verfügbarkeit, Betriebszeit, Reaktionszeit oder Leistung zu und geben keinerlei Service-Level-Zusage. Wir können den Dienst und jede Funktion jederzeit ändern, einschränken, aussetzen oder einstellen.",
+            "Wartungsarbeiten können wir jederzeit durchführen. Wir sind nicht verpflichtet, Ihre Daten aufzubewahren, zu sichern oder wiederherzustellen; halten Sie daher jederzeit eine eigene aktuelle Kopie Ihrer Karteninhalte vor."
           ]
         },
         "liability": {
-          "title": "Haftung",
+          "title": "Haftungsbeschränkung",
           "body": [
-            "Nichts hierin beschränkt eine Haftung, die nicht beschränkt werden kann — insbesondere für vorsätzlich oder grob fahrlässig verursachte Schäden sowie für Schäden an Leben und Gesundheit.",
-            "Im Übrigen und soweit tschechisches Recht dies zulässt, haften wir nicht für mittelbare Schäden oder Folgeschäden, entgangenen Gewinn, entgangene Kundschaft oder Datenverlust; unsere Gesamthaftung für einen Anspruch ist auf den Betrag begrenzt, den Sie uns in den zwölf Monaten vor Entstehen des Anspruchs für den Dienst gezahlt haben."
+            "Im weitestmöglichen nach tschechischem Recht zulässigen Umfang haften wir nicht für entgangenen Gewinn, Umsatz, Geschäfte, Verträge, Geschäftswert oder erwartete Einsparungen; für Verlust oder Beschädigung von Daten; für Schäden aus Karteninhalten, einschließlich unrichtiger Preise oder Allergenangaben; für Schäden aus Nichtverfügbarkeit, Unterbrechung oder Verzögerung; sowie für mittelbare Schäden und Folgeschäden, gleich aus welchem Grund.",
+            "Soweit wir dennoch haften, ist unsere Gesamthaftung für sämtliche in einem Zwölfmonatszeitraum entstehenden Ansprüche auf den Betrag begrenzt, den Sie uns in diesem Zeitraum tatsächlich für den Dienst gezahlt haben. Wird der Dienst unentgeltlich bereitgestellt, ist unsere Haftung im weitestmöglichen zulässigen Umfang ausgeschlossen.",
+            "Nichts in diesen Bedingungen beschränkt eine Haftung, die im Voraus nicht beschränkt werden kann, insbesondere für vorsätzlich oder grob fahrlässig verursachte Schäden sowie für Schäden an den natürlichen Rechten einer Person einschließlich Leben und Gesundheit. Dieser Absatz erweitert unsere Haftung nicht über das gesetzlich Gebotene hinaus."
+          ]
+        },
+        "indemnity": {
+          "title": "Ansprüche Dritter",
+          "body": [
+            "Sie stellen uns von allen Ansprüchen, Verfahren, Verlusten, Schäden, Sanktionen und Kosten einschließlich angemessener Rechtsverfolgungskosten frei, die von Dritten erhoben werden oder diesen zustehen und aus Ihren Karteninhalten, Ihrer Nutzung des Dienstes oder Ihrem Verstoß gegen diese Bedingungen entstehen.",
+            "Wir werden Sie über solche Ansprüche unverzüglich informieren und sie nicht ohne Ihre Zustimmung regeln; die Zustimmung werden Sie nicht unbillig verweigern."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Umstände außerhalb unserer Kontrolle",
+          "body": [
+            "Keine Partei haftet für Ausfälle oder Verzögerungen aufgrund von Umständen außerhalb ihres zumutbaren Einflussbereichs, insbesondere Störungen bei Hosting-, Netz- oder anderen Anbietern, Ausfall öffentlicher Kommunikationsnetze, Stromausfall, Cyberangriff, Arbeitskampf, Epidemie, hoheitlicher Maßnahme, Krieg oder Naturereignis."
+          ]
+        },
+        "claims": {
+          "title": "Geltendmachung von Ansprüchen",
+          "body": [
+            "Sie müssen uns jeden Anspruch schriftlich und mit für eine Prüfung ausreichenden Angaben innerhalb von dreißig Tagen anzeigen, nachdem Sie von den zugrunde liegenden Umständen Kenntnis erlangt haben.",
+            "Die Parteien vereinbaren, dass die Verjährungsfrist für Rechte aus oder im Zusammenhang mit dieser Vereinbarung ein Jahr beträgt, gerechnet ab dem Tag, an dem das Recht erstmals hätte ausgeübt werden können."
           ]
         },
         "termination": {
           "title": "Beendigung",
           "body": [
-            "Sie können die Nutzung jederzeit beenden und Ihre Karten löschen. Wir können das Verhältnis mit angemessener Frist beenden, bei schwerwiegenden Verstößen gegen diese Bedingungen auch fristlos.",
-            "Nach Beendigung halten wir Ihre Karteninhalte für einen angemessenen Zeitraum für Sie bereit, bevor wir sie löschen."
+            "Sie können die Nutzung jederzeit beenden und Ihre Karten löschen.",
+            "Den Zugang zu einem kostenlosen Tarif können wir jederzeit und aus beliebigem Grund ohne Haftung beenden oder aussetzen. Besteht ein bezahlter Tarif, können wir ihn mit einer Frist von dreißig Tagen beenden, bei wesentlicher Vertragsverletzung, Insolvenz oder rechtswidriger Nutzung auch fristlos.",
+            "Nach Beendigung halten wir Ihre Karteninhalte dreißig Tage für Sie bereit; danach können sie gelöscht werden. Vor der Beendigung entstandene Rechte und Pflichten bleiben unberührt."
           ]
         },
         "changes": {
           "title": "Änderungen dieser Bedingungen",
           "body": [
-            "Wir können diese Bedingungen aktualisieren. Betrifft eine Änderung Sie wesentlich, kündigen wir sie vor Wirksamwerden an; die weitere Nutzung gilt dann als Annahme."
+            "Wir können diese Bedingungen ändern. Wir veröffentlichen die aktualisierte Fassung und informieren Sie vor Wirksamwerden, soweit eine Änderung Sie wesentlich betrifft. Die weitere Nutzung gilt als Annahme.",
+            "Jede Partei übernimmt das Risiko einer Änderung der Umstände im Sinne des tschechischen Bürgerlichen Gesetzbuchs."
           ]
         },
         "law": {
-          "title": "Recht und Streitigkeiten",
+          "title": "Anwendbares Recht",
           "body": [
-            "Diese Bedingungen unterliegen tschechischem Recht; zuständig sind die tschechischen Gerichte. Sind Sie Verbraucher, entzieht Ihnen das nicht den Schutz der zwingenden Vorschriften Ihres Wohnsitzstaats.",
-            "Verbraucher können zudem die Online-Streitbeilegungsplattform der Europäischen Kommission nutzen."
+            "Diese Bedingungen und alles, was aus ihnen entsteht, unterliegen tschechischem Recht unter Ausschluss seiner Kollisionsnormen und des UN-Kaufrechts.",
+            "Wenn etwas schiefgeht, wenden Sie sich zuerst an uns. Schreiben Sie an {email}, und wir suchen gemeinsam nach Treu und Glauben eine Lösung; fast alles klärt sich auf diesem Weg.",
+            "Diese Bedingungen werden auf Tschechisch, Englisch und Deutsch veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist die tschechische Fassung maßgeblich. Was zwischen uns nicht geklärt werden kann, unterliegt der ausschließlichen Zuständigkeit der für unseren Sitz zuständigen tschechischen Gerichte."
           ]
         }
       }

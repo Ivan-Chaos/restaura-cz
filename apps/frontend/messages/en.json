@@ -225,77 +225,110 @@
         "scope": {
           "title": "These terms",
           "body": [
-            "These terms govern your use of Restaura, operated by {name}, company number {companyId}, registered at {address}. By using the service you accept them.",
-            "If you are using the service for a business, you confirm you are entitled to accept these terms on its behalf."
+            "These terms govern the provision and use of Restaura, operated by {name}, company number {companyId}, registered at {address}. They form part of every agreement under which we provide the service, and by using it you agree to them.",
+            "The service is provided to businesses only. By using it you confirm that you act in the course of your business or profession and not as a consumer, and that you are authorised to accept these terms for the business you represent.",
+            "As both parties act as entrepreneurs, the parties agree that the provisions of the Czech Civil Code on contracts concluded by way of adhesion do not apply to this agreement."
           ]
         },
         "service": {
           "title": "What the service does",
           "body": [
-            "Restaura lets a restaurant publish a digital menu, export the same menu as a printable PDF, and generate QR codes that open it at the table.",
-            "Anything described on our site as coming soon is a statement of intent, not a promise. It may change, arrive later than expected, or not arrive at all."
+            "Restaura lets a restaurant publish a digital menu, export that menu as a printable PDF, and generate QR codes that open it at the table.",
+            "Anything described anywhere on our site as planned or coming soon is a statement of present intention only. It is not a commitment, forms no part of this agreement, and may change or be abandoned without notice."
           ]
         },
         "eligibility": {
-          "title": "Who may use it",
+          "title": "Business use only",
           "body": [
-            "The service is intended for hospitality businesses and the people acting for them. You must be capable of entering into a contract."
+            "You must be capable of entering into a contract and must use the service for business purposes. We do not offer the service to consumers and may decline or end access that appears to be used otherwise.",
+            "You are responsible for everything done through your access, including by your staff and anyone else you allow to use it."
           ]
         },
         "yourContent": {
           "title": "Your menu stays yours",
           "body": [
-            "Everything you put into the service — dish names, descriptions, prices, photographs, your trade marks — remains yours. You grant us only the permission we need to host it, show it to your guests, and render it into the PDFs and QR codes you ask for.",
-            "You are responsible for having the right to use what you upload, and for what your menu says. Allergen information and prices in particular are yours to get right.",
-            "The Free plan includes a Restaura mark on generated PDFs and QR codes. Paid plans remove it."
+            "Everything you put into the service — dish names, descriptions, prices, photographs, your trade marks — remains yours. You grant us only the non-exclusive permission we need to host it, show it to your guests and render it into the PDFs and QR codes you ask for, for as long as you use the service.",
+            "You confirm that you hold every right needed for that content, and that publishing it breaks no law and infringes nobody's rights.",
+            "You alone are responsible for what your menu says and for its compliance with food-information, allergen, labelling and price-display rules. We do not check, verify or correct menu content and are not responsible for it."
+          ]
+        },
+        "warranties": {
+          "title": "The service is provided as it is",
+          "body": [
+            "The service is provided on an “as is” and “as available” basis. To the fullest extent Czech law permits, we give no warranties, conditions or guarantees of any kind, express or implied, including as to quality, fitness for a particular purpose, accuracy, or uninterrupted or error-free operation.",
+            "In particular, we do not warrant that generated PDFs or QR codes are fit for any regulatory, contractual or commercial purpose, that the service will meet your requirements, or that any defect will be corrected."
           ]
         },
         "acceptableUse": {
           "title": "What you must not do",
           "body": [
-            "Do not publish anything unlawful, misleading or infringing through the service. Do not attempt to break, overload, probe or reverse-engineer it, and do not resell it as your own.",
-            "We may suspend access that is doing any of these, and will tell you why."
+            "Do not publish anything unlawful, misleading or infringing through the service. Do not attempt to disrupt, overload, probe, circumvent or reverse-engineer it, use it to build a competing product, or resell or sublicense it.",
+            "We may suspend or restrict access immediately, without notice and without liability, where we reasonably believe this section has been breached or where continued access risks harm to the service or to others."
           ]
         },
         "plans": {
           "title": "Plans and payment",
           "body": [
-            "The Free plan is available now at no cost, within the limits shown on our pricing page.",
-            "Pro and Pro Plus are not yet available and cannot be purchased. Prices shown for them are indicative and may change before launch. The applicable price, billing terms and VAT treatment will be stated before any payment is taken."
+            "The Free plan is provided at no charge, within the limits shown on our pricing page, and without any commitment as to its continued availability.",
+            "Pro and Pro Plus are not available and cannot be purchased. Any prices shown for them are indicative only and create no offer or obligation. If paid plans are introduced, the applicable price, billing terms and VAT treatment will be agreed before any payment is taken."
           ]
         },
         "availability": {
           "title": "Availability",
           "body": [
-            "We work to keep the service available, but we do not promise that it will be uninterrupted or free of errors. We may change, suspend or withdraw features, and will give reasonable notice where a change materially reduces something you rely on.",
-            "The service is early in its life. Please keep your own copy of your menu."
+            "We give no guarantee of availability, uptime, response time or performance, and no service-level commitment of any kind. We may change, limit, suspend or withdraw the service or any feature at any time.",
+            "We may carry out maintenance at any time. We are not obliged to retain, back up or restore your data, and you should keep your own current copy of your menu content at all times."
           ]
         },
         "liability": {
-          "title": "Liability",
+          "title": "Limitation of liability",
           "body": [
-            "Nothing here limits liability that cannot be limited by law, including for damage caused intentionally or by gross negligence, and for harm to life or health.",
-            "Otherwise, and so far as Czech law permits, we are not liable for indirect or consequential loss, lost profit, lost custom or lost data, and our total liability for any claim is limited to the amount you paid us for the service in the twelve months before the claim arose."
+            "To the fullest extent permitted by Czech law we are not liable for: lost profit, revenue, business, contracts, goodwill or anticipated savings; loss or corruption of data; loss arising from menu content, including incorrect prices or allergen information; loss arising from unavailability, interruption or delay; or any indirect or consequential loss, in each case however it arises.",
+            "Where we are liable despite the above, our total aggregate liability for all claims arising in any twelve-month period is limited to the amount you actually paid us for the service in that period. Where the service is provided free of charge, our liability is excluded to the fullest extent the law permits.",
+            "Nothing in these terms limits liability that cannot lawfully be limited in advance, in particular liability for harm caused intentionally or by gross negligence and for harm to a person's natural rights, including life and health. This paragraph does not extend our liability beyond what the law requires."
+          ]
+        },
+        "indemnity": {
+          "title": "Claims brought by others",
+          "body": [
+            "You will indemnify us against any claim, proceeding, loss, damage, penalty or cost, including reasonable legal costs, that is brought by or owed to a third party and arises from your menu content, your use of the service, or your breach of these terms.",
+            "We will tell you promptly of any such claim and will not settle it without your agreement, which you will not unreasonably withhold."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Events outside our control",
+          "body": [
+            "Neither party is liable for any failure or delay caused by circumstances beyond its reasonable control, including outages at hosting, network or other suppliers, failure of public communications networks, power failure, cyber-attack, industrial action, epidemic, act of a public authority, war or natural event."
+          ]
+        },
+        "claims": {
+          "title": "Notifying a claim",
+          "body": [
+            "You must notify us of any claim in writing, with enough detail for us to investigate, within thirty days of becoming aware of the circumstances giving rise to it.",
+            "The parties agree that the limitation period for rights arising from or relating to this agreement is one year, running from the day the right could first have been exercised."
           ]
         },
         "termination": {
           "title": "Ending it",
           "body": [
-            "You may stop using the service and delete your menus at any time. We may end the arrangement on reasonable notice, or immediately if these terms are seriously breached.",
-            "After termination we will keep your menu content available to you for a reasonable period before deleting it."
+            "You may stop using the service and delete your menus at any time.",
+            "We may end or suspend access to a free plan at any time, for any reason, without liability. Where a paid plan is in place we may end it on thirty days' notice, or immediately for material breach, insolvency or unlawful use.",
+            "After termination we will keep your menu content available to you for thirty days, after which it may be deleted. Termination does not affect any right or liability that arose before it."
           ]
         },
         "changes": {
           "title": "Changes to these terms",
           "body": [
-            "We may update these terms. Where a change materially affects you we will give notice before it takes effect; continuing to use the service after that means you accept it."
+            "We may change these terms. We will publish the updated version and, where a change materially affects you, tell you before it takes effect. Continuing to use the service after that means you accept it.",
+            "Each party assumes the risk of a change of circumstances within the meaning of the Czech Civil Code."
           ]
         },
         "law": {
-          "title": "Law and disputes",
+          "title": "Governing law",
           "body": [
-            "These terms are governed by Czech law and the Czech courts have jurisdiction. If you are a consumer, this does not deprive you of the protection of the mandatory rules of the country where you live.",
-            "Consumers may also use the European Commission's online dispute resolution platform."
+            "These terms, and anything arising from them, are governed by Czech law, excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods.",
+            "If something goes wrong, tell us first. Write to {email} and we will work with you in good faith to put it right; almost everything is resolved this way.",
+            "These terms are published in Czech, English and German. In the event of any discrepancy between the versions, the Czech version prevails. Anything that cannot be resolved between us falls under the exclusive jurisdiction of the Czech courts having jurisdiction over our registered seat."
           ]
         }
       }

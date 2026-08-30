@@ -36,7 +36,14 @@ export const Terms: Story = {
   render: () => <LegalDocument document={getLegalDocument("terms")} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getAllByRole("heading", { level: 2 })).toHaveLength(11);
+    await expect(canvas.getAllByRole("heading", { level: 2 })).toHaveLength(15);
+
+    // The carve-out for intent, gross negligence and harm to life or health is
+    // not optional under Czech law, and a limitation clause that omits it can
+    // be struck down whole. It is load-bearing *for us*, so it is asserted.
+    await expect(canvasElement.textContent).toMatch(
+      /gross negligence|hrubé nedbalosti|grob fahrlässig/i,
+    );
   },
 };
 
