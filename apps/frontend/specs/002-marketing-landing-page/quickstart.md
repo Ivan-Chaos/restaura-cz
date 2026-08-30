@@ -128,3 +128,41 @@ Worth running once before the page is publicly linked.
 3. The hero poster budget was raised from 180 KB to 256 KB. The committed file is the source
    `next/image` re-encodes from, not what a visitor downloads, so the budget governs repository
    weight rather than LCP.
+
+---
+
+## Hero video (added 2026-08-29)
+
+The hero's moving picture is Pexels 6321912 (*People Eating Healthy Foods*, cottonbro studio),
+streamed from the project's own R2 bucket rather than committed:
+
+```
+https://pub-1ab2f4df12124ef28ddfc89ae67880ea.r2.dev/public_assets/6321912-uhd_4096_2160_25fps.mp4
+```
+
+**Measured**: 132 MB, 4096×2160, 62.8 s, `Accept-Ranges: bytes` (a range request returns 206, so
+it genuinely streams). In a real browser the `<video>` mounts ~150 ms after the `load` event and
+begins playing with ~1.2 s buffered — it does not download the file to start.
+
+**How it is kept off the critical path** — all asserted in `tests/e2e/landing.spec.ts`:
+
+| Guard | Behaviour |
+|-------|-----------|
+| Not requested before `load` + idle | `videoRequests` is empty at `domcontentloaded` |
+| Streams from our bucket over https | first request matches `https://*.r2.dev/` |
+| Skipped under reduced motion | zero video requests, zero `<video>` elements |
+| Skipped on phones (< 768 px) | zero video requests at 390 px |
+| Skipped on reduced-data / Save-Data / sub-4G | read at decision time in `HeroVideo` |
+| Never blocks first paint | poster is server-rendered with `preload`; video mounts client-side |
+
+The e2e suite blocks and records video requests rather than downloading them, so the tests stay
+fast and do not depend on the bucket being reachable.
+
+**Outstanding — worth doing before launch.** The source is a 62.8 s UHD master at roughly
+17 Mbit/s. A desktop visitor who lets the loop run pulls the full ~132 MB. Transcoding to 1080p
+at 3–4 Mbit/s and trimming to 10–15 s would put it near 5 MB — visually identical once scaled
+into a hero, and ~25× less data. The manifest takes a new URL and nothing else changes.
+
+**Also outstanding**: `public/landing/hero.jpg` is still the original dining-room photograph, so
+the poster and the clip show different scenes and the crossfade reads as a cut. A still exported
+from the video would make the transition seamless (and would become the mobile hero).

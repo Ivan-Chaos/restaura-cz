@@ -34,6 +34,26 @@ const VIEWPORTS = [
 
 const path = (locale: string) => `/${locale}`;
 
+/** The hero clip lives in our bucket, not in `public/`. */
+const VIDEO_PATTERN = /\.(mp4|webm)(\?|$)/;
+
+/**
+ * Records every attempt to fetch the hero clip and refuses all of them.
+ *
+ * The clip is a 130 MB 4K file on a real CDN. Letting the suite pull it would
+ * make every test slower, flakier and dependent on a bucket being reachable,
+ * for no assertion that needs the bytes — what the tests care about is *whether
+ * it was asked for*, which the recorded list answers exactly.
+ */
+function watchVideoRequests(page: Page): string[] {
+  const requested: string[] = [];
+  page.route(VIDEO_PATTERN, (route) => {
+    requested.push(route.request().url());
+    return route.abort();
+  });
+  return requested;
+}
+
 async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => {
     const el = document.documentElement;
@@ -84,6 +104,15 @@ async function expectNoAxeViolations(page: Page, context: string) {
 
   expect(results.violations, `${context}\n  ${summary}`).toEqual([]);
 }
+
+/**
+ * Every test gets the clip blocked and its requests recorded. Assigning to a
+ * module-level binding is safe because a worker runs its tests one at a time.
+ */
+let videoRequests: string[] = [];
+test.beforeEach(async ({ page }) => {
+  videoRequests = watchVideoRequests(page);
+});
 
 test.describe("@us1 the offer", () => {
   for (const locale of LOCALES) {
@@ -287,14 +316,7 @@ test.describe("@us3 language, appearance and motion", () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.setViewportSize({ width: 375, height: 812 });
-
-    const videoRequests: string[] = [];
-    page.on("request", (request) => {
-      if (/\.(mp4|webm)(\?|$)/.test(request.url())) {
-        videoRequests.push(request.url());
-      }
-    });
+    await page.setViewportSize({ width: 1440, height: 900 });
 
     await page.goto(path("cs"));
     await page.waitForLoadState("networkidle");
@@ -314,6 +336,54 @@ test.describe("@us3 language, appearance and motion", () => {
 
     // And with the reveal disabled, the content is still there.
     await expect(page.locator("[data-capability]")).toHaveCount(3);
+  });
+
+  test("streams the hero clip on a desktop, and only after the page has loaded", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(path("cs"));
+
+    // Nothing may have been requested by the time the page is usable — the
+    // clip waits for `load` and then for an idle moment.
+    await page.waitForLoadState("domcontentloaded");
+    expect(
+      videoRequests,
+      "the clip was fetched before the page had finished loading",
+    ).toEqual([]);
+
+    // Then it arrives, from our bucket, over https.
+    await expect
+      .poll(() => videoRequests.length, { timeout: 10_000 })
+      .toBeGreaterThan(0);
+    expect(videoRequests[0]).toMatch(/^https:\/\/[^/]+\.r2\.dev\//);
+
+    // Decorative, so it is kept away from assistive technology entirely.
+    const video = page.locator("video");
+    await expect(video).toHaveAttribute("aria-hidden", "true");
+    await expect(video).toHaveAttribute("playsinline", /.*/);
+
+    // `muted` is asserted as a property, not an attribute: React assigns it
+    // directly and never reflects it into the markup. The property is what
+    // Chrome's autoplay policy reads, so it is also the one that matters —
+    // but it means "is the attribute there?" is the wrong question to ask.
+    await expect(video).toHaveJSProperty("muted", true);
+    await expect(video).toHaveJSProperty("loop", true);
+  });
+
+  test("leaves the clip alone on a phone", async ({ page }) => {
+    // A 4K stream scaled into a 390px viewport is somebody's data plan spent on
+    // pixels they cannot see. Phones keep the poster.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path("cs"));
+    await page.waitForLoadState("load");
+    await page.waitForTimeout(4000);
+
+    expect(videoRequests, "a phone should never fetch the clip").toEqual([]);
+    await expect(page.locator("video")).toHaveCount(0);
+
+    // The poster is doing the work instead, and is still the LCP candidate.
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
   });
 
   test("shows every section when JavaScript never runs", async ({ browser }) => {

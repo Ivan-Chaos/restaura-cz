@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { Landing } from "@/components/landing/Landing";
 import { routing } from "@/i18n/routing";
 import { assetSrc, getAsset } from "@/lib/landing/assets";
-import { hasAssetFile } from "@/lib/landing/assets.server";
 
 /**
  * The marketing landing page — the site's front door, and for most restaurant
@@ -64,10 +63,8 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
   // Keeps the page statically rendered for this locale.
   setRequestLocale(locale);
 
-  // The hero clip is optional media (Pexels gates its video files). Resolving
-  // it here, at build time, means the built HTML is right either way: no
-  // <video> pointing at a 404, and no flag anyone has to remember to flip.
-  const clip = getAsset("heroClip");
-
-  return <Landing heroClip={hasAssetFile(clip) ? clip : undefined} />;
+  // The clip streams from our bucket, so it is always available to offer.
+  // Whether a given visitor is offered it at all is `HeroVideo`'s decision,
+  // and it is made in the browser, where the answer actually lives.
+  return <Landing heroClip={getAsset("heroClip")} />;
 }

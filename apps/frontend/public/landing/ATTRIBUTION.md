@@ -7,10 +7,10 @@ Every file below comes from [Pexels](https://www.pexels.com) and is used under t
 attribution required. We record it anyway — the people who made these photographs
 deserve the credit, and knowing the source makes replacing an asset a two-minute job.
 
-| File | Author | Source |
-|------|--------|--------|
-| `landing/hero.jpg` | [Chan Walrus](https://www.pexels.com/@chanwalrus/) | [Pexels #67468](https://www.pexels.com/photo/restaurant-interior-67468/) |
-| `landing/hero.mp4` | [Rostislav Uzunov](https://www.pexels.com/@rostislav/) | [Pexels #3298832](https://www.pexels.com/video/a-restaurant-s-interior-design-3298832/) |
-| `landing/digital-menu.jpg` | [Anna Tarazevich](https://www.pexels.com/@anntarazevich/) | [Pexels #4839756](https://www.pexels.com/photo/close-up-of-a-woman-using-a-smartphone-4839756/) |
-| `landing/pdf.jpg` | [Rachel Claire](https://www.pexels.com/@rachel-claire/) | [Pexels #4921400](https://www.pexels.com/photo/person-holding-a-menu-4921400/) |
-| `landing/og.jpg` | [Chan Walrus](https://www.pexels.com/@chanwalrus/) | [Pexels #67468](https://www.pexels.com/photo/restaurant-interior-67468/) |
+| File | Delivery | Author | Source |
+|------|----------|--------|--------|
+| `landing/hero.jpg` | download | [Chan Walrus](https://www.pexels.com/@chanwalrus/) | [Pexels #67468](https://www.pexels.com/photo/restaurant-interior-67468/) |
+| `https://pub-1ab2f4df12124ef28ddfc89ae67880ea.r2.dev/public_assets/6321912-uhd_4096_2160_25fps.mp4` | stream | [cottonbro studio](https://www.pexels.com/@cottonbro/) | [Pexels #6321912](https://www.pexels.com/video/people-eating-healthy-foods-6321912/) |
+| `landing/digital-menu.jpg` | download | [Anna Tarazevich](https://www.pexels.com/@anntarazevich/) | [Pexels #4839756](https://www.pexels.com/photo/close-up-of-a-woman-using-a-smartphone-4839756/) |
+| `landing/pdf.jpg` | download | [Rachel Claire](https://www.pexels.com/@rachel-claire/) | [Pexels #4921400](https://www.pexels.com/photo/person-holding-a-menu-4921400/) |
+| `landing/og.jpg` | download | [Chan Walrus](https://www.pexels.com/@chanwalrus/) | [Pexels #67468](https://www.pexels.com/photo/restaurant-interior-67468/) |

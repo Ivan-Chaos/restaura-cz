@@ -69,19 +69,20 @@ function readManifest() {
 
     entries.push({
       id,
+      delivery: str("delivery") ?? "download",
       kind: str("kind"),
       pexelsId: num("pexelsId"),
       pageUrl: str("pageUrl"),
       author: str("author"),
       authorUrl: str("authorUrl"),
       downloadUrl: str("downloadUrl"),
+      streamUrl: str("streamUrl"),
       file: str("file"),
       width: num("width"),
       height: num("height"),
       maxBytes: bytes
         ? Number(bytes[1]) * (bytes[2] === "MB" ? 1024 * 1024 : 1024)
         : Number.POSITIVE_INFINITY,
-      optional: /\boptional:\s*true/.test(chunk),
     });
   }
 
@@ -159,25 +160,24 @@ function readDimensions(buffer) {
 /* ------------------------------------------------------------- reporting -- */
 
 const problems = [];
-const warnings = [];
 
-/** Optional assets degrade to a warning: the page is built to do without them. */
-const fail = (asset, reason) =>
-  (asset.optional ? warnings : problems).push(`${asset.file}: ${reason}`);
+const fail = (asset, reason) => problems.push(`${asset.file}: ${reason}`);
 
+/**
+ * Streamed assets have nothing on disk to check. Their URL is covered by
+ * `tests/unit/landing-assets.test.ts`, and by the network at runtime — this
+ * script deliberately does not reach across it to prove a bucket is up.
+ */
 function validate(asset) {
+  if (asset.delivery === "stream") return;
+
   const path = join(PUBLIC_DIR, asset.file);
 
   let size;
   try {
     size = statSync(path).size;
   } catch {
-    fail(
-      asset,
-      asset.optional
-        ? `not present — download it from ${asset.pageUrl} and save it as public/${asset.file}`
-        : "missing — run `pnpm assets:landing`",
-    );
+    fail(asset, "missing — run `pnpm assets:landing`");
     return;
   }
 
@@ -253,7 +253,7 @@ function writeAttribution(assets) {
   const rows = assets
     .map(
       (a) =>
-        `| \`${a.file}\` | [${a.author}](${a.authorUrl}) | [Pexels #${a.pexelsId}](${a.pageUrl}) |`,
+        `| \`${a.file ?? a.streamUrl}\` | ${a.delivery} | [${a.author}](${a.authorUrl}) | [Pexels #${a.pexelsId}](${a.pageUrl}) |`,
     )
     .join("\n");
 
@@ -266,8 +266,8 @@ Every file below comes from [Pexels](https://www.pexels.com) and is used under t
 attribution required. We record it anyway — the people who made these photographs
 deserve the credit, and knowing the source makes replacing an asset a two-minute job.
 
-| File | Author | Source |
-|------|--------|--------|
+| File | Delivery | Author | Source |
+|------|----------|--------|--------|
 ${rows}
 `;
 
@@ -294,6 +294,13 @@ if (!CHECK_ONLY) {
   const key = process.env.PEXELS_API_KEY;
 
   for (const asset of assets) {
+    if (asset.delivery === "stream") {
+      console.log(`  ~ ${asset.streamUrl}`);
+      console.log("    (streamed from our bucket — nothing to fetch)");
+      if (key) await verifyAuthor(asset, key);
+      continue;
+    }
+
     const path = join(PUBLIC_DIR, asset.file);
     const exists = (() => {
       try {
@@ -317,16 +324,15 @@ if (!CHECK_ONLY) {
 
 for (const asset of assets) validate(asset);
 
-if (warnings.length > 0) {
-  console.warn(`\n! ${warnings.length} optional asset(s) unavailable:`);
-  for (const warning of warnings) console.warn(`    ${warning}`);
-}
-
 if (problems.length > 0) {
   console.error(`\n✗ ${problems.length} asset problem(s):`);
   for (const problem of problems) console.error(`    ${problem}`);
   process.exit(1);
 }
 
-const required = assets.length - warnings.length;
-console.log(`\n✓ ${required} required landing asset(s) present and within budget`);
+const committed = assets.filter((a) => a.delivery !== "stream").length;
+const streamed = assets.length - committed;
+console.log(
+  `\n✓ ${committed} committed asset(s) present and within budget` +
+    (streamed ? `, ${streamed} streamed` : ""),
+);

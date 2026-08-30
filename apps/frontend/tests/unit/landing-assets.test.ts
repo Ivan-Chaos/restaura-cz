@@ -9,27 +9,33 @@ import en from "@/messages/en.json";
 import {
   assetSrc,
   getAsset,
+  isStreamed,
   LANDING_ASSETS,
-  type MediaAsset,
+  type DownloadedAsset,
   type MediaAssetId,
 } from "@/lib/landing/assets";
 
 /**
- * The manifest claims things about files on disk — dimensions `next/image` will
- * reserve space from, budgets that keep the repository sane, authors we credit.
- * Nothing checks those claims at runtime, so they are checked here. A re-crop
- * that forgets to update `width`/`height` shows up as layout shift in
- * production; it shows up as a failing test in a second.
+ * The manifest claims things nothing checks at runtime — dimensions
+ * `next/image` reserves space from, budgets that keep the repository sane,
+ * authors we credit. They are checked here instead. A re-crop that forgets to
+ * update `width`/`height` shows up as layout shift in production; it shows up
+ * as a failing test in a second.
+ *
+ * Streamed assets are deliberately checked less: the file is not ours to stat,
+ * and reaching across the network would make this suite depend on a bucket
+ * being up. What can be checked without leaving the machine is checked.
  */
 
 const PUBLIC_DIR = join(process.cwd(), "public");
 const CATALOGUES = { cs, en, de } as const;
 
-const pathOf = (asset: MediaAsset) => join(PUBLIC_DIR, asset.file);
-const present = (asset: MediaAsset) => existsSync(pathOf(asset));
+const DOWNLOADED = LANDING_ASSETS.filter(
+  (asset): asset is DownloadedAsset => asset.delivery === "download",
+);
+const STREAMED = LANDING_ASSETS.filter(isStreamed);
 
-/** Required assets must exist; optional ones (the hero clip) may not yet. */
-const REQUIRED = LANDING_ASSETS.filter((asset) => !asset.optional);
+const pathOf = (asset: DownloadedAsset) => join(PUBLIC_DIR, asset.file);
 
 /** Minimal JPEG/PNG header parse — the same check the fetch script performs. */
 function readDimensions(
@@ -84,21 +90,14 @@ describe("landing asset manifest", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("keeps the required media in the repository", () => {
-    for (const asset of REQUIRED) {
-      expect(present(asset), `${asset.file} is missing`).toBe(true);
-    }
-  });
-
-  it("never hot-links: every src is a local path", () => {
-    for (const asset of LANDING_ASSETS) {
-      expect(assetSrc(asset)).toBe(`/${asset.file}`);
-      expect(assetSrc(asset).startsWith("/landing/")).toBe(true);
+  it("keeps every downloaded asset in the repository", () => {
+    for (const asset of DOWNLOADED) {
+      expect(existsSync(pathOf(asset)), `${asset.file} is missing`).toBe(true);
     }
   });
 
   it("stays inside its size budget", () => {
-    for (const asset of LANDING_ASSETS.filter(present)) {
+    for (const asset of DOWNLOADED) {
       const size = statSync(pathOf(asset)).size;
       expect(
         size,
@@ -110,9 +109,7 @@ describe("landing asset manifest", () => {
   it("declares the dimensions the file actually has", () => {
     // `next/image` reserves space from these numbers; if they lie, the page
     // shifts under the visitor as the photograph arrives.
-    for (const asset of LANDING_ASSETS.filter(
-      (a) => a.kind === "image" && present(a),
-    )) {
+    for (const asset of DOWNLOADED.filter((a) => a.kind === "image")) {
       const dimensions = readDimensions(readFileSync(pathOf(asset)));
       expect(dimensions, `could not parse ${asset.file}`).not.toBeNull();
       expect({ file: asset.file, ...dimensions }).toEqual({
@@ -123,8 +120,46 @@ describe("landing asset manifest", () => {
     }
   });
 
+  it("resolves a local path for committed media and a URL for streamed media", () => {
+    for (const asset of DOWNLOADED) {
+      expect(assetSrc(asset)).toBe(`/${asset.file}`);
+      expect(assetSrc(asset).startsWith("/landing/")).toBe(true);
+    }
+    for (const asset of STREAMED) {
+      expect(assetSrc(asset)).toBe(asset.streamUrl);
+    }
+  });
+
   it("throws rather than rendering an unknown asset", () => {
-    expect(() => getAsset("nope" as MediaAssetId)).toThrow(/Unknown landing asset/);
+    expect(() => getAsset("nope" as MediaAssetId)).toThrow(
+      /Unknown landing asset/,
+    );
+  });
+});
+
+describe("streamed media", () => {
+  it("streams only over https, from a host we control", () => {
+    // Hot-linking someone else's CDN is the failure this rules out: a URL that
+    // can rotate under us takes the hero with it.
+    for (const asset of STREAMED) {
+      const url = new URL(asset.streamUrl);
+      expect(url.protocol).toBe("https:");
+      expect(url.hostname).toMatch(/\.r2\.dev$/);
+    }
+  });
+
+  it("declares a mime type, so the browser can skip what it cannot play", () => {
+    for (const asset of STREAMED) {
+      expect(asset.mimeType).toMatch(/^video\//);
+    }
+  });
+
+  it("is the only way video is delivered", () => {
+    // A video small enough to commit would be a different decision; today the
+    // one clip we have is far past that line, and this records the expectation.
+    for (const asset of LANDING_ASSETS.filter((a) => a.kind === "video")) {
+      expect(isStreamed(asset), `${asset.id} should stream`).toBe(true);
+    }
   });
 });
 
@@ -142,8 +177,8 @@ describe("landing asset descriptions", () => {
   }
 
   it("leaves only decorative media without a description", () => {
-    // The hero clip is the one exception: it repeats the poster's scene and is
-    // hidden from assistive technology, so describing it would be noise.
+    // The hero clip is the one exception: it shows the same room the poster
+    // does and is hidden from assistive technology, so describing it is noise.
     const undescribed = LANDING_ASSETS.filter((a) => a.altKey === null);
     expect(undescribed.map((a) => a.id)).toEqual(["heroClip"]);
   });
@@ -157,11 +192,11 @@ describe("attribution", () => {
 
   it("credits every photographer and links every source", () => {
     // Pexels does not require this. We do it because the file is also how the
-    // next person finds and replaces an asset.
+    // next person finds and replaces an asset — streamed ones included, which
+    // are the easiest to forget precisely because they are not in the tree.
     for (const asset of LANDING_ASSETS) {
       expect(attribution, `${asset.id}: author`).toContain(asset.author);
       expect(attribution, `${asset.id}: source`).toContain(asset.pageUrl);
-      expect(attribution, `${asset.id}: file`).toContain(asset.file);
     }
   });
 

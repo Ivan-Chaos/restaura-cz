@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { CtaButton } from "@/components/landing/CtaButton";
 import { HeroVideo } from "@/components/landing/HeroVideo";
 import { Container } from "@/components/layout/Container";
-import { assetSrc, type MediaAsset } from "@/lib/landing/assets";
+import { assetSrc, isStreamed, type MediaAsset } from "@/lib/landing/assets";
 import { resolveSignupHref } from "@/lib/landing/links";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +58,11 @@ export function Hero({ poster, clip, className }: HeroProps) {
       />
 
       {clip ? (
-        <HeroVideo src={assetSrc(clip)} poster={assetSrc(poster)} />
+        <HeroVideo
+          src={assetSrc(clip)}
+          poster={assetSrc(poster)}
+          type={isStreamed(clip) ? clip.mimeType : undefined}
+        />
       ) : null}
 
       {/* Darkest where the words are, thinning towards the edges so the

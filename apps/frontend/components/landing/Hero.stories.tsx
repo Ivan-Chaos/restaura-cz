@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { getAsset, type MediaAsset } from "@/lib/landing/assets";
+import {
+  getAsset,
+  type DownloadedAsset,
+  type MediaAsset,
+} from "@/lib/landing/assets";
 
 import { Hero } from "./Hero";
 
@@ -34,7 +38,7 @@ const clip = getAsset("heroClip");
 
 /** A file that will 404 — the browser's own broken-image path, not a mock. */
 const missing: MediaAsset = {
-  ...poster,
+  ...(poster as DownloadedAsset),
   file: "landing/does-not-exist.jpg",
 };
 

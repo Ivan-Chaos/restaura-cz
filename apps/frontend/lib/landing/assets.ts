@@ -10,10 +10,17 @@
  *     dimensions and budget claimed here,
  *   - the components read `width`/`height` so `next/image` can reserve space.
  *
- * Media is downloaded and committed, never hot-linked: a marketing page that
- * silently loses its hero because a CDN URL rotated is worse than a slightly
- * larger repository. Alt text lives in the message catalogues, not here — a
- * description of a photograph is prose, and prose is translated.
+ * Every asset is delivered one of two ways, and the `delivery` field says which:
+ *
+ *   `download` — fetched once and committed. Never hot-linked from someone
+ *     else's CDN, because a marketing page that silently loses its hero when a
+ *     URL rotates is worse than a slightly larger repository.
+ *   `stream`   — served from our own object storage and range-requested as it
+ *     plays. For video, where committing the file is not an option and
+ *     downloading it in full would defeat the point.
+ *
+ * Alt text lives in the message catalogues, not here — a description of a
+ * photograph is prose, and prose is translated.
  */
 
 export type MediaAssetId = "hero" | "heroClip" | "digitalMenu" | "pdf" | "og";
@@ -28,7 +35,7 @@ export type AssetAltKey =
   | "assets.pdf.alt"
   | "assets.og.alt";
 
-export interface MediaAsset {
+interface BaseAsset {
   id: MediaAssetId;
   kind: "image" | "video";
   /** Numeric id from the Pexels page URL. */
@@ -36,10 +43,6 @@ export interface MediaAsset {
   pageUrl: string;
   author: string;
   authorUrl: string;
-  /** Direct file URL the fetch script downloads from. */
-  downloadUrl: string;
-  /** Path under `public/`; also the runtime `src` with a leading slash. */
-  file: `landing/${string}`;
   width: number;
   height: number;
   /**
@@ -47,21 +50,48 @@ export interface MediaAsset {
    * carries no information a screen-reader user would miss.
    */
   altKey: AssetAltKey | null;
+}
+
+/**
+ * Fetched once, committed, and served from our own `public/`. This is the right
+ * shape for anything small enough that the repository will not notice it.
+ */
+export interface DownloadedAsset extends BaseAsset {
+  delivery: "download";
+  /** Direct file URL the fetch script downloads from. */
+  downloadUrl: string;
+  /** Path under `public/`; also the runtime `src` with a leading slash. */
+  file: `landing/${string}`;
   /** Budget the fetch script enforces, in bytes. */
   maxBytes: number;
-  /**
-   * An enhancement the page is designed to survive without. A missing optional
-   * asset is a warning, not a build failure — the hero falls back to its poster
-   * and picks the clip up automatically the day the file appears.
-   */
-  optional?: boolean;
 }
+
+/**
+ * Served from our own object storage and pulled in pieces as it plays.
+ *
+ * This is not hot-linking: the file sits in a bucket we control, behind a URL
+ * that will not rotate under us. It exists because some media is simply too
+ * large to live in git, and because a video the browser can range-request is
+ * one it never has to download in full.
+ */
+export interface StreamedAsset extends BaseAsset {
+  delivery: "stream";
+  /** Absolute URL. Must answer range requests, or this is a download in disguise. */
+  streamUrl: string;
+  /** MIME type for the `<source>` element. */
+  mimeType: string;
+  /** Rough size, for the record — nothing enforces it, the network does. */
+  approxBytes: number;
+}
+
+export type MediaAsset = DownloadedAsset | StreamedAsset;
 
 const KB = 1024;
 const MB = 1024 * KB;
 
 export const LANDING_ASSETS: readonly MediaAsset[] = [
   {
+    delivery: "download",
     id: "hero",
     kind: "image",
     pexelsId: 67468,
@@ -80,29 +110,30 @@ export const LANDING_ASSETS: readonly MediaAsset[] = [
     maxBytes: 256 * KB,
   },
   {
+    delivery: "stream",
     id: "heroClip",
     kind: "video",
-    pexelsId: 3298832,
+    pexelsId: 6321912,
     pageUrl:
-      "https://www.pexels.com/video/a-restaurant-s-interior-design-3298832/",
-    author: "Rostislav Uzunov",
-    authorUrl: "https://www.pexels.com/@rostislav/",
-    downloadUrl:
-      "https://videos.pexels.com/video-files/3298832/3298832-hd_1920_1080_25fps.mp4",
-    file: "landing/hero.mp4",
-    width: 1920,
-    height: 1080,
-    // Decorative: the poster already carries the same scene, and the clip is
-    // hidden from assistive technology.
+      "https://www.pexels.com/video/people-eating-healthy-foods-6321912/",
+    author: "cottonbro studio",
+    authorUrl: "https://www.pexels.com/@cottonbro/",
+    streamUrl:
+      "https://pub-1ab2f4df12124ef28ddfc89ae67880ea.r2.dev/public_assets/6321912-uhd_4096_2160_25fps.mp4",
+    mimeType: "video/mp4",
+    // 132 MB of UHD. Committing that would be absurd, and downloading it up
+    // front would be worse — R2 answers range requests, so the browser pulls
+    // only the part it is actually playing. `HeroVideo` decides whether to ask
+    // for any of it at all.
+    approxBytes: 138 * MB,
+    width: 4096,
+    height: 2160,
+    // Decorative: it is the same room the poster shows, and it carries nothing
+    // a screen-reader user would otherwise miss.
     altKey: null,
-    maxBytes: 6 * MB,
-    // Pexels serves its video files behind protections an unauthenticated
-    // fetch cannot pass, so this one may have to be downloaded by hand from
-    // `pageUrl` and dropped in as `public/landing/hero.mp4`. Until it is there,
-    // the hero shows its poster and nothing else changes.
-    optional: true,
   },
   {
+    delivery: "download",
     id: "digitalMenu",
     kind: "image",
     pexelsId: 4839756,
@@ -119,6 +150,7 @@ export const LANDING_ASSETS: readonly MediaAsset[] = [
     maxBytes: 400 * KB,
   },
   {
+    delivery: "download",
     id: "pdf",
     kind: "image",
     pexelsId: 4921400,
@@ -139,6 +171,7 @@ export const LANDING_ASSETS: readonly MediaAsset[] = [
   // The QR capability draws its own table tent instead (`TableTent`), which is
   // also the more honest picture: it shows our product, not someone else's.
   {
+    delivery: "download",
     id: "og",
     kind: "image",
     pexelsId: 67468,
@@ -161,7 +194,15 @@ export function getAsset(id: MediaAssetId): MediaAsset {
   return asset;
 }
 
-/** The runtime `src` for an asset: `landing/hero.jpg` → `/landing/hero.jpg`. */
+/**
+ * The runtime `src` for an asset — a local path for anything we committed,
+ * the bucket URL for anything we stream.
+ */
 export function assetSrc(asset: MediaAsset): string {
-  return `/${asset.file}`;
+  return asset.delivery === "stream" ? asset.streamUrl : `/${asset.file}`;
+}
+
+/** Narrowing helper, so callers can ask without repeating the discriminant. */
+export function isStreamed(asset: MediaAsset): asset is StreamedAsset {
+  return asset.delivery === "stream";
 }
