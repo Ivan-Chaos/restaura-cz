@@ -1,114 +1,70 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Restaura API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS + PostgreSQL backend for Restaura. Serves the owner-facing workspace (accounts,
+menus, publishing) and the one public endpoint guests read a published menu from.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Governed by `.specify/memory/constitution.md` in this directory, and by the repository
+root constitution above it.
 
-## Description
+## Setup
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+Requires Node 22+, pnpm, and Docker.
 
 ```bash
-$ pnpm install
+# From the repository root
+pnpm install
+
+# Postgres on host port 5433 — 5432 is commonly taken by a locally installed
+# Postgres, which silently wins the bind and answers with the wrong database.
+docker compose -f apps/api/docker-compose.yml up -d
+
+cp apps/api/.env.example apps/api/.env    # then fill it in
+pnpm --filter api db:migrate
+pnpm --filter api start:dev               # http://localhost:3001
 ```
 
-## Compile and run the project
+## Layout
+
+```text
+src/
+├── config/env.ts        Typed environment access; fails at boot, not at first request
+├── db/                  The single data-access layer — every query goes through it
+│   ├── schema.ts        Drizzle tables; the source of truth for constraints
+│   ├── client.ts        Pool + Drizzle instance behind the DRIZZLE token
+│   ├── migrate.ts       Programmatic migrator, used by the CLI and the tests
+│   └── migrations/      Generated SQL, committed, never edited after applying
+├── common/              Error shape, session guard, shared validators
+├── auth/                Sign-up, sign-in, sign-out, session lifecycle
+└── menus/               Owner CRUD, publishing, and the public read
+```
+
+## Conventions
+
+- **ESM with `nodenext`**: relative imports carry a `.js` extension even in `.ts` files.
+  TypeScript resolves them to the source; Node resolves them to the build output.
+- **Constraints live in Postgres.** A DTO gives the caller a friendly message; the schema
+  is what makes the rule true. Add both, never only the DTO.
+- **Schema changes go through migrations**: edit `db/schema.ts` → `pnpm db:generate` →
+  review the SQL → `pnpm db:migrate`. Never hand-edit an applied migration or the database.
+- **One error shape.** Everything non-2xx leaves through `HttpErrorFilter` as
+  `{ error: { code, message, details? } }`. `code` is a closed set in `common/app-error.ts`;
+  the frontend renders a translated message per code and never shows `message`.
+  Adding a code is a contract change — update the contract and both apps together.
+- **A resource you do not own answers 404, not 403.** A 403 confirms the id is real.
+- **Ownership is checked in the service, not the controller**, so no route can forget it.
+
+## Tests
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm --filter api lint
+pnpm --filter api test        # unit: pure logic
+pnpm --filter api test:e2e    # integration against real Postgres
 ```
 
-## Run tests
+The e2e suite creates and migrates its own `restaura_test` database (derived from
+`DATABASE_URL`, or set `TEST_DATABASE_URL`), so it never touches development data. It runs
+one file at a time on purpose: the suites share a database and truncate between tests.
+Migrating from empty on every run is also how "migrations apply cleanly" stays true.
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Persistence is never covered by mocking the database — the constraints and cascades are
+most of the behaviour worth testing.

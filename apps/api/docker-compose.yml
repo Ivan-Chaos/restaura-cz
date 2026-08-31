@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: restaura-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: restaura
+      POSTGRES_PASSWORD: restaura
+      POSTGRES_DB: restaura
+    ports:
+      # 5433 on the host: a locally installed Postgres commonly owns 5432, and
+      # it silently wins the bind, sending connections to the wrong server.
+      - "5433:5432"
+    volumes:
+      - restaura-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U restaura -d restaura"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  restaura-pgdata:

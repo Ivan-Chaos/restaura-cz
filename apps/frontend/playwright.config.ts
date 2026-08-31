@@ -39,12 +39,28 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: "pnpm build && pnpm start",
-    url: "http://localhost:3000/cs",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-    stdout: "pipe",
-    stderr: "pipe",
-  },
+  // The API first: the workspace and guest-menu suites are meaningless without
+  // it, and the frontend's server-side fetches fail closed if it is not up.
+  // Requires Postgres — `docker compose -f apps/api/docker-compose.yml up -d`.
+  webServer: [
+    {
+      command: "pnpm build && node dist/db/migrate.js && node dist/main.js",
+      cwd: "../api",
+      // Waiting on the port rather than a URL: every API route either needs a
+      // session or answers 404, so there is nothing that returns 200 to poll.
+      port: 3001,
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+    {
+      command: "pnpm build && pnpm start",
+      url: "http://localhost:3000/cs",
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  ],
 });

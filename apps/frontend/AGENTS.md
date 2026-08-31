@@ -68,6 +68,49 @@ The public landing page is `app/[locale]/page.tsx` → `components/landing/`. Co
 - **No `motion` on this route.** Reveal-on-scroll is `hooks/use-in-view.ts` + `components/landing/Reveal.tsx`, about 1 KB. Its three states (`idle`/`hidden`/`shown`) exist so nothing is ever hidden that the reader can already see: only an element the browser has confirmed is off-screen is made transparent.
 - **Link-buttons use `buttonVariants` on a real anchor**, not the `Button` primitive with `render`. Base UI's button expects a native `<button>`; given an anchor it either warns or replaces the link's semantics with button ones.
 
+# Talking to the API, accounts, and the guest menu
+
+The NestJS API in `apps/api` is the system of record. Spec: `specs/001-menu-creation-publishing/`
+at the repository root, with the cross-app contract in its `contracts/http-api.md`.
+
+- **The browser never calls the API.** Server Components read and Server Actions write, both
+  through `lib/api/client.ts`, which forwards the session cookie server-side. That means no
+  CORS, no token in client JavaScript, and one place where the request shape lives. The module
+  imports `next/headers`, so importing it from a client component fails the build — that is the
+  guard, and it is why there is no `server-only` dependency.
+- **Expected failures are values, not exceptions.** `apiRequest` returns
+  `{ ok: false, error }` for a taken email or a rejected field, because a form has to render
+  those as readily as a success. Only unreachable-API cases produce the synthetic `NETWORK` code.
+- **The API speaks codes; the UI speaks the visitor's language.** Never render `error.message` —
+  it is developer-facing. `lib/api/form-state.ts` turns an error into a `FormState` of codes,
+  and the component translates them (`Auth.errors`, `Auth.fieldErrors`, `MenuEditor.fieldErrors`).
+  Field codes are class-validator constraint names uppercased, so `@Length` arrives as
+  `IS_LENGTH`, not `LENGTH`. An unrecognised code degrades to `INVALID` rather than vanishing.
+  When one field breaks several rules, `CODE_PRIORITY` prefers the type problem over the range
+  problem: for a price of "free", "enter a whole number" is the useful half.
+- **Forms take their action as a prop.** `AuthForm`, `InlineTextForm`, `ItemForm` and
+  `ConfirmDialog` never import a Server Action. Pages inject the real one; stories inject a stub.
+  Importing a `"use server"` module into the Storybook browser bundle does not work.
+- **`requireAccount(locale)` gates every workspace route**, and `getAccount()` is the
+  non-throwing read for pages that merely branch (sign-in redirects an already-signed-in visitor).
+  Both live in `lib/api/session.ts`, deliberately *not* a `"use server"` module: they are render
+  reads, and marking them would publish them as endpoints for no reason.
+- **The guest menu is `force-dynamic`, and that is load-bearing.** Unpublishing has to take
+  effect on the very next request and a saved edit has to be visible immediately, so the page
+  cannot be static or time-revalidated. Both would serve a menu the restaurant has taken down.
+  The upgrade path, if load ever demands it, is tag-based revalidation on publish/unpublish/save.
+- **`GuestMenu` is not `SampleMenu`.** `SampleMenu` is the design system's showcase and always
+  renders the specials strip and the full allergen legend, because its fixture always has that
+  data. A menu built in the editor has none of it, and printing a legend for allergens nobody
+  declared tells guests something untrue. When the editor starts collecting photos, markers and
+  allergens, grow `GuestMenu` to match — the components already exist.
+- **`lib/menu-display/adapter.ts` is the only seam** between the API's shape and the design
+  system's `Menu`. Prices are whole korunas both sides (`{ kind: "single", … }`); category ids
+  are slugified titles plus an index, because they double as element ids and two sections may
+  share a title.
+- **A draft menu and an address that never existed answer identically** (404 plus the
+  not-available page). Anything else lets the public route enumerate which menus exist.
+
 # Legal pages and cookie consent
 
 `/[locale]/privacy`, `/terms` and `/cookies` render from `lib/legal/documents.ts` through one

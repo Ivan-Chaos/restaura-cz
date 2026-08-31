@@ -1,0 +1,60 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+import type { FormState } from "@/lib/api/form-state";
+import type { MenuSectionView } from "@/lib/api/types";
+
+import { SectionEditor } from "./SectionEditor";
+
+const succeeds = async (): Promise<FormState> => ({ status: "idle" });
+const noop = async (): Promise<void> => {};
+
+const filled: MenuSectionView = {
+  id: "section-1",
+  title: "Polévky",
+  position: 0,
+  items: [
+    {
+      id: "item-1",
+      name: "Kulajda",
+      description: "Se zastřeným vejcem a koprem",
+      priceCzk: 89,
+      position: 0,
+    },
+    { id: "item-2", name: "Hovězí vývar", description: null, priceCzk: 79, position: 1 },
+  ],
+};
+
+const meta = {
+  title: "Workspace/SectionEditor",
+  component: SectionEditor,
+  parameters: { layout: "padded" },
+  args: {
+    locale: "cs",
+    menuId: "menu-1",
+    isFirst: true,
+    isLast: false,
+    renameAction: succeeds,
+    addItemAction: succeeds,
+    updateItemAction: succeeds,
+    moveSectionAction: noop,
+    deleteSectionAction: noop,
+    moveItemAction: noop,
+    deleteItemAction: noop,
+  },
+} satisfies Meta<typeof SectionEditor>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const WithItems: Story = {
+  args: { section: filled },
+};
+
+export const EmptySection: Story = {
+  args: { section: { id: "section-2", title: "Připravujeme", position: 1, items: [] } },
+};
+
+export const Narrow: Story = {
+  globals: { viewport: { value: "mobile1" } },
+  args: { section: filled },
+};

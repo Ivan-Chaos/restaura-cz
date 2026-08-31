@@ -8,6 +8,14 @@ import type { BrowserConfigOptions } from "vitest/node";
 const alias = { "@": fileURLToPath(new URL("./", import.meta.url)) };
 
 /**
+ * The monorepo root. pnpm keeps its store in `<root>/node_modules/.pnpm`, which
+ * is *above* this project's root, and Vite refuses to serve files outside the
+ * project unless told to. Without this, every story fails to import the
+ * Storybook addon's setup file and the whole suite collects zero tests.
+ */
+const workspaceRoot = fileURLToPath(new URL("../../", import.meta.url));
+
+/**
  * Vitest 4 takes a provider object, not the v3 `provider: "playwright"` string.
  * The same Playwright that drives the end-to-end suite therefore also renders
  * the component tests — one browser engine, one set of behaviours to reason
@@ -40,6 +48,7 @@ const browserFor = (name: string): BrowserConfigOptions => ({
  */
 export default defineConfig({
   resolve: { alias },
+  server: { fs: { allow: [workspaceRoot] } },
   test: {
     projects: [
       {
