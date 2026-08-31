@@ -1,8 +1,9 @@
 /**
  * The frontend's half of the cross-app contract.
  *
- * These mirror `specs/001-menu-creation-publishing/contracts/http-api.md`. The
- * API proves it serves these shapes; `tests/unit/api-contract.test.ts` proves we
+ * These mirror `specs/001-menu-creation-publishing/contracts/http-api.md`, as
+ * amended by `specs/002-signup-dashboard-revamp/contracts/http-api.md`. The API
+ * proves it serves these shapes; `tests/unit/api-contract.test.ts` proves we
  * expect them. Change one side and you must change the other in the same
  * change set.
  */
@@ -32,7 +33,14 @@ export type FieldErrorCode =
   | "IS_LENGTH"
   | "MAX_LENGTH"
   | "MIN"
-  | "AT_LEAST_ONE_DEFINED";
+  | "AT_LEAST_ONE_DEFINED"
+  /** A phone number the API could not read as one. */
+  | "IS_PHONE"
+  | "IS_ARRAY"
+  /** Fewer phone numbers than the minimum of one. */
+  | "ARRAY_MIN_SIZE"
+  /** More phone numbers than the maximum of three. */
+  | "ARRAY_MAX_SIZE";
 
 export interface ApiFieldError {
   field: string;
@@ -60,8 +68,26 @@ export interface Account {
   email: string;
 }
 
+/**
+ * The business identity behind an account. Its absence — `profile: null` on
+ * `/auth/me` — is what marks an account as incomplete and sends its owner to
+ * the profile-completion step instead of the dashboard.
+ */
+export interface RestaurantProfile {
+  restaurantName: string;
+  /** One to three, in the order the owner entered them. */
+  phones: string[];
+  /** Free-form address text. */
+  location: string;
+}
+
 export interface AccountResponse {
   account: Account;
+  profile: RestaurantProfile | null;
+}
+
+export interface ProfileResponse {
+  profile: RestaurantProfile;
 }
 
 // ----------------------------------------------------------------- menus

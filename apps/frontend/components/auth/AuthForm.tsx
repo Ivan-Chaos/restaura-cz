@@ -5,20 +5,11 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { IDLE, type FormState } from "@/lib/api/form-state";
 
-export type AuthMode = "signUp" | "signIn";
-
 export interface AuthFormProps {
-  mode: AuthMode;
   /**
    * Injected rather than imported so the component can be rendered in
    * Storybook and tests without pulling a Server Action into the browser
@@ -26,14 +17,18 @@ export interface AuthFormProps {
    */
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   locale: string;
+  /** Where to go once signed in. Passed through to the action. */
+  next?: string;
 }
 
 /**
- * Sign-up and sign-in are the same form with different copy and one extra
- * hint, so they are one component: two files would drift the moment either
- * changed.
+ * Signing in: email and password, nothing else.
+ *
+ * Registration used to share this component, and stopped when it grew a
+ * restaurant profile — see `RegistrationForm`. Two forms that no longer collect
+ * the same things are better apart than behind a mode flag.
  */
-export function AuthForm({ mode, action, locale }: AuthFormProps) {
+export function AuthForm({ action, locale, next }: AuthFormProps) {
   const t = useTranslations("Auth");
   const tErrors = useTranslations("Auth.errors");
   const tFields = useTranslations("Auth.fieldErrors");
@@ -46,19 +41,16 @@ export function AuthForm({ mode, action, locale }: AuthFormProps) {
   // same problem would be reported twice.
   const summary = state.status === "error" && !fields ? state.code : undefined;
 
-  const isSignUp = mode === "signUp";
-
   return (
     <form action={formAction} noValidate className="flex flex-col gap-6">
       <input type="hidden" name="locale" value={locale} />
+      {next ? <input type="hidden" name="next" value={next} /> : null}
 
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {isSignUp ? t("signUpTitle") : t("signInTitle")}
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">
+          {t("signInTitle")}
         </h1>
-        <p className="text-muted-foreground text-sm">
-          {isSignUp ? t("signUpSubtitle") : t("signInSubtitle")}
-        </p>
+        <p className="text-muted-foreground text-sm">{t("signInSubtitle")}</p>
       </div>
 
       {summary ? (
@@ -93,16 +85,11 @@ export function AuthForm({ mode, action, locale }: AuthFormProps) {
             id="password"
             name="password"
             type="password"
-            autoComplete={isSignUp ? "new-password" : "current-password"}
+            autoComplete="current-password"
             required
             aria-invalid={passwordError ? true : undefined}
-            aria-describedby={
-              passwordError ? "password-error" : isSignUp ? "password-hint" : undefined
-            }
+            aria-describedby={passwordError ? "password-error" : undefined}
           />
-          {isSignUp && !passwordError ? (
-            <FieldDescription id="password-hint">{t("passwordHint")}</FieldDescription>
-          ) : null}
           {passwordError ? (
             <FieldError id="password-error">{tFields(passwordError)}</FieldError>
           ) : null}
@@ -110,16 +97,13 @@ export function AuthForm({ mode, action, locale }: AuthFormProps) {
       </FieldGroup>
 
       <Button type="submit" disabled={pending}>
-        {pending ? t("pending") : isSignUp ? t("signUpSubmit") : t("signInSubmit")}
+        {pending ? t("pending") : t("signInSubmit")}
       </Button>
 
       <p className="text-muted-foreground text-center text-sm">
-        {isSignUp ? t("haveAccount") : t("noAccount")}{" "}
-        <Link
-          href={isSignUp ? "/sign-in" : "/sign-up"}
-          className="text-foreground underline underline-offset-4"
-        >
-          {isSignUp ? t("signInLink") : t("signUpLink")}
+        {t("noAccount")}{" "}
+        <Link href="/sign-up" className="text-foreground underline underline-offset-4">
+          {t("signUpLink")}
         </Link>
       </p>
     </form>

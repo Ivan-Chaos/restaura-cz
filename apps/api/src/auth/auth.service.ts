@@ -5,7 +5,7 @@ import { and, eq, gt, sql } from 'drizzle-orm';
 import { AppError } from '../common/app-error.js';
 import { isUniqueViolation } from '../common/pg-errors.js';
 import { DRIZZLE, type DrizzleDb } from '../db/client.js';
-import { ownerAccount, session } from '../db/schema.js';
+import { ownerAccount, restaurantProfile, session } from '../db/schema.js';
 import { SESSION_TTL_MS } from './session-cookie.js';
 
 export interface PublicAccount {
@@ -13,8 +13,17 @@ export interface PublicAccount {
   email: string;
 }
 
+/** The profile as callers see it: no ids, no timestamps. */
+export interface PublicProfile {
+  restaurantName: string;
+  phones: string[];
+  location: string;
+}
+
 export interface IssuedSession {
   account: PublicAccount;
+  /** Always present for sign-up; null for an account created before profiles. */
+  profile: PublicProfile | null;
   /** The raw token. Stored only in the caller's cookie — never in the database. */
   token: string;
   expiresAt: Date;
@@ -46,18 +55,32 @@ export class AuthService {
     return this.decoyHash;
   }
 
-  async signUp(email: string, password: string): Promise<IssuedSession> {
+  /**
+   * Creates the account and its profile as one unit. A rejected email must
+   * leave nothing behind, and an account must never reach the dashboard
+   * half-registered, so both inserts share a transaction: either the owner has
+   * a complete account or they have none.
+   */
+  async signUp(
+    email: string,
+    password: string,
+    profile: PublicProfile,
+  ): Promise<IssuedSession> {
     const passwordHash = await argonHash(password, ARGON_OPTIONS);
 
     let account: PublicAccount;
     try {
-      const [row] = await this.db
-        .insert(ownerAccount)
-        .values({ email, passwordHash })
-        .returning({ id: ownerAccount.id, email: ownerAccount.email });
-      // The insert either returns a row or throws; this satisfies the type.
-      if (!row) throw AppError.emailTaken();
-      account = row;
+      account = await this.db.transaction(async (tx) => {
+        const [row] = await tx
+          .insert(ownerAccount)
+          .values({ email, passwordHash })
+          .returning({ id: ownerAccount.id, email: ownerAccount.email });
+        // The insert either returns a row or throws; this satisfies the type.
+        if (!row) throw AppError.emailTaken();
+
+        await tx.insert(restaurantProfile).values({ accountId: row.id, ...profile });
+        return row;
+      });
     } catch (error) {
       // The unique index on lower(email) is what actually enforces one account
       // per address, including against two simultaneous sign-ups.
@@ -65,7 +88,46 @@ export class AuthService {
       throw error;
     }
 
-    return this.issueSession(account);
+    return this.issueSession(account, profile);
+  }
+
+  /** Null for an account created before profiles existed. */
+  async getProfile(accountId: string): Promise<PublicProfile | null> {
+    const [row] = await this.db
+      .select({
+        restaurantName: restaurantProfile.restaurantName,
+        phones: restaurantProfile.phones,
+        location: restaurantProfile.location,
+      })
+      .from(restaurantProfile)
+      .where(eq(restaurantProfile.accountId, accountId))
+      .limit(1);
+
+    return row ?? null;
+  }
+
+  /**
+   * One statement for both the completion step and the settings form. Which of
+   * the two happened is not something the caller has to care about, and making
+   * it one write means there is no window where a profile is half-replaced.
+   */
+  async upsertProfile(accountId: string, profile: PublicProfile): Promise<PublicProfile> {
+    const [row] = await this.db
+      .insert(restaurantProfile)
+      .values({ accountId, ...profile })
+      .onConflictDoUpdate({
+        target: restaurantProfile.accountId,
+        set: { ...profile, updatedAt: new Date() },
+      })
+      .returning({
+        restaurantName: restaurantProfile.restaurantName,
+        phones: restaurantProfile.phones,
+        location: restaurantProfile.location,
+      });
+
+    // The upsert always returns the stored row; this satisfies the type.
+    if (!row) throw AppError.notFound();
+    return row;
   }
 
   async signIn(email: string, password: string): Promise<IssuedSession> {
@@ -87,7 +149,10 @@ export class AuthService {
     const passwordMatches = await argonVerify(account.passwordHash, password);
     if (!passwordMatches) throw AppError.invalidCredentials();
 
-    return this.issueSession({ id: account.id, email: account.email });
+    // Read alongside the session so the caller can route a profile-less owner
+    // to the completion step directly, rather than bouncing off the dashboard.
+    const profile = await this.getProfile(account.id);
+    return this.issueSession({ id: account.id, email: account.email }, profile);
   }
 
   /** Idempotent: signing out with a token that is already gone is still success. */
@@ -110,7 +175,10 @@ export class AuthService {
     return row ?? null;
   }
 
-  private async issueSession(account: PublicAccount): Promise<IssuedSession> {
+  private async issueSession(
+    account: PublicAccount,
+    profile: PublicProfile | null,
+  ): Promise<IssuedSession> {
     const token = randomBytes(32).toString('base64url');
     const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
 
@@ -120,7 +188,7 @@ export class AuthService {
       expiresAt,
     });
 
-    return { account, token, expiresAt };
+    return { account, profile, token, expiresAt };
   }
 }
 

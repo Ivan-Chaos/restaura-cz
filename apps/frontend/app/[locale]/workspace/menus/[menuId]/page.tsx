@@ -24,7 +24,6 @@ import {
   updateItemAction,
 } from "@/lib/api/actions/menus";
 import { publishAction, unpublishAction } from "@/lib/api/actions/publish";
-import { requireAccount } from "@/lib/api/session";
 
 export async function generateMetadata({
   params,
@@ -50,7 +49,6 @@ export default async function MenuEditorPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  await requireAccount(locale);
   const t = await getTranslations({ locale, namespace: "MenuEditor" });
 
   const result = await getMenu(menuId);
@@ -59,8 +57,10 @@ export default async function MenuEditorPage({
   if (!result.ok) notFound();
   const { menu } = result.data;
 
+  // A div, not a main: the shell's SidebarInset is already this page's main
+  // landmark, and nesting a second one inside it is invalid.
   return (
-    <main className="flex-1 py-10">
+    <div className="flex-1 py-10">
       <Container size="lg" className="flex flex-col gap-6">
         <Link href="/workspace" className="text-muted-foreground w-fit text-sm underline underline-offset-4">
           {t("back")}
@@ -144,6 +144,6 @@ export default async function MenuEditorPage({
           </div>
         </section>
       </Container>
-    </main>
+    </div>
   );
 }

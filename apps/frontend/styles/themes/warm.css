@@ -14,7 +14,8 @@
  */
 
 :root,
-[data-theme="warm"] {
+[data-theme="warm"],
+[data-appearance="light"] {
   /* Surfaces ------------------------------------------------------------- */
   --background: var(--palette-parchment-100);
   --foreground: var(--palette-cocoa-900);
@@ -97,6 +98,22 @@
   --sidebar-accent-foreground: var(--palette-cocoa-900);
   --sidebar-border: var(--palette-linen-500);
   --sidebar-ring: var(--palette-terracotta-600);
+}
+
+/**
+ * Pins a subtree to the light tokens no matter what `<html>` says.
+ *
+ * The owner dashboard is specified as light-toned always (spec FR-011), and
+ * this is how: the same values as above, re-declared on a scope that sits below
+ * `.dark` in the tree, so they win by inheritance rather than by specificity —
+ * no `!important`, no JavaScript, no flash. `color-scheme` carries it to the
+ * things CSS variables cannot reach: native controls, scrollbars, the canvas.
+ *
+ * Public pages are untouched, and the visitor's own appearance preference is
+ * neither read nor changed.
+ */
+[data-appearance="light"] {
+  color-scheme: light;
 }
 
 .dark,

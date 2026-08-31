@@ -7,6 +7,7 @@ import type {
   ApiError,
   MenuDetailResponse,
   MenuListResponse,
+  ProfileResponse,
   PublicMenuResponse,
   PublishResponse,
   UnpublishResponse,
@@ -17,15 +18,43 @@ import type {
  *
  * The API's e2e suite proves it *serves* these shapes; this proves we *expect*
  * them. The fixtures below are copied from
- * `specs/001-menu-creation-publishing/contracts/http-api.md`, so if the contract
+ * `specs/001-menu-creation-publishing/contracts/http-api.md` and its amendment
+ * `specs/002-signup-dashboard-revamp/contracts/http-api.md`, so if the contract
  * changes and only one app is updated, one of the two suites fails.
  */
 
 describe("response shapes match the contract", () => {
-  it("accepts the documented account response", () => {
-    const payload = { account: { id: "8d1c…", email: "owner@example.com" } };
+  it("accepts the documented account response, profile and all", () => {
+    const payload = {
+      account: { id: "8d1c…", email: "owner@example.com" },
+      profile: {
+        restaurantName: "U Zlaté Lípy",
+        phones: ["+420 601 234 567"],
+        location: "Náměstí Míru 12, 120 00 Praha 2",
+      },
+    };
     expectTypeOf(payload).toExtend<AccountResponse>();
     expect(payload.account.email).toBe("owner@example.com");
+    expect(payload.profile.phones).toHaveLength(1);
+  });
+
+  it("accepts a null profile, which is how an incomplete account is reported", () => {
+    const payload = { account: { id: "8d1c…", email: "owner@example.com" }, profile: null };
+    expectTypeOf(payload).toExtend<AccountResponse>();
+    expect(payload.profile).toBeNull();
+  });
+
+  it("accepts the documented profile response", () => {
+    const payload = {
+      profile: {
+        restaurantName: "U Zlaté Lípy",
+        phones: ["+420 601 234 567", "222 333 444"],
+        location: "Náměstí Míru 12, 120 00 Praha 2",
+      },
+    };
+    expectTypeOf(payload).toExtend<ProfileResponse>();
+    // Order is the owner's, so it must survive the round trip unchanged.
+    expect(payload.profile.phones[0]).toBe("+420 601 234 567");
   });
 
   it("accepts the documented menu list response", () => {
@@ -114,6 +143,55 @@ describe("toFormState", () => {
       code: "VALIDATION_FAILED",
       fields: { email: "IS_EMAIL", password: "IS_LENGTH" },
     });
+  });
+
+  it("pins the profile field codes the sign-up contract documents", () => {
+    const error: ApiError = {
+      code: "VALIDATION_FAILED",
+      message: "Request body failed validation.",
+      details: [
+        { field: "restaurantName", code: "IS_LENGTH", message: "wrong length" },
+        { field: "phones", code: "IS_PHONE", message: "must be a phone number" },
+        { field: "location", code: "IS_STRING", message: "must be a string" },
+      ],
+    };
+
+    expect(toFormState(error)).toEqual({
+      status: "error",
+      code: "VALIDATION_FAILED",
+      fields: {
+        restaurantName: "IS_LENGTH",
+        phones: "IS_PHONE",
+        location: "IS_STRING",
+      },
+    });
+  });
+
+  /**
+   * The API reports a bad entry against the list as a whole; the Server Action
+   * applies the same rule per entry and pins `phones.<index>` itself, so the
+   * form can mark the one input at fault.
+   */
+  it("carries a per-index phone key the Server Action produced", () => {
+    const state = toFormState({
+      code: "VALIDATION_FAILED",
+      message: "x",
+      details: [{ field: "phones.1", code: "IS_PHONE", message: "must be a phone number" }],
+    });
+
+    expect(state).toMatchObject({ fields: { "phones.1": "IS_PHONE" } });
+  });
+
+  it("keeps too-many-phones distinct from too-few, since the fixes differ", () => {
+    const error: ApiError = {
+      code: "VALIDATION_FAILED",
+      message: "Request body failed validation.",
+      details: [
+        { field: "phones", code: "ARRAY_MAX_SIZE", message: "must contain no more than 3" },
+      ],
+    };
+
+    expect(toFormState(error)).toMatchObject({ fields: { phones: "ARRAY_MAX_SIZE" } });
   });
 
   it("shows one reason per field, preferring the type problem", () => {

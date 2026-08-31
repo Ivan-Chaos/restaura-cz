@@ -7,9 +7,24 @@ import type { ApiError, ApiErrorCode, FieldErrorCode } from "./types";
  */
 export type FormState =
   | { status: "idle" }
+  /** The write went through and the form stays put — settings, not sign-up. */
+  | { status: "success" }
   | { status: "error"; code: ApiErrorCode; fields?: Record<string, FieldErrorCode | "INVALID"> };
 
 export const IDLE: FormState = { status: "idle" };
+export const SAVED: FormState = { status: "success" };
+
+/**
+ * A failure the frontend found for itself — a password confirmation that does
+ * not match, a phone number that cannot be one. Shaped exactly like the API's
+ * so a form renders both the same way and never has to ask where the problem
+ * was noticed.
+ */
+export function localValidationError(
+  fields: Record<string, FieldErrorCode | "INVALID">,
+): FormState {
+  return { status: "error", code: "VALIDATION_FAILED", fields };
+}
 
 const KNOWN_FIELD_CODES: readonly FieldErrorCode[] = [
   "IS_EMAIL",
@@ -21,6 +36,10 @@ const KNOWN_FIELD_CODES: readonly FieldErrorCode[] = [
   "MAX_LENGTH",
   "MIN",
   "AT_LEAST_ONE_DEFINED",
+  "IS_PHONE",
+  "IS_ARRAY",
+  "ARRAY_MIN_SIZE",
+  "ARRAY_MAX_SIZE",
 ];
 
 function toFieldCode(code: string): FieldErrorCode | "INVALID" {
@@ -38,11 +57,15 @@ function toFieldCode(code: string): FieldErrorCode | "INVALID" {
  */
 const CODE_PRIORITY: readonly (FieldErrorCode | "INVALID")[] = [
   "IS_STRING",
+  "IS_ARRAY",
   "IS_INT",
   "IS_EMAIL",
+  "IS_PHONE",
   "IS_IN",
   "IS_LENGTH",
   "MAX_LENGTH",
+  "ARRAY_MIN_SIZE",
+  "ARRAY_MAX_SIZE",
   "MIN",
   "IS_EMPTY",
   "AT_LEAST_ONE_DEFINED",

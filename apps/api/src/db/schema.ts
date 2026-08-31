@@ -32,6 +32,48 @@ export const ownerAccount = pgTable(
   ],
 );
 
+/**
+ * The business identity behind an account: what a guest sees on a menu and how
+ * they reach the restaurant.
+ *
+ * `accountId` is both primary key and foreign key, which is what makes the
+ * one-profile-per-account rule structural rather than a uniqueness index we
+ * have to remember to add. Its *absence* is meaningful too: an account with no
+ * row here is incomplete, and the frontend gates the dashboard on exactly that.
+ */
+export const restaurantProfile = pgTable(
+  'restaurant_profile',
+  {
+    accountId: uuid('account_id')
+      .primaryKey()
+      .references(() => ownerAccount.id, { onDelete: 'cascade' }),
+    restaurantName: text('restaurant_name').notNull(),
+    /**
+     * One to three numbers, in the order the owner entered them. An array
+     * rather than a child table: the list is capped, has no per-entry metadata,
+     * and is always read and written whole, so a join would buy nothing. Per
+     * entry format is a boundary rule (ProfileDto); the count is an invariant,
+     * so it lives here.
+     */
+    phones: text('phones').array().notNull(),
+    /** Free-form address text. Never geocoded, so never parsed into parts. */
+    location: text('location').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      'restaurant_profile_name_length',
+      sql`char_length(${table.restaurantName}) between 1 and 120`,
+    ),
+    check('restaurant_profile_phones_count', sql`cardinality(${table.phones}) between 1 and 3`),
+    check(
+      'restaurant_profile_location_length',
+      sql`char_length(${table.location}) between 1 and 200`,
+    ),
+  ],
+);
+
 export const session = pgTable('session', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id')
@@ -112,6 +154,7 @@ export const menuItem = pgTable(
 );
 
 export type OwnerAccountRow = typeof ownerAccount.$inferSelect;
+export type RestaurantProfileRow = typeof restaurantProfile.$inferSelect;
 export type MenuRow = typeof menu.$inferSelect;
 export type MenuSectionRow = typeof menuSection.$inferSelect;
 export type MenuItemRow = typeof menuItem.$inferSelect;

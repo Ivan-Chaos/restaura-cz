@@ -91,10 +91,29 @@ at the repository root, with the cross-app contract in its `contracts/http-api.m
 - **Forms take their action as a prop.** `AuthForm`, `InlineTextForm`, `ItemForm` and
   `ConfirmDialog` never import a Server Action. Pages inject the real one; stories inject a stub.
   Importing a `"use server"` module into the Storybook browser bundle does not work.
-- **`requireAccount(locale)` gates every workspace route**, and `getAccount()` is the
-  non-throwing read for pages that merely branch (sign-in redirects an already-signed-in visitor).
-  Both live in `lib/api/session.ts`, deliberately *not* a `"use server"` module: they are render
-  reads, and marking them would publish them as endpoints for no reason.
+- **The workspace gate lives in one place: `app/[locale]/workspace/layout.tsx`.** It calls
+  `requireProfile(locale)`, which sends a visitor with no session to sign-in and a signed-in
+  owner with no restaurant profile to `/complete-profile`. Pages under `/workspace` therefore
+  do **not** repeat the check — a gate each new page must remember is one a new page will
+  forget. `requireSession(locale)` is the weaker gate for `/complete-profile` itself (session
+  required, profile deliberately not), and `getSession()` is the non-throwing read for pages
+  that merely branch. All three live in `lib/api/session.ts`, deliberately *not* a
+  `"use server"` module: they are render reads, and marking them would publish them as
+  endpoints for no reason. `getSession` is wrapped in React `cache()`, so a layout and the page
+  inside it cost one `/auth/me`, not two.
+- **`/auth/me` answers `{ account, profile }`, and `profile: null` is the whole gate signal** —
+  it means an account created before restaurant profiles existed. Registration writes account
+  and profile in one transaction, so no new account can be in that state.
+- **The return destination travels as `?next=`, and it is never trusted.** `proxy.ts` publishes
+  the current path in a request header (App Router gives a layout no other way to know its own
+  URL); `lib/api/next-path.ts` strips the locale prefix and rejects anything that could leave
+  this origin. Pass it to `redirect` as an **object** href — a string href is localised as a
+  pathname and silently loses its query.
+- **The dashboard is always light.** `components/dashboard/AppearanceScope.tsx` sets
+  `data-appearance="light"`, which `styles/themes/warm.css` redeclares the light tokens
+  against. It is CSS only — no JS, no flash, no effect on the visitor's stored appearance
+  preference, and public pages keep their dark mode. The shell's `SidebarInset` is the page's
+  one `<main>`, so pages under `/workspace` render a `<div>`, not a second one.
 - **The guest menu is `force-dynamic`, and that is load-bearing.** Unpublishing has to take
   effect on the very next request and a saved edit has to be visible immediately, so the page
   cannot be static or time-revalidated. Both would serve a menu the restaurant has taken down.

@@ -1,7 +1,12 @@
+import { cache } from "react";
+import { headers } from "next/headers";
+
 import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { PATHNAME_HEADER } from "@/proxy";
 import { apiGet } from "./client";
-import type { Account, AccountResponse } from "./types";
+import { stripLocale } from "./next-path";
+import type { Account, AccountResponse, RestaurantProfile } from "./types";
 
 /**
  * Session reads for Server Components.
@@ -11,21 +16,85 @@ import type { Account, AccountResponse } from "./types";
  * no reason.
  */
 
-/** Null when nobody is signed in, so a page can branch instead of catching. */
-export async function getAccount(): Promise<Account | null> {
-  const result = await apiGet<AccountResponse>("/auth/me");
-  return result.ok ? result.data.account : null;
+export interface Session {
+  account: Account;
+  /**
+   * Null for an account that has credentials but no restaurant profile — every
+   * account created before this feature. That is the only "incomplete" state
+   * there is, and it is what the dashboard gate keys off.
+   */
+  profile: RestaurantProfile | null;
 }
 
 /**
- * Gate for every workspace route. An expired or missing session sends the
- * visitor to sign in rather than rendering an empty shell.
+ * Null when nobody is signed in, so a page can branch instead of catching.
+ *
+ * Memoised for the render pass: the layout reads it to run the gate and the
+ * page below reads it again for the owner's name, and that must cost one
+ * request, not two.
  */
-export async function requireAccount(locale: Locale): Promise<Account> {
-  const account = await getAccount();
-  if (account) return account;
+export const getSession = cache(async function getSession(): Promise<Session | null> {
+  const result = await apiGet<AccountResponse>("/auth/me");
+  return result.ok ? { account: result.data.account, profile: result.data.profile } : null;
+});
 
-  redirect({ href: "/sign-in", locale });
+/**
+ * The path being rendered, without its locale prefix — the destination to
+ * return to after signing in. Published by `proxy.ts`; absent in contexts that
+ * never went through the middleware, in which case the caller falls back to the
+ * workspace.
+ */
+async function currentDestination(): Promise<string | undefined> {
+  const pathname = (await headers()).get(PATHNAME_HEADER);
+  return pathname ? stripLocale(pathname) : undefined;
+}
+
+/**
+ * An object href, not a string with a query glued on: next-intl's `redirect`
+ * localises a string href as a pathname and drops anything after `?`.
+ */
+function withDestination(pathname: string, destination: string | undefined) {
+  if (!destination || destination === "/") return pathname;
+  return { pathname, query: { next: destination } };
+}
+
+/**
+ * Requires a session but not a profile — the profile-completion step itself,
+ * which an owner reaches precisely because they have no profile yet.
+ */
+export async function requireSession(locale: Locale): Promise<Session> {
+  const session = await getSession();
+  if (session) return session;
+
+  redirect({ href: withDestination("/sign-in", await currentDestination()), locale });
   // redirect throws; this line only satisfies control-flow analysis.
   throw new Error("unreachable");
+}
+
+/**
+ * The gate for every dashboard route.
+ *
+ * Applied once, in the workspace layout, rather than page by page: a gate that
+ * has to be remembered is a gate that will eventually be forgotten on a new
+ * page. An expired session sends the visitor to sign in; a signed-in owner who
+ * never completed their restaurant profile is sent to finish it, because a
+ * dashboard is not much use without one (spec FR-004, FR-005, FR-013).
+ */
+export async function requireProfile(
+  locale: Locale,
+): Promise<Session & { profile: RestaurantProfile }> {
+  const destination = await currentDestination();
+  const session = await getSession();
+
+  if (!session) {
+    redirect({ href: withDestination("/sign-in", destination), locale });
+    throw new Error("unreachable");
+  }
+
+  if (!session.profile) {
+    redirect({ href: withDestination("/complete-profile", destination), locale });
+    throw new Error("unreachable");
+  }
+
+  return { account: session.account, profile: session.profile };
 }
