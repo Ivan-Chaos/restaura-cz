@@ -41,14 +41,14 @@ test.describe("menu creation and filling", () => {
     await addSection(page, "Polévky");
     await addItem(page, "Polévky", { name: "Kulajda", price: "89" });
 
-    await page.goto("/cs/workspace");
+    await page.goto("/cs/workspace/menus");
     await page.getByRole("button", { name: "Odhlásit se" }).click();
     await page.waitForURL("**/cs/sign-in");
 
     await page.getByLabel("E-mail").fill(email);
     await page.getByLabel("Heslo").fill(PASSWORD);
     await page.getByRole("button", { name: "Přihlásit se" }).click();
-    await page.waitForURL("**/cs/workspace");
+    await page.waitForURL("**/cs/workspace/menus");
 
     await page.goto(editorUrl);
     await expect(page.locator('input[value="Polévky"]')).toBeVisible();
@@ -141,7 +141,7 @@ test.describe("menu creation and filling", () => {
     await signUp(page);
     const editorUrl = await createMenu(page, "Polední menu");
 
-    await page.goto("/cs/workspace");
+    await page.goto("/cs/workspace/menus");
     await page.getByRole("button", { name: "Odhlásit se" }).click();
     await page.waitForURL("**/cs/sign-in");
 

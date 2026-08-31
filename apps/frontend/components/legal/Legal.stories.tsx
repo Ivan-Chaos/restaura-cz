@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent, within } from "storybook/test";
 
+import { STORAGE_INVENTORY } from "@/lib/legal/cookies";
 import { getLegalDocument } from "@/lib/legal/documents";
 
 import { CookieBanner } from "./CookieBanner";
@@ -65,8 +66,10 @@ export const StorageTable: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // One row per documented key, plus the header row.
-    await expect(canvas.getAllByRole("row")).toHaveLength(4);
+    // One row per documented key, plus the header row. Counted from the
+    // inventory rather than written down, so adding storage cannot leave this
+    // assertion quietly describing the wrong table.
+    await expect(canvas.getAllByRole("row")).toHaveLength(STORAGE_INVENTORY.length + 1);
   },
 };
 

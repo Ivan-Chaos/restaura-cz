@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, userEvent, within } from "storybook/test";
 
 import type { FormState } from "@/lib/api/form-state";
 
@@ -6,14 +7,14 @@ import { AuthForm } from "./AuthForm";
 
 /** Stand-ins for the Server Action, so the states are reachable in isolation. */
 const succeeds = async (): Promise<FormState> => ({ status: "idle" });
-const emailTaken = async (): Promise<FormState> => ({
+const invalidCredentials = async (): Promise<FormState> => ({
   status: "error",
-  code: "EMAIL_TAKEN",
+  code: "INVALID_CREDENTIALS",
 });
 const invalidFields = async (): Promise<FormState> => ({
   status: "error",
   code: "VALIDATION_FAILED",
-  fields: { email: "IS_EMAIL", password: "IS_LENGTH" },
+  fields: { email: "IS_EMAIL" },
 });
 
 const meta = {
@@ -33,28 +34,38 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SignUp: Story = {
-  args: { mode: "signUp" },
-};
-
-export const SignIn: Story = {
-  args: { mode: "signIn" },
-};
+export const Default: Story = {};
 
 /**
- * The initial state cannot show an error, so these render the form as it looks
- * before submission; the error branches are covered by the end-to-end tests
- * that actually submit.
+ * A wrong password reaches the visitor as one summary message, never pinned to
+ * an input: which of the two was wrong is exactly what must not be revealed.
  */
-export const SignUpWithTakenEmail: Story = {
-  args: { mode: "signUp", action: emailTaken },
+export const WrongCredentials: Story = {
+  args: { action: invalidCredentials },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(canvas.getByLabelText(/e-?mail/i), "owner@example.com");
+    await userEvent.type(canvas.getByLabelText(/heslo|password|passwort/i), "wrong");
+    await userEvent.click(canvas.getByRole("button", { name: /přihlásit|sign in|anmelden/i }));
+
+    await expect(await canvas.findByRole("alert")).toBeVisible();
+  },
 };
 
-export const SignUpWithInvalidFields: Story = {
-  args: { mode: "signUp", action: invalidFields },
+export const InvalidEmail: Story = {
+  args: { action: invalidFields },
 };
 
-export const SignInNarrow: Story = {
+/** The return destination rides along as a hidden field, not in the action. */
+export const WithReturnDestination: Story = {
+  args: { next: "/workspace/settings/profile" },
+  play: async ({ canvasElement }) => {
+    const hidden = canvasElement.querySelector('input[name="next"]');
+    await expect(hidden).toHaveValue("/workspace/settings/profile");
+  },
+};
+
+export const Narrow: Story = {
   globals: { viewport: { value: "mobile1" } },
-  args: { mode: "signIn" },
 };

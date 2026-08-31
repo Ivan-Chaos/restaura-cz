@@ -385,7 +385,8 @@
       "entries": {
         "locale": "Pamatuje si zvolený jazyk, abyste se při další návštěvě nevrátili na výchozí.",
         "appearance": "Pamatuje si, zda jste zvolili světlý, nebo tmavý vzhled.",
-        "consent": "Pamatuje si odpověď na upozornění o cookies, abychom se neptali znovu."
+        "consent": "Pamatuje si odpověď na upozornění o cookies, abychom se neptali znovu.",
+        "sidebar": "Pamatuje si, zda jste v přehledu své restaurace sbalili navigaci. Nastavuje se až po přihlášení."
       },
       "durations": {
         "session": "Do zavření karty",
@@ -626,7 +627,67 @@
       "MAX_LENGTH": "Tento údaj je příliš dlouhý.",
       "MIN": "Hodnota nesmí být záporná.",
       "AT_LEAST_ONE_DEFINED": "Změňte alespoň jedno pole.",
-      "INVALID": "Tato hodnota není platná."
+      "INVALID": "Tato hodnota není platná.",
+      "IS_PHONE": "Zadejte platné telefonní číslo.",
+      "IS_ARRAY": "Tato hodnota není platná.",
+      "ARRAY_MIN_SIZE": "Přidejte alespoň jednu položku.",
+      "ARRAY_MAX_SIZE": "To je více položek, než je povoleno."
+    }
+  },
+  "Registration": {
+    "title": "Vytvořte si účet",
+    "subtitle": "Nastavte svou restauraci a začněte tvořit její menu.",
+    "restaurantHeading": "Vaše restaurace",
+    "restaurantHint": "Tyto údaje uvidí hosté na zveřejněných menu.",
+    "confirmPasswordLabel": "Potvrzení hesla",
+    "passwordMismatch": "Hesla se neshodují.",
+    "restaurantNameLabel": "Název restaurace",
+    "restaurantNamePlaceholder": "U Zlaté Lípy",
+    "phonesLabel": "Telefonní čísla",
+    "phoneLabel": "Telefonní číslo {position}",
+    "phonePlaceholder": "+420 601 234 567",
+    "phonesHint": "Alespoň jedno, nejvýše tři.",
+    "addPhone": "Přidat další číslo",
+    "removePhone": "Odebrat telefonní číslo {position}",
+    "locationLabel": "Adresa",
+    "locationPlaceholder": "Náměstí Míru 12, 120 00 Praha 2",
+    "submit": "Vytvořit účet",
+    "pending": "Čekejte prosím…",
+    "completeTitle": "Dokončete nastavení restaurace",
+    "completeSubtitle": "Než otevřeme váš přehled, potřebujeme ještě několik údajů.",
+    "completeSubmit": "Uložit a pokračovat",
+    "fieldErrors": {
+      "restaurantName": "Zadejte název restaurace, nejvýše 120 znaků.",
+      "location": "Zadejte adresu restaurace, nejvýše 200 znaků.",
+      "phone": "Zadejte platné telefonní číslo.",
+      "phonesMin": "Přidejte alespoň jedno telefonní číslo.",
+      "phonesMax": "Přidejte nejvýše tři telefonní čísla."
+    }
+  },
+  "Dashboard": {
+    "brand": "Restaura",
+    "navLabel": "Přehled",
+    "signedInTo": "Přihlášeni k",
+    "signedInAs": "Přihlášeni jako {email}",
+    "menus": "Menu",
+    "settings": "Nastavení"
+  },
+  "Settings": {
+    "title": "Nastavení",
+    "subtitle": "Údaje o vaší restauraci a váš tarif.",
+    "tabsLabel": "Sekce nastavení",
+    "profile": "Restaurace",
+    "subscription": "Předplatné",
+    "save": "Uložit změny",
+    "saving": "Ukládání…",
+    "saved": "Uloženo",
+    "profileMetaTitle": "Nastavení restaurace",
+    "subscriptionMetaTitle": "Předplatné",
+    "subscriptionTab": {
+      "planName": "Předběžný přístup",
+      "statusActive": "Aktivní",
+      "planDescription": "Všechny funkce zdarma po dobu předběžného přístupu k Restauře.",
+      "comingSoon": "Placené tarify a fakturaci budete spravovat zde. Zatím není co dělat — dáme vám vědět s dostatečným předstihem, než se něco změní."
     }
   },
   "Workspace": {
@@ -645,7 +706,9 @@
     "deleteBody": "Menu „{name}“ a celý jeho obsah bude odstraněn. Pokud je zveřejněné, jeho veřejná adresa přestane fungovat. Tuto akci nelze vrátit zpět.",
     "deleteConfirm": "Smazat menu",
     "cancel": "Zrušit",
-    "metaTitle": "Vaše menu"
+    "metaTitle": "Vaše menu",
+    "notPublishedYet": "Zatím nezveřejněno",
+    "updatedAt": "Upraveno {date}"
   },
   "MenuEditor": {
     "back": "Zpět na menu",
@@ -695,6 +758,10 @@
       "MAX_LENGTH": "Tento údaj je příliš dlouhý.",
       "MIN": "Cena nesmí být záporná.",
       "AT_LEAST_ONE_DEFINED": "Změňte alespoň jedno pole.",
+      "IS_PHONE": "Zadejte platné telefonní číslo.",
+      "IS_ARRAY": "Tato hodnota není platná.",
+      "ARRAY_MIN_SIZE": "Přidejte alespoň jednu položku.",
+      "ARRAY_MAX_SIZE": "To je více položek, než je povoleno.",
       "INVALID": "Tato hodnota není platná."
     }
   },

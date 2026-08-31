@@ -29,7 +29,7 @@ function apiUrl(): string {
 }
 
 export interface ApiRequest {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   /**
    * Publish state changes at any moment, so nothing served to a guest may be

@@ -124,7 +124,7 @@ test.describe("publishing", () => {
     await createMenu(page, "Polední menu");
     const url = await publish(page);
 
-    await page.goto("/cs/workspace");
+    await page.goto("/cs/workspace/menus");
     await page.getByRole("button", { name: "Smazat", exact: true }).click();
     await page.getByRole("button", { name: "Smazat menu" }).click();
     await expect(page.getByText("Zatím žádná menu")).toBeVisible();

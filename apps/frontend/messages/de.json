@@ -385,7 +385,8 @@
       "entries": {
         "locale": "Merkt sich die gewählte Sprache, damit Sie beim nächsten Besuch nicht wieder auf der Standardsprache landen.",
         "appearance": "Merkt sich, ob Sie helles oder dunkles Erscheinungsbild gewählt haben.",
-        "consent": "Merkt sich Ihre Antwort auf den Cookie-Hinweis, damit wir nicht erneut fragen."
+        "consent": "Merkt sich Ihre Antwort auf den Cookie-Hinweis, damit wir nicht erneut fragen.",
+        "sidebar": "Merkt sich, ob Sie die Navigation in Ihrem Restaurant-Dashboard eingeklappt haben. Wird erst nach der Anmeldung gesetzt."
       },
       "durations": {
         "session": "Bis zum Schließen des Tabs",
@@ -626,7 +627,67 @@
       "MAX_LENGTH": "Diese Angabe ist zu lang.",
       "MIN": "Der Wert darf nicht negativ sein.",
       "AT_LEAST_ONE_DEFINED": "Ändern Sie mindestens ein Feld.",
-      "INVALID": "Dieser Wert ist ungültig."
+      "INVALID": "Dieser Wert ist ungültig.",
+      "IS_PHONE": "Geben Sie eine gültige Telefonnummer ein.",
+      "IS_ARRAY": "Dieser Wert ist ungültig.",
+      "ARRAY_MIN_SIZE": "Fügen Sie mindestens einen Eintrag hinzu.",
+      "ARRAY_MAX_SIZE": "Das sind mehr Einträge als erlaubt."
+    }
+  },
+  "Registration": {
+    "title": "Konto erstellen",
+    "subtitle": "Richten Sie Ihr Restaurant ein und erstellen Sie seine Speisekarte.",
+    "restaurantHeading": "Ihr Restaurant",
+    "restaurantHint": "Diese Angaben sehen Gäste auf Ihren veröffentlichten Speisekarten.",
+    "confirmPasswordLabel": "Passwort bestätigen",
+    "passwordMismatch": "Die beiden Passwörter stimmen nicht überein.",
+    "restaurantNameLabel": "Name des Restaurants",
+    "restaurantNamePlaceholder": "U Zlaté Lípy",
+    "phonesLabel": "Telefonnummern",
+    "phoneLabel": "Telefonnummer {position}",
+    "phonePlaceholder": "+420 601 234 567",
+    "phonesHint": "Mindestens eine, höchstens drei.",
+    "addPhone": "Weitere Nummer hinzufügen",
+    "removePhone": "Telefonnummer {position} entfernen",
+    "locationLabel": "Adresse",
+    "locationPlaceholder": "Náměstí Míru 12, 120 00 Praha 2",
+    "submit": "Konto erstellen",
+    "pending": "Bitte warten…",
+    "completeTitle": "Schließen Sie die Einrichtung ab",
+    "completeSubtitle": "Wir brauchen noch ein paar Angaben, bevor Sie Ihr Dashboard öffnen können.",
+    "completeSubmit": "Speichern und fortfahren",
+    "fieldErrors": {
+      "restaurantName": "Geben Sie den Namen Ihres Restaurants ein, höchstens 120 Zeichen.",
+      "location": "Geben Sie die Adresse Ihres Restaurants ein, höchstens 200 Zeichen.",
+      "phone": "Geben Sie eine gültige Telefonnummer ein.",
+      "phonesMin": "Fügen Sie mindestens eine Telefonnummer hinzu.",
+      "phonesMax": "Fügen Sie höchstens drei Telefonnummern hinzu."
+    }
+  },
+  "Dashboard": {
+    "brand": "Restaura",
+    "navLabel": "Übersicht",
+    "signedInTo": "Angemeldet bei",
+    "signedInAs": "Angemeldet als {email}",
+    "menus": "Speisekarten",
+    "settings": "Einstellungen"
+  },
+  "Settings": {
+    "title": "Einstellungen",
+    "subtitle": "Die Angaben zu Ihrem Restaurant und Ihr Tarif.",
+    "tabsLabel": "Bereiche der Einstellungen",
+    "profile": "Restaurant",
+    "subscription": "Abonnement",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert…",
+    "saved": "Gespeichert",
+    "profileMetaTitle": "Restaurant-Einstellungen",
+    "subscriptionMetaTitle": "Abonnement",
+    "subscriptionTab": {
+      "planName": "Früher Zugang",
+      "statusActive": "Aktiv",
+      "planDescription": "Alle Funktionen kostenlos, solange sich Restaura im frühen Zugang befindet.",
+      "comingSoon": "Bezahltarife und Abrechnung werden hier verwaltet. Im Moment ist nichts zu tun — wir melden uns rechtzeitig, bevor sich etwas ändert."
     }
   },
   "Workspace": {
@@ -645,7 +706,9 @@
     "deleteBody": "„{name}“ und alle Inhalte werden entfernt. Falls sie veröffentlicht ist, funktioniert ihre öffentliche Adresse nicht mehr. Das lässt sich nicht rückgängig machen.",
     "deleteConfirm": "Speisekarte löschen",
     "cancel": "Abbrechen",
-    "metaTitle": "Ihre Speisekarten"
+    "metaTitle": "Ihre Speisekarten",
+    "notPublishedYet": "Noch nicht veröffentlicht",
+    "updatedAt": "Geändert am {date}"
   },
   "MenuEditor": {
     "back": "Zurück zu den Speisekarten",
@@ -695,6 +758,10 @@
       "MAX_LENGTH": "Diese Angabe ist zu lang.",
       "MIN": "Der Preis darf nicht negativ sein.",
       "AT_LEAST_ONE_DEFINED": "Ändern Sie mindestens ein Feld.",
+      "IS_PHONE": "Geben Sie eine gültige Telefonnummer ein.",
+      "IS_ARRAY": "Dieser Wert ist ungültig.",
+      "ARRAY_MIN_SIZE": "Fügen Sie mindestens einen Eintrag hinzu.",
+      "ARRAY_MAX_SIZE": "Das sind mehr Einträge als erlaubt.",
       "INVALID": "Dieser Wert ist ungültig."
     }
   },

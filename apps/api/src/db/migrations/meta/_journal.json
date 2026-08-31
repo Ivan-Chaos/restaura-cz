@@ -8,6 +8,13 @@
       "when": 1788195928866,
       "tag": "0000_shallow_whiplash",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788201863669,
+      "tag": "0001_square_warbird",
+      "breakpoints": true
     }
   ]
 }

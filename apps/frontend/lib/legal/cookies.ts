@@ -29,7 +29,7 @@ export interface StorageEntry {
    * string, so adding an entry without writing its explanation in all three
    * languages fails to compile rather than rendering a raw key at a visitor.
    */
-  purposeKey: "locale" | "appearance" | "consent";
+  purposeKey: "locale" | "appearance" | "consent" | "sidebar";
   /**
    * Where in this repository the key is defined. The test uses it to prove the
    * entry still describes something real.
@@ -65,6 +65,17 @@ export const STORAGE_INVENTORY: readonly StorageEntry[] = [
     duration: "persistent",
     purposeKey: "consent",
     definedIn: "lib/legal/consent.ts",
+    thirdParty: false,
+  },
+  {
+    // Set only inside the signed-in dashboard, and only once an owner collapses
+    // the navigation themselves — a preference they expressed, remembered.
+    name: "sidebar_state",
+    mechanism: "cookie",
+    category: "necessary",
+    duration: "7 days",
+    purposeKey: "sidebar",
+    definedIn: "components/ui/sidebar.tsx",
     thirdParty: false,
   },
 ];

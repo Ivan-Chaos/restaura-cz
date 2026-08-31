@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -13,7 +14,13 @@ import type { Request, Response } from 'express';
 import { AppError } from '../common/app-error.js';
 import { SessionGuard, type AuthenticatedRequest } from '../common/session.guard.js';
 import { loadEnv } from '../config/env.js';
-import { AuthService, type IssuedSession, type PublicAccount } from './auth.service.js';
+import {
+  AuthService,
+  type IssuedSession,
+  type PublicAccount,
+  type PublicProfile,
+} from './auth.service.js';
+import { ProfileDto } from './dto/profile.dto.js';
 import { SignInDto } from './dto/sign-in.dto.js';
 import { SignUpDto } from './dto/sign-up.dto.js';
 import {
@@ -33,8 +40,9 @@ export class AuthController {
   async signUp(
     @Body() dto: SignUpDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ account: PublicAccount }> {
-    const issued = await this.auth.signUp(dto.email, dto.password);
+  ): Promise<AccountPayload> {
+    const { email, password, ...profile } = dto;
+    const issued = await this.auth.signUp(email, password, profile);
     return this.respondWithSession(issued, response);
   }
 
@@ -43,7 +51,7 @@ export class AuthController {
   async signIn(
     @Body() dto: SignInDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ account: PublicAccount }> {
+  ): Promise<AccountPayload> {
     const issued = await this.auth.signIn(dto.email, dto.password);
     return this.respondWithSession(issued, response);
   }
@@ -62,23 +70,50 @@ export class AuthController {
     response.clearCookie(SESSION_COOKIE, clearedCookieOptions(this.cookieSecure));
   }
 
+  /**
+   * The one read every signed-in page makes. It carries the profile — `null`
+   * for an account created before profiles existed — so the frontend can gate
+   * the dashboard without a second round trip.
+   */
   @Get('me')
   @UseGuards(SessionGuard)
-  me(@Req() request: Request): { account: PublicAccount } {
+  async me(@Req() request: Request): Promise<AccountPayload> {
     const { account } = request as AuthenticatedRequest;
     if (!account) throw AppError.unauthenticated();
-    return { account };
+
+    return { account, profile: await this.auth.getProfile(account.id) };
   }
 
-  private respondWithSession(
-    issued: IssuedSession,
-    response: Response,
-  ): { account: PublicAccount } {
+  /**
+   * Upsert, not create-then-update: the profile-completion step and the
+   * settings form are the same write under the same rules, and a caller has no
+   * reason to know which of the two it is performing.
+   */
+  @Put('profile')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SessionGuard)
+  async putProfile(
+    @Req() request: Request,
+    @Body() dto: ProfileDto,
+  ): Promise<{ profile: PublicProfile }> {
+    const { account } = request as AuthenticatedRequest;
+    if (!account) throw AppError.unauthenticated();
+
+    return { profile: await this.auth.upsertProfile(account.id, dto) };
+  }
+
+  private respondWithSession(issued: IssuedSession, response: Response): AccountPayload {
     response.cookie(
       SESSION_COOKIE,
       issued.token,
       sessionCookieOptions(this.cookieSecure, issued.expiresAt),
     );
-    return { account: issued.account };
+    return { account: issued.account, profile: issued.profile };
   }
+}
+
+/** What sign-up, sign-in and `me` all answer with, so the frontend has one shape. */
+interface AccountPayload {
+  account: PublicAccount;
+  profile: PublicProfile | null;
 }

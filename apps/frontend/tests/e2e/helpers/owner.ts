@@ -14,11 +14,21 @@ const BANNER_LABELS = [cs.Legal.banner.label, en.Legal.banner.label, de.Legal.ba
 export async function dismissCookieNotice(page: Page): Promise<void> {
   for (const label of BANNER_LABELS) {
     const notice = page.getByRole("region", { name: label });
-    if ((await notice.count()) > 0) {
-      await notice.getByRole("button").first().click();
+    if ((await notice.count()) === 0) continue;
+
+    // The decision is remembered in a cookie, so on a second visit within the
+    // same context the notice may already be on its way out. Finding it is not
+    // a promise that it will still be there a moment later.
+    const dismiss = notice.getByRole("button").first();
+    try {
+      await dismiss.click({ timeout: 5_000 });
+    } catch {
       await expect(notice).toHaveCount(0);
       return;
     }
+
+    await expect(notice).toHaveCount(0);
+    return;
   }
 }
 
@@ -37,25 +47,58 @@ export const PASSWORD = "correct horse battery";
 
 export interface Owner {
   email: string;
+  restaurantName: string;
 }
 
-/** Registers a new owner and leaves the page on the workspace. */
+/** A valid profile, for the suites whose subject is something other than it. */
+export const PROFILE = {
+  restaurantName: "U Zlaté Lípy",
+  phone: "+420 601 234 567",
+  location: "Náměstí Míru 12, 120 00 Praha 2",
+};
+
+export const LABELS = {
+  email: /e-?mail/i,
+  password: /^(heslo|password|passwort)$/i,
+  confirmPassword: /potvrzení hesla|confirm password|passwort bestätigen/i,
+  restaurantName: /název restaurace|restaurant name|name des restaurants/i,
+  phone: /telefonní číslo 1|phone number 1|telefonnummer 1/i,
+  location: /^(adresa|address|adresse)$/i,
+  createAccount: /vytvořit účet|create account|konto erstellen/i,
+  addPhone: /přidat další číslo|add another number|weitere nummer hinzufügen/i,
+  signOut: /odhlásit se|sign out|abmelden/i,
+};
+
+/** Fills the restaurant half of the registration or completion form. */
+export async function fillProfile(
+  page: Page,
+  overrides: Partial<typeof PROFILE> = {},
+): Promise<void> {
+  const values = { ...PROFILE, ...overrides };
+  await page.getByLabel(LABELS.restaurantName).fill(values.restaurantName);
+  await page.getByLabel(LABELS.phone).fill(values.phone);
+  await page.getByLabel(LABELS.location).fill(values.location);
+}
+
+/** Registers a new owner and leaves the page on their menus. */
 export async function signUp(page: Page, locale = "cs"): Promise<Owner> {
   const email = uniqueEmail();
 
   await page.goto(`/${locale}/sign-up`);
   await dismissCookieNotice(page);
-  await page.getByLabel(/e-?mail/i).fill(email);
-  await page.getByLabel(/heslo|password|passwort/i).fill(PASSWORD);
-  await page.getByRole("button", { name: /vytvořit účet|create account|konto erstellen/i }).click();
+  await page.getByLabel(LABELS.email).fill(email);
+  await page.getByLabel(LABELS.password).fill(PASSWORD);
+  await page.getByLabel(LABELS.confirmPassword).fill(PASSWORD);
+  await fillProfile(page);
+  await page.getByRole("button", { name: LABELS.createAccount }).click();
 
-  await page.waitForURL(`**/${locale}/workspace`);
-  return { email };
+  await page.waitForURL(`**/${locale}/workspace/menus`);
+  return { email, restaurantName: PROFILE.restaurantName };
 }
 
-/** Creates a menu from the workspace and returns its editor URL. */
+/** Creates a menu from the menus section and returns its editor URL. */
 export async function createMenu(page: Page, name: string, locale = "cs"): Promise<string> {
-  await page.goto(`/${locale}/workspace`);
+  await page.goto(`/${locale}/workspace/menus`);
   await page
     .getByRole("textbox", { name: /název menu|menu name|name der speisekarte/i })
     .fill(name);

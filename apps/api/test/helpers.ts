@@ -24,6 +24,13 @@ export function uniqueEmail(prefix = 'owner'): string {
   return `${prefix}-${Date.now()}-${uniqueCounter}@example.com`;
 }
 
+/** A valid restaurant profile, for tests whose subject is something else. */
+export const PROFILE = {
+  restaurantName: 'U Zlaté Lípy',
+  phones: ['+420 601 234 567'],
+  location: 'Náměstí Míru 12, 120 00 Praha 2',
+} as const;
+
 export async function signUp(
   testApp: TestApp,
   email = uniqueEmail(),
@@ -31,7 +38,7 @@ export async function signUp(
 ): Promise<SignedUpOwner> {
   const response = await request(testApp.server)
     .post('/auth/sign-up')
-    .send({ email, password })
+    .send({ email, password, ...PROFILE })
     .expect(201);
 
   return {
@@ -39,6 +46,34 @@ export async function signUp(
     accountId: response.body.account.id,
     email,
   };
+}
+
+/**
+ * An account with credentials but no restaurant profile — the state every
+ * account created before this feature is in. Written straight to the database
+ * because the API deliberately offers no way to produce it.
+ */
+export async function signUpWithoutProfile(
+  testApp: TestApp,
+  email = uniqueEmail('legacy'),
+  password = 'correct horse battery',
+): Promise<SignedUpOwner> {
+  const owner = await signUp(testApp, email, password);
+  await deleteProfile(owner.accountId);
+  return owner;
+}
+
+async function deleteProfile(accountId: string): Promise<void> {
+  const { Client } = await import('pg');
+  const { testDatabaseUrl } = await import('./database.js');
+
+  const client = new Client({ connectionString: testDatabaseUrl() });
+  await client.connect();
+  try {
+    await client.query('delete from "restaurant_profile" where "account_id" = $1', [accountId]);
+  } finally {
+    await client.end();
+  }
 }
 
 /** Creates a menu and returns its id. */

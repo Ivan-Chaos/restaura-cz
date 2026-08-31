@@ -52,7 +52,7 @@ export async function truncateAll(databaseUrl: string): Promise<void> {
   await client.connect();
   try {
     await client.query(
-      'truncate table "menu_item", "menu_section", "menu", "session", "owner_account" restart identity cascade',
+      'truncate table "menu_item", "menu_section", "menu", "session", "restaurant_profile", "owner_account" restart identity cascade',
     );
   } finally {
     await client.end();

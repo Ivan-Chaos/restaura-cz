@@ -385,7 +385,8 @@
       "entries": {
         "locale": "Remembers the language you chose, so you are not sent back to the default on your next visit.",
         "appearance": "Remembers whether you chose a light or dark appearance.",
-        "consent": "Remembers the answer you gave to the cookie notice, so we do not ask again."
+        "consent": "Remembers the answer you gave to the cookie notice, so we do not ask again.",
+        "sidebar": "Remembers whether you collapsed the navigation in your restaurant dashboard. Set only after you sign in."
       },
       "durations": {
         "session": "Until you close the tab",
@@ -626,7 +627,67 @@
       "MAX_LENGTH": "This is too long.",
       "MIN": "This value cannot be negative.",
       "AT_LEAST_ONE_DEFINED": "Change at least one field.",
-      "INVALID": "This value is not valid."
+      "INVALID": "This value is not valid.",
+      "IS_PHONE": "Enter a valid phone number.",
+      "IS_ARRAY": "This value is not valid.",
+      "ARRAY_MIN_SIZE": "Add at least one entry.",
+      "ARRAY_MAX_SIZE": "That is more entries than allowed."
+    }
+  },
+  "Registration": {
+    "title": "Create your account",
+    "subtitle": "Set up your restaurant and start building its menu.",
+    "restaurantHeading": "Your restaurant",
+    "restaurantHint": "Guests see this on your published menus.",
+    "confirmPasswordLabel": "Confirm password",
+    "passwordMismatch": "The two passwords do not match.",
+    "restaurantNameLabel": "Restaurant name",
+    "restaurantNamePlaceholder": "U Zlaté Lípy",
+    "phonesLabel": "Phone numbers",
+    "phoneLabel": "Phone number {position}",
+    "phonePlaceholder": "+420 601 234 567",
+    "phonesHint": "At least one, up to three.",
+    "addPhone": "Add another number",
+    "removePhone": "Remove phone number {position}",
+    "locationLabel": "Address",
+    "locationPlaceholder": "Náměstí Míru 12, 120 00 Praha 2",
+    "submit": "Create account",
+    "pending": "Please wait…",
+    "completeTitle": "Finish setting up your restaurant",
+    "completeSubtitle": "We need a few details before you can open your dashboard.",
+    "completeSubmit": "Save and continue",
+    "fieldErrors": {
+      "restaurantName": "Enter your restaurant’s name, up to 120 characters.",
+      "location": "Enter your restaurant’s address, up to 200 characters.",
+      "phone": "Enter a valid phone number.",
+      "phonesMin": "Add at least one phone number.",
+      "phonesMax": "Add at most three phone numbers."
+    }
+  },
+  "Dashboard": {
+    "brand": "Restaura",
+    "navLabel": "Dashboard",
+    "signedInTo": "Signed in to",
+    "signedInAs": "Signed in as {email}",
+    "menus": "Menus",
+    "settings": "Settings"
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Your restaurant’s details and your plan.",
+    "tabsLabel": "Settings sections",
+    "profile": "Restaurant",
+    "subscription": "Subscription",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "profileMetaTitle": "Restaurant settings",
+    "subscriptionMetaTitle": "Subscription",
+    "subscriptionTab": {
+      "planName": "Early access",
+      "statusActive": "Active",
+      "planDescription": "Every feature, at no cost, while Restaura is in early access.",
+      "comingSoon": "Paid plans and billing will be managed here. Nothing to do for now — we will let you know well before anything changes."
     }
   },
   "Workspace": {
@@ -645,7 +706,9 @@
     "deleteBody": "“{name}” and everything in it will be removed. If it is published, its public address stops working. This cannot be undone.",
     "deleteConfirm": "Delete menu",
     "cancel": "Cancel",
-    "metaTitle": "Your menus"
+    "metaTitle": "Your menus",
+    "notPublishedYet": "Not published yet",
+    "updatedAt": "Updated {date}"
   },
   "MenuEditor": {
     "back": "Back to menus",
@@ -695,6 +758,10 @@
       "MAX_LENGTH": "This is too long.",
       "MIN": "The price cannot be negative.",
       "AT_LEAST_ONE_DEFINED": "Change at least one field.",
+      "IS_PHONE": "Enter a valid phone number.",
+      "IS_ARRAY": "This value is not valid.",
+      "ARRAY_MIN_SIZE": "Add at least one entry.",
+      "ARRAY_MAX_SIZE": "That is more entries than allowed.",
       "INVALID": "This value is not valid."
     }
   },
