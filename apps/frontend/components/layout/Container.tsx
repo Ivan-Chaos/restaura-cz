@@ -19,6 +19,8 @@ const containerVariants = cva("mx-auto w-full px-4 sm:px-6", {
       md: "max-w-4xl",
       /** Wide layouts — three columns, admin tables. */
       lg: "max-w-6xl",
+      /** Marketing sections — full-bleed photography needs room to breathe. */
+      xl: "max-w-7xl",
       /** Edge-to-edge; still applies gutters. */
       full: "max-w-none",
     },

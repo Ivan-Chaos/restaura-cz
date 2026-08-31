@@ -55,3 +55,38 @@ pnpm test:stories         # every story as a browser test
 pnpm test:e2e             # sample menu on a production build
 pnpm test:e2e:storybook   # built docs site + toolbars
 ```
+
+# Landing page & marketing assets
+
+The public landing page is `app/[locale]/page.tsx` → `components/landing/`. Content lives as typed data in `lib/landing/` (`plans.ts`, `capabilities.ts`, `assets.ts`, `links.ts`) so pricing and copy change without touching components, and so `tests/unit/landing-*.test.ts` can assert the spec's numbers directly. Spec: `specs/002-marketing-landing-page/`.
+
+- **Media is never hot-linked, and every asset declares how it is delivered.** `lib/landing/assets.ts` is the manifest, and each entry is `delivery: "download"` or `delivery: "stream"`. Downloads are fetched by `pnpm assets:landing` into `public/landing/` and committed; `--check` validates budgets and dimensions without touching the network (the CI path). Streams live in our own R2 bucket and are range-requested as they play — used for the hero clip, which is ~130 MB of UHD and has no business in git.
+- **The hero clip is opt-in, and `HeroVideo` is where that is decided.** Nothing is requested until the `load` event has fired *and* an idle callback runs, and never at all under reduced motion, reduced data, Save-Data, a sub-4G connection, or a viewport under 768px. The `<video>` is not rendered until every check passes — `preload="none"` is not enough on its own, because `autoPlay` overrides it. The poster underneath is always server-rendered and is the LCP element, so the clip can never delay first paint.
+- **Never use a stock photo carrying another company's branding.** Two of the QR candidates did; the page draws its own table tent (`components/landing/TableTent.tsx`) instead. Implying an endorsement is a Pexels licence violation, not a style preference.
+- **`overlay` / `overlay-foreground` are the tokens for text on media** — `bg-overlay/60` for a scrim, `text-overlay-foreground` for what sits on it. They are the one pair that is identical in light and dark, and they are *not* safe on ordinary `background`/`card` surfaces.
+- **CTA destinations are configuration**: `NEXT_PUBLIC_SIGNUP_URL` and `NEXT_PUBLIC_NOTIFY_URL` (both support `{locale}` and `{plan}` placeholders) with `mailto:` fallbacks. A call to action must never resolve to `#` — an e2e test enforces it. `NEXT_PUBLIC_SITE_URL` sets `metadataBase`, without which a relative Open Graph image is a build error.
+- **No `motion` on this route.** Reveal-on-scroll is `hooks/use-in-view.ts` + `components/landing/Reveal.tsx`, about 1 KB. Its three states (`idle`/`hidden`/`shown`) exist so nothing is ever hidden that the reader can already see: only an element the browser has confirmed is off-screen is made transparent.
+- **Link-buttons use `buttonVariants` on a real anchor**, not the `Button` primitive with `render`. Base UI's button expects a native `<button>`; given an anchor it either warns or replaces the link's semantics with button ones.
+
+# Legal pages and cookie consent
+
+`/[locale]/privacy`, `/terms` and `/cookies` render from `lib/legal/documents.ts` through one
+`components/legal/LegalDocument.tsx`; the prose lives in the `Legal` message namespace so the
+catalogue gate proves all three languages describe the same document. All three are `noindex`.
+
+- **`lib/legal/cookies.ts` is the source of truth for everything stored on a visitor's device**,
+  and `tests/unit/legal-cookies.test.ts` checks it against the code that actually sets it — in
+  both directions. Add storage without adding it to `STORAGE_INVENTORY` and the suite fails,
+  because at that moment the cookie policy has started lying.
+- **The banner has two modes, derived not chosen.** Today nothing stored needs consent
+  (a language choice, an appearance preference, and the record of the choice itself are all
+  exempt under ePrivacy Art. 5(3)), so it informs and offers one dismissal. Add a non-necessary
+  entry to the inventory and `REQUIRES_CONSENT` flips it to a real accept/reject choice with no
+  further code change.
+- **Gate anything non-essential on `allows("analytics")`** from `hooks/use-cookie-consent.ts`.
+  It returns false until someone actively says yes — absence is refusal, and a stored decision
+  made against a different set of categories is discarded, not honoured.
+- **Never prefetch from the banner.** It renders on every route including the guest menu, where
+  three speculative RSC requests to a policy nobody opens is a real cost on a real connection.
+- **The operator's identity comes from `NEXT_PUBLIC_LEGAL_*`.** Unset, the pages say they are
+  drafts. Do not hard-code a company name to make that notice go away.

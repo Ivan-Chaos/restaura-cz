@@ -50,6 +50,10 @@
      colour. Proving a theme may legitimately collapse a distinction. */
   --price: var(--palette-graphite-900);
 
+  /* Media — the scrim over photography, identical in both appearances. */
+  --overlay: var(--palette-graphite-950);
+  --overlay-foreground: var(--palette-graphite-50);
+
   /* Structure ------------------------------------------------------------ */
   --border: var(--palette-graphite-400);
   --input: var(--palette-graphite-600);
@@ -127,6 +131,10 @@
 
   /* Menu semantics ------------------------------------------------------- */
   --price: var(--palette-graphite-100);
+
+  /* Media — unchanged from the light block on purpose. */
+  --overlay: var(--palette-graphite-950);
+  --overlay-foreground: var(--palette-graphite-50);
 
   /* Structure ------------------------------------------------------------ */
   --border: var(--palette-graphite-700);

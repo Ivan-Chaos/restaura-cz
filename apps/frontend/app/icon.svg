@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Restaura">
+  <!--
+    The Restaura mark: a cloche on a plate.
+
+    Drawn as flat geometry rather than set as a letterform, because a favicon
+    is read at 16px in a crowded tab strip. A silhouette survives that; a serif
+    "R" turns to mush, and depends on a font the browser may not have.
+
+    Colours are the brand palette resolved to hex — `--palette-terracotta-600`
+    and `--palette-cream-50` from `styles/palette.css`. They are literals here
+    on purpose: this file is served as a static asset, outside any theme scope,
+    so there are no custom properties to inherit. Keep them in step with the
+    palette by hand if the ramp ever moves.
+  -->
+  <rect width="64" height="64" rx="14" fill="#b54e21" />
+  <g fill="#fffdfa">
+    <!-- Dome: a half-disc of radius 20 sitting on the plate line. -->
+    <path d="M12 42a20 20 0 0 1 40 0Z" />
+    <!-- Handle, just touching the apex. -->
+    <circle cx="32" cy="19" r="3.4" />
+    <!-- Plate. -->
+    <rect x="7" y="45" width="50" height="6" rx="3" />
+  </g>
+</svg>

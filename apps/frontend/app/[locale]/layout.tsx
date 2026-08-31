@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { AppearanceProvider } from "@/components/theme/AppearanceProvider";
+import { CookieBanner } from "@/components/legal/CookieBanner";
 import "../globals.css";
 
 /**
@@ -39,7 +40,29 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Metadata" });
-  return { title: t("title"), description: t("description") };
+  const name = t("title");
+
+  return {
+    // Open Graph images must be absolute URLs. Declaring the base here lets
+    // every page below write a relative path and lets the deployment decide the
+    // origin; without it, a relative OG image is a build error.
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    title: {
+      default: name,
+      // Pages below inherit "<their title> | Restaura". A page that is not ours
+      // to brand — a restaurant's own menu — opts out with `title.absolute`.
+      template: `%s | ${name}`,
+    },
+    description: t("description"),
+    applicationName: name,
+    openGraph: {
+      siteName: name,
+      type: "website",
+      locale,
+    },
+  };
 }
 
 export default async function LocaleLayout({
@@ -69,7 +92,16 @@ export default async function LocaleLayout({
           Removing it is what brings the shared bundle inside the 200 KB budget.
         */}
         <NextIntlClientProvider>
-          <AppearanceProvider>{children}</AppearanceProvider>
+          <AppearanceProvider>
+            {children}
+            {/*
+              Last in the DOM on purpose: it is fixed to the bottom of the
+              viewport visually, but it comes after the page in reading and tab
+              order, so it never stands between a visitor and the content they
+              came for.
+            */}
+            <CookieBanner />
+          </AppearanceProvider>
         </NextIntlClientProvider>
       </body>
     </html>

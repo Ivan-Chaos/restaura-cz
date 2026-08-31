@@ -1,15 +1,416 @@
 {
   "Metadata": {
     "title": "Restaura",
-    "description": "Restaura – restaurant management made simple"
+    "description": "Digital menus for restaurants — publish a menu, export a print-ready PDF and generate table QR codes."
+  },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — your menu, on every table",
+      "description": "Publish a digital menu, export a print-ready PDF and generate table QR codes. Free to start."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — home"
+    },
+    "hero": {
+      "headline": "Your menu, on every table",
+      "subheadline": "A digital menu, a print-ready PDF and table QR codes — from one place, in minutes.",
+      "cta": "Start for free",
+      "seePricing": "See pricing"
+    },
+    "capabilities": {
+      "sectionTitle": "What you get",
+      "digitalMenu": {
+        "eyebrow": "Digital menu",
+        "title": "A menu that reads beautifully on every phone",
+        "body": "Your dishes, prices and allergens in a page that opens instantly — no app to install, no pinching to zoom. Change a price once and every guest sees it.",
+        "demo": "See a live menu"
+      },
+      "pdf": {
+        "eyebrow": "PDF export",
+        "title": "Print-ready, always up to date",
+        "body": "Export the same menu as a clean PDF whenever the kitchen changes. Print it, email it, hand it to a supplier — no designer, no waiting."
+      },
+      "qr": {
+        "eyebrow": "Table QR codes",
+        "title": "One scan from the table to the menu",
+        "body": "Generate a QR code for every table and put it where your guests already look. They scan, the menu opens, you are done."
+      }
+    },
+    "steps": {
+      "title": "Up and running before service",
+      "create": {
+        "title": "Add your menu",
+        "body": "Type in your categories and dishes, or paste them from what you already have."
+      },
+      "generate": {
+        "title": "Generate PDF and QR codes",
+        "body": "One click gives you a print-ready PDF and a QR code for every table."
+      },
+      "scan": {
+        "title": "Guests scan at the table",
+        "body": "They open the menu on their own phone — always the current one."
+      }
+    },
+    "pricing": {
+      "title": "Start free. Grow when you need to.",
+      "subtitle": "The Free plan is enough to put a real menu on your tables today. Pro and Pro Plus are on the way.",
+      "comingSoon": "Coming soon",
+      "recommended": "Recommended",
+      "perMonth": "{price}/month",
+      "free": "Free",
+      "noPriceYet": "Coming soon",
+      "ctaSignup": "Start for free",
+      "ctaNotify": "Notify me"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "tagline": "Everything you need for one menu.",
+        "features": {
+          "oneMenu": "1 menu",
+          "thirtyItems": "Up to 30 menu items",
+          "brandedPdf": "PDF export with Restaura branding",
+          "brandedQr": "Table QR codes with Restaura branding"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "For a full à la carte kitchen.",
+        "features": {
+          "fiveMenus": "5 menus",
+          "unlimitedItems": "Unlimited menu items",
+          "noBranding": "No Restaura branding"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "For groups and venues that change daily.",
+        "features": {
+          "menuParsing": "Import an existing menu automatically",
+          "unlimitedMenus": "Unlimited menus",
+          "unlimitedSize": "Unlimited menu size",
+          "timeMenus": "Time-based menus (morning, evening)",
+          "qrCodes": "Table QR codes",
+          "pdfTemplates": "PDF export with unlimited templates"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "I would like to start with Restaura",
+      "mailSubjectNotify": "Notify me when {plan} launches"
+    },
+    "assets": {
+      "hero": {
+        "alt": "A restaurant dining room in warm daylight, tables laid with white cloths and glassware"
+      },
+      "digitalMenu": {
+        "alt": "Close-up of two hands holding a phone at a wooden café counter"
+      },
+      "pdf": {
+        "alt": "A hand holding a printed menu card above a café table with coffee and cake"
+      },
+      "qr": {
+        "alt": "A table tent card standing on a table, showing a QR code above the words Scan for the menu"
+      },
+      "og": {
+        "alt": "A restaurant dining room in warm daylight, tables laid and ready for service"
+      }
+    },
+    "footer": {
+      "tagline": "Digital menus for restaurants.",
+      "legal": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact",
+      "copyright": "© {year} Restaura",
+      "cookies": "Cookies"
+    }
+  },
+  "Legal": {
+    "updated": "Last updated {date}",
+    "backHome": "Back to home",
+    "draftNotice": {
+      "title": "Draft — not yet in force",
+      "body": "The operator's registered details have not been configured for this deployment, so this document is incomplete and should not be relied on. Set the NEXT_PUBLIC_LEGAL_* environment variables and have the text reviewed by a lawyer before publishing."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "meta": {
+        "title": "Privacy policy",
+        "description": "What Restaura does with personal data: what we collect, why, who else is involved, and the rights you have."
+      },
+      "sections": {
+        "who": {
+          "title": "Who is responsible",
+          "body": [
+            "This service is operated by {name}, company number {companyId}, registered at {address}. For anything in this policy, write to {email}.",
+            "It covers the Restaura website and the digital menus published through it. It does not cover a restaurant's own website, or anything that happens after you follow a link away from ours."
+          ]
+        },
+        "whatWeCollect": {
+          "title": "What we collect",
+          "body": [
+            "Browsing this site: our hosting provider processes the technical data any web server receives — your IP address, the page requested, the time, and your browser's user-agent string — in order to deliver the page and keep the service secure.",
+            "Your preferences: the language you pick and whether you prefer a light or dark appearance are stored on your own device. They are not sent to us.",
+            "Writing to us: if you email us we process your address and whatever you tell us, in order to reply.",
+            "We use no analytics, no advertising and no tracking of any kind. We do not profile visitors, and we never sell personal data or hand it to anyone for their own purposes."
+          ]
+        },
+        "legalBasis": {
+          "title": "Why we are allowed to",
+          "body": [
+            "Delivering and securing the site rests on our legitimate interest in running a service that works and is not abused — Article 6(1)(f) GDPR.",
+            "Answering your enquiry rests on taking steps at your request before entering a contract, or on our legitimate interest in replying to people who write to us — Article 6(1)(b) and (f).",
+            "Anything that is not strictly necessary would rest on your consent under Article 6(1)(a), which you could withdraw at any time. Nothing on this site currently needs it."
+          ]
+        },
+        "storage": {
+          "title": "What we store on your device",
+          "body": [
+            "Three things, all first-party, none of which can follow you to another website: the language you chose, your light or dark preference, and a record of the answer you gave to our cookie notice.",
+            "The cookie policy lists each one, what it does and how long it lasts."
+          ]
+        },
+        "processors": {
+          "title": "Who else is involved",
+          "body": [
+            "Hosting: the site is served by our hosting provider, which processes connection data on our behalf under a data-processing agreement.",
+            "Media delivery: the video on our home page is served from Cloudflare R2, so requesting it means your IP address reaches Cloudflare, acting as our processor. That request is not made at all if your browser or system asks for reduced data or reduced motion, or if your screen is small.",
+            "Fonts are served from our own domain. No request is made to Google or any other font provider when you visit."
+          ]
+        },
+        "transfers": {
+          "title": "Transfers outside the EEA",
+          "body": [
+            "Cloudflare runs a global network, so media requests may be served from or routed through servers outside the European Economic Area. Those transfers rely on the European Commission's standard contractual clauses."
+          ]
+        },
+        "retention": {
+          "title": "How long we keep it",
+          "body": [
+            "Server logs are kept only as long as needed to operate and secure the service, then deleted or aggregated.",
+            "Email correspondence is kept as long as needed to deal with the matter, and afterwards only for as long as we are required to keep records.",
+            "Anything stored on your device stays until it expires or you clear it; the cookie policy gives the lifetimes."
+          ]
+        },
+        "rights": {
+          "title": "Your rights",
+          "body": [
+            "You may ask us for a copy of your personal data, to correct it, to erase it, to restrict or object to how we use it, and to receive it in a portable form. Where we rely on consent you may withdraw it at any time, without affecting what was lawful beforehand.",
+            "Write to {email} and we will answer within one month.",
+            "If you believe we have got it wrong you may complain to the {authority} ({authorityUrl}), or to the supervisory authority where you live."
+          ]
+        },
+        "children": {
+          "title": "Children",
+          "body": [
+            "This is a service for businesses. It is not directed at children and we do not knowingly collect their personal data."
+          ]
+        },
+        "changes": {
+          "title": "Changes",
+          "body": [
+            "If this policy changes materially we will update the date at the top, and where the change affects existing users we will tell them directly."
+          ]
+        }
+      }
+    },
+    "terms": {
+      "title": "Terms and conditions",
+      "meta": {
+        "title": "Terms and conditions",
+        "description": "The terms on which Restaura provides digital menus, PDF export and table QR codes."
+      },
+      "sections": {
+        "scope": {
+          "title": "These terms",
+          "body": [
+            "These terms govern the provision and use of Restaura, operated by {name}, company number {companyId}, registered at {address}. They form part of every agreement under which we provide the service, and by using it you agree to them.",
+            "The service is provided to businesses only. By using it you confirm that you act in the course of your business or profession and not as a consumer, and that you are authorised to accept these terms for the business you represent.",
+            "As both parties act as entrepreneurs, the parties agree that the provisions of the Czech Civil Code on contracts concluded by way of adhesion do not apply to this agreement."
+          ]
+        },
+        "service": {
+          "title": "What the service does",
+          "body": [
+            "Restaura lets a restaurant publish a digital menu, export that menu as a printable PDF, and generate QR codes that open it at the table.",
+            "Anything described anywhere on our site as planned or coming soon is a statement of present intention only. It is not a commitment, forms no part of this agreement, and may change or be abandoned without notice."
+          ]
+        },
+        "eligibility": {
+          "title": "Business use only",
+          "body": [
+            "You must be capable of entering into a contract and must use the service for business purposes. We do not offer the service to consumers and may decline or end access that appears to be used otherwise.",
+            "You are responsible for everything done through your access, including by your staff and anyone else you allow to use it."
+          ]
+        },
+        "yourContent": {
+          "title": "Your menu stays yours",
+          "body": [
+            "Everything you put into the service — dish names, descriptions, prices, photographs, your trade marks — remains yours. You grant us only the non-exclusive permission we need to host it, show it to your guests and render it into the PDFs and QR codes you ask for, for as long as you use the service.",
+            "You confirm that you hold every right needed for that content, and that publishing it breaks no law and infringes nobody's rights.",
+            "You alone are responsible for what your menu says and for its compliance with food-information, allergen, labelling and price-display rules. We do not check, verify or correct menu content and are not responsible for it."
+          ]
+        },
+        "warranties": {
+          "title": "The service is provided as it is",
+          "body": [
+            "The service is provided on an “as is” and “as available” basis. To the fullest extent Czech law permits, we give no warranties, conditions or guarantees of any kind, express or implied, including as to quality, fitness for a particular purpose, accuracy, or uninterrupted or error-free operation.",
+            "In particular, we do not warrant that generated PDFs or QR codes are fit for any regulatory, contractual or commercial purpose, that the service will meet your requirements, or that any defect will be corrected."
+          ]
+        },
+        "acceptableUse": {
+          "title": "What you must not do",
+          "body": [
+            "Do not publish anything unlawful, misleading or infringing through the service. Do not attempt to disrupt, overload, probe, circumvent or reverse-engineer it, use it to build a competing product, or resell or sublicense it.",
+            "We may suspend or restrict access immediately, without notice and without liability, where we reasonably believe this section has been breached or where continued access risks harm to the service or to others."
+          ]
+        },
+        "plans": {
+          "title": "Plans and payment",
+          "body": [
+            "The Free plan is provided at no charge, within the limits shown on our pricing page, and without any commitment as to its continued availability.",
+            "Pro and Pro Plus are not available and cannot be purchased. Any prices shown for them are indicative only and create no offer or obligation. If paid plans are introduced, the applicable price, billing terms and VAT treatment will be agreed before any payment is taken."
+          ]
+        },
+        "availability": {
+          "title": "Availability",
+          "body": [
+            "We give no guarantee of availability, uptime, response time or performance, and no service-level commitment of any kind. We may change, limit, suspend or withdraw the service or any feature at any time.",
+            "We may carry out maintenance at any time. We are not obliged to retain, back up or restore your data, and you should keep your own current copy of your menu content at all times."
+          ]
+        },
+        "liability": {
+          "title": "Limitation of liability",
+          "body": [
+            "To the fullest extent permitted by Czech law we are not liable for: lost profit, revenue, business, contracts, goodwill or anticipated savings; loss or corruption of data; loss arising from menu content, including incorrect prices or allergen information; loss arising from unavailability, interruption or delay; or any indirect or consequential loss, in each case however it arises.",
+            "Where we are liable despite the above, our total aggregate liability for all claims arising in any twelve-month period is limited to the amount you actually paid us for the service in that period. Where the service is provided free of charge, our liability is excluded to the fullest extent the law permits.",
+            "Nothing in these terms limits liability that cannot lawfully be limited in advance, in particular liability for harm caused intentionally or by gross negligence and for harm to a person's natural rights, including life and health. This paragraph does not extend our liability beyond what the law requires."
+          ]
+        },
+        "indemnity": {
+          "title": "Claims brought by others",
+          "body": [
+            "You will indemnify us against any claim, proceeding, loss, damage, penalty or cost, including reasonable legal costs, that is brought by or owed to a third party and arises from your menu content, your use of the service, or your breach of these terms.",
+            "We will tell you promptly of any such claim and will not settle it without your agreement, which you will not unreasonably withhold."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Events outside our control",
+          "body": [
+            "Neither party is liable for any failure or delay caused by circumstances beyond its reasonable control, including outages at hosting, network or other suppliers, failure of public communications networks, power failure, cyber-attack, industrial action, epidemic, act of a public authority, war or natural event."
+          ]
+        },
+        "claims": {
+          "title": "Notifying a claim",
+          "body": [
+            "You must notify us of any claim in writing, with enough detail for us to investigate, within thirty days of becoming aware of the circumstances giving rise to it.",
+            "The parties agree that the limitation period for rights arising from or relating to this agreement is one year, running from the day the right could first have been exercised."
+          ]
+        },
+        "termination": {
+          "title": "Ending it",
+          "body": [
+            "You may stop using the service and delete your menus at any time.",
+            "We may end or suspend access to a free plan at any time, for any reason, without liability. Where a paid plan is in place we may end it on thirty days' notice, or immediately for material breach, insolvency or unlawful use.",
+            "After termination we will keep your menu content available to you for thirty days, after which it may be deleted. Termination does not affect any right or liability that arose before it."
+          ]
+        },
+        "changes": {
+          "title": "Changes to these terms",
+          "body": [
+            "We may change these terms. We will publish the updated version and, where a change materially affects you, tell you before it takes effect. Continuing to use the service after that means you accept it.",
+            "Each party assumes the risk of a change of circumstances within the meaning of the Czech Civil Code."
+          ]
+        },
+        "law": {
+          "title": "Governing law",
+          "body": [
+            "These terms, and anything arising from them, are governed by Czech law, excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods.",
+            "If something goes wrong, tell us first. Write to {email} and we will work with you in good faith to put it right; almost everything is resolved this way.",
+            "These terms are published in Czech, English and German. In the event of any discrepancy between the versions, the Czech version prevails. Anything that cannot be resolved between us falls under the exclusive jurisdiction of the Czech courts having jurisdiction over our registered seat."
+          ]
+        }
+      }
+    },
+    "cookies": {
+      "title": "Cookie policy",
+      "meta": {
+        "title": "Cookie policy",
+        "description": "Exactly what Restaura stores on your device: three first-party items, no analytics and no tracking."
+      },
+      "sections": {
+        "what": {
+          "title": "What we store, and why so little",
+          "body": [
+            "We use no analytics, advertising or tracking cookies. Nothing we store can follow you to another website.",
+            "What we do store is limited to remembering choices you made yourself, and remembering the answer you gave to our cookie notice."
+          ]
+        },
+        "necessary": {
+          "title": "Strictly necessary storage",
+          "body": [
+            "These exist because you asked for something that needs them, so European law does not require us to ask permission first. All are first-party and none is shared."
+          ]
+        },
+        "analytics": {
+          "title": "Analytics and marketing",
+          "body": [
+            "None, today. If we ever add anything of the kind it will not run until you have actively agreed, and this page and the notice will describe what it does before you decide."
+          ]
+        },
+        "thirdParty": {
+          "title": "Third parties",
+          "body": [
+            "No third party stores anything on your device through this site. One third party does see a request: the video on our home page is served from Cloudflare, which receives your IP address in order to send it.",
+            "That video is not requested at all if your browser or system asks for reduced data or reduced motion, or if your screen is small."
+          ]
+        },
+        "managing": {
+          "title": "Changing your mind",
+          "body": [
+            "You can clear cookies and site data for this site at any time in your browser's settings, which also resets the choices remembered here.",
+            "You can withdraw or change the answer you gave to our notice with the button below."
+          ]
+        }
+      },
+      "table": {
+        "caption": "Everything this site stores on your device",
+        "name": "Name",
+        "purpose": "Purpose",
+        "type": "Type",
+        "duration": "Duration",
+        "category": "Category"
+      },
+      "entries": {
+        "locale": "Remembers the language you chose, so you are not sent back to the default on your next visit.",
+        "appearance": "Remembers whether you chose a light or dark appearance.",
+        "consent": "Remembers the answer you gave to the cookie notice, so we do not ask again."
+      },
+      "durations": {
+        "session": "Until you close the tab",
+        "persistent": "6 months"
+      },
+      "categories": {
+        "necessary": "Strictly necessary",
+        "analytics": "Analytics"
+      },
+      "reset": "Change my cookie choice",
+      "resetDone": "Your choice has been cleared. The notice will appear again."
+    },
+    "banner": {
+      "label": "Cookie notice",
+      "title": "About cookies on this site",
+      "noticeBody": "We store only what is needed to remember your language, your light or dark preference, and this choice. No analytics, no advertising, no tracking.",
+      "consentBody": "We would like to use optional cookies to understand how the site is used. They are not set unless you agree, and you can change your mind at any time.",
+      "acknowledge": "Got it",
+      "accept": "Accept optional",
+      "reject": "Reject optional",
+      "more": "Read the cookie policy"
+    }
   },
   "LocaleSwitcher": {
     "label": "Language"
-  },
-  "HomePage": {
-    "title": "Welcome to Restaura",
-    "description": "Your app is set up with Czech, English and German. Edit <code>app/[locale]/page.tsx</code> to get started.",
-    "cta": "Get started"
   },
   "Appearance": {
     "label": "Appearance",

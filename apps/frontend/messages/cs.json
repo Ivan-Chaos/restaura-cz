@@ -1,15 +1,416 @@
 {
   "Metadata": {
     "title": "Restaura",
-    "description": "Restaura – správa restaurace jednoduše"
+    "description": "Digitální menu pro restaurace — zveřejněte menu, exportujte PDF pro tisk a vygenerujte QR kódy na stoly."
+  },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — vaše menu na každém stole",
+      "description": "Zveřejněte digitální menu, exportujte PDF pro tisk a vygenerujte QR kódy na stoly. Začátek zdarma."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — domů"
+    },
+    "hero": {
+      "headline": "Vaše menu na každém stole",
+      "subheadline": "Digitální menu, PDF pro tisk a QR kódy na stoly — z jednoho místa, během chvíle.",
+      "cta": "Začít zdarma",
+      "seePricing": "Zobrazit ceník"
+    },
+    "capabilities": {
+      "sectionTitle": "Co získáte",
+      "digitalMenu": {
+        "eyebrow": "Digitální menu",
+        "title": "Menu, které se dobře čte na každém telefonu",
+        "body": "Vaše jídla, ceny a alergeny na stránce, která se otevře okamžitě — bez instalace aplikace a bez přibližování. Cenu změníte jednou a vidí ji každý host.",
+        "demo": "Prohlédnout ukázkové menu"
+      },
+      "pdf": {
+        "eyebrow": "Export do PDF",
+        "title": "Připravené k tisku, vždy aktuální",
+        "body": "Kdykoli kuchyně něco změní, vyexportujete stejné menu jako čisté PDF. Vytisknete, pošlete e‑mailem, předáte dodavateli — bez grafika a bez čekání."
+      },
+      "qr": {
+        "eyebrow": "QR kódy na stoly",
+        "title": "Jedno naskenování od stolu k menu",
+        "body": "Vygenerujte QR kód pro každý stůl a dejte ho tam, kam se hosté stejně dívají. Naskenují, menu se otevře, hotovo."
+      }
+    },
+    "steps": {
+      "title": "Připraveno dřív, než začne provoz",
+      "create": {
+        "title": "Zadejte menu",
+        "body": "Napište kategorie a jídla, nebo je vložte z toho, co už máte."
+      },
+      "generate": {
+        "title": "Vygenerujte PDF a QR kódy",
+        "body": "Jedno kliknutí a máte PDF pro tisk i QR kód pro každý stůl."
+      },
+      "scan": {
+        "title": "Hosté skenují přímo u stolu",
+        "body": "Menu si otevřou na vlastním telefonu — vždy to aktuální."
+      }
+    },
+    "pricing": {
+      "title": "Začněte zdarma. Rozšiřte, až budete potřebovat.",
+      "subtitle": "Tarif Zdarma stačí na to, abyste dnes dostali skutečné menu na stoly. Pro a Pro Plus se chystají.",
+      "comingSoon": "Připravujeme",
+      "recommended": "Doporučujeme",
+      "perMonth": "{price}/měsíc",
+      "free": "Zdarma",
+      "noPriceYet": "Připravujeme",
+      "ctaSignup": "Začít zdarma",
+      "ctaNotify": "Dejte mi vědět"
+    },
+    "plans": {
+      "free": {
+        "name": "Zdarma",
+        "tagline": "Vše potřebné pro jedno menu.",
+        "features": {
+          "oneMenu": "1 menu",
+          "thirtyItems": "Až 30 položek menu",
+          "brandedPdf": "Export do PDF s logem Restaura",
+          "brandedQr": "QR kódy na stoly s logem Restaura"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Pro kuchyni s plným à la carte.",
+        "features": {
+          "fiveMenus": "5 menu",
+          "unlimitedItems": "Neomezený počet položek",
+          "noBranding": "Bez loga Restaura"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "Pro skupiny a podniky, které mění menu denně.",
+        "features": {
+          "menuParsing": "Automatické načtení stávajícího menu",
+          "unlimitedMenus": "Neomezený počet menu",
+          "unlimitedSize": "Neomezená velikost menu",
+          "timeMenus": "Menu podle času (ranní, večerní)",
+          "qrCodes": "QR kódy na stoly",
+          "pdfTemplates": "Export do PDF s neomezenými šablonami"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "Rád bych začal s Restaurou",
+      "mailSubjectNotify": "Dejte mi vědět, až spustíte {plan}"
+    },
+    "assets": {
+      "hero": {
+        "alt": "Restaurační sál v teplém denním světle, stoly prostřené bílými ubrusy a sklenicemi"
+      },
+      "digitalMenu": {
+        "alt": "Detail dvou rukou držících telefon u dřevěného pultu v kavárně"
+      },
+      "pdf": {
+        "alt": "Ruka drží tištěné menu nad kavárenským stolkem s kávou a dortem"
+      },
+      "qr": {
+        "alt": "Stolní stojánek na stole s QR kódem a nápisem Naskenujte pro menu"
+      },
+      "og": {
+        "alt": "Restaurační sál v teplém denním světle, stoly prostřené a připravené k provozu"
+      }
+    },
+    "footer": {
+      "tagline": "Digitální menu pro restaurace.",
+      "legal": "Podmínky",
+      "privacy": "Soukromí",
+      "contact": "Kontakt",
+      "copyright": "© {year} Restaura",
+      "cookies": "Cookies"
+    }
+  },
+  "Legal": {
+    "updated": "Naposledy aktualizováno {date}",
+    "backHome": "Zpět na úvod",
+    "draftNotice": {
+      "title": "Návrh — dosud neplatný",
+      "body": "Registrační údaje provozovatele nejsou pro toto nasazení nastavené, dokument je proto neúplný a nelze se na něj spoléhat. Před zveřejněním nastavte proměnné prostředí NEXT_PUBLIC_LEGAL_* a nechte text zkontrolovat právníkem."
+    },
+    "privacy": {
+      "title": "Zásady ochrany osobních údajů",
+      "meta": {
+        "title": "Zásady ochrany osobních údajů",
+        "description": "Co Restaura dělá s osobními údaji: co zpracováváme, proč, kdo další je zapojen a jaká máte práva."
+      },
+      "sections": {
+        "who": {
+          "title": "Kdo je správcem",
+          "body": [
+            "Službu provozuje {name}, IČO {companyId}, se sídlem {address}. S čímkoli z těchto zásad se obraťte na {email}.",
+            "Zásady se vztahují na web Restaura a na digitální menu, která se přes něj zveřejňují. Netýkají se webu samotné restaurace ani ničeho, co následuje po odchodu z našich stránek."
+          ]
+        },
+        "whatWeCollect": {
+          "title": "Co zpracováváme",
+          "body": [
+            "Návštěva webu: náš poskytovatel hostingu zpracovává technické údaje, které obdrží každý webový server — vaši IP adresu, požadovanou stránku, čas a identifikaci prohlížeče — aby stránku doručil a udržel službu bezpečnou.",
+            "Vaše předvolby: zvolený jazyk a světlý či tmavý vzhled se ukládají ve vašem zařízení. K nám se neodesílají.",
+            "Když nám napíšete: zpracujeme vaši adresu a obsah zprávy, abychom mohli odpovědět.",
+            "Nepoužíváme žádnou analytiku, reklamu ani sledování. Nevytváříme profily návštěvníků a osobní údaje nikdy neprodáváme ani nepředáváme nikomu pro jeho vlastní účely."
+          ]
+        },
+        "legalBasis": {
+          "title": "Na jakém základě",
+          "body": [
+            "Doručování a zabezpečení webu stojí na našem oprávněném zájmu provozovat službu, která funguje a není zneužívána — čl. 6 odst. 1 písm. f) GDPR.",
+            "Odpověď na váš dotaz stojí na provedení opatření na vaši žádost před uzavřením smlouvy, případně na oprávněném zájmu odpovídat těm, kdo nám píší — čl. 6 odst. 1 písm. b) a f).",
+            "Cokoli, co není nezbytně nutné, by stálo na vašem souhlasu podle čl. 6 odst. 1 písm. a), který byste mohli kdykoli odvolat. Na tomto webu to zatím nic nevyžaduje."
+          ]
+        },
+        "storage": {
+          "title": "Co ukládáme ve vašem zařízení",
+          "body": [
+            "Tři věci, všechny první strany, a žádná z nich vás nemůže sledovat na jiném webu: zvolený jazyk, předvolbu světlého či tmavého vzhledu a záznam o vaší odpovědi na naše upozornění o cookies.",
+            "Zásady používání cookies uvádějí u každé položky, k čemu slouží a jak dlouho vydrží."
+          ]
+        },
+        "processors": {
+          "title": "Kdo další je zapojen",
+          "body": [
+            "Hosting: web doručuje náš poskytovatel hostingu, který pro nás zpracovává údaje o připojení na základě smlouvy o zpracování osobních údajů.",
+            "Doručování médií: video na úvodní stránce se streamuje z Cloudflare R2, takže při jeho načtení se vaše IP adresa dostane ke Cloudflare, který vystupuje jako náš zpracovatel. Tento požadavek se vůbec neodešle, pokud váš prohlížeč nebo systém žádá o omezení dat či pohybu, nebo máte malou obrazovku.",
+            "Písma doručujeme z vlastní domény. Při návštěvě neodchází žádný požadavek ke Googlu ani k jinému poskytovateli písem."
+          ]
+        },
+        "transfers": {
+          "title": "Předávání mimo EHP",
+          "body": [
+            "Cloudflare provozuje globální síť, požadavky na média proto mohou být obslouženy ze serverů mimo Evropský hospodářský prostor nebo přes ně vedeny. Takové předání se opírá o standardní smluvní doložky Evropské komise."
+          ]
+        },
+        "retention": {
+          "title": "Jak dlouho údaje uchováváme",
+          "body": [
+            "Serverové logy uchováváme jen po dobu nutnou k provozu a zabezpečení služby, poté je mažeme nebo agregujeme.",
+            "E-mailovou korespondenci uchováváme po dobu nutnou k vyřízení věci a dále jen tak dlouho, jak nám ukládají předpisy.",
+            "Co je uloženo ve vašem zařízení, zůstává, dokud nevyprší nebo je nesmažete; doby uvádějí zásady cookies."
+          ]
+        },
+        "rights": {
+          "title": "Vaše práva",
+          "body": [
+            "Máte právo na přístup ke svým osobním údajům, na jejich opravu či výmaz, na omezení zpracování, právo vznést námitku a právo na přenositelnost. Tam, kde stavíme na souhlasu, jej můžete kdykoli odvolat, aniž by to ovlivnilo zákonnost dřívějšího zpracování.",
+            "Napište na {email} a odpovíme do jednoho měsíce.",
+            "Pokud máte za to, že jsme pochybili, můžete podat stížnost u {authority} ({authorityUrl}) nebo u dozorového úřadu v místě svého bydliště."
+          ]
+        },
+        "children": {
+          "title": "Děti",
+          "body": [
+            "Jde o službu pro podnikatele. Není určena dětem a jejich osobní údaje vědomě nezpracováváme."
+          ]
+        },
+        "changes": {
+          "title": "Změny",
+          "body": [
+            "Pokud se tyto zásady podstatně změní, aktualizujeme datum v záhlaví a tam, kde se změna dotkne stávajících uživatelů, je informujeme přímo."
+          ]
+        }
+      }
+    },
+    "terms": {
+      "title": "Obchodní podmínky",
+      "meta": {
+        "title": "Obchodní podmínky",
+        "description": "Podmínky, za nichž Restaura poskytuje digitální menu, export do PDF a QR kódy na stoly."
+      },
+      "sections": {
+        "scope": {
+          "title": "Tyto podmínky",
+          "body": [
+            "Tyto podmínky upravují poskytování a užívání služby Restaura, kterou provozuje {name}, IČO {companyId}, se sídlem {address}. Tvoří součást každé smlouvy, na jejímž základě službu poskytujeme, a jejím užíváním s nimi souhlasíte.",
+            "Služba je poskytována výhradně podnikatelům. Užíváním potvrzujete, že jednáte v rámci své podnikatelské činnosti, nikoli jako spotřebitel, a že jste oprávněni tyto podmínky přijmout za subjekt, který zastupujete.",
+            "Jelikož obě strany jednají jako podnikatelé, strany se dohodly, že se na tuto smlouvu nepoužijí ustanovení občanského zákoníku o smlouvách uzavíraných adhezním způsobem."
+          ]
+        },
+        "service": {
+          "title": "Co služba dělá",
+          "body": [
+            "Restaura umožňuje restauraci zveřejnit digitální menu, exportovat totéž menu jako PDF pro tisk a vygenerovat QR kódy, které je otevřou přímo u stolu.",
+            "Cokoli je kdekoli na našem webu označeno jako plánované či připravované, je pouze vyjádřením aktuálního záměru. Nejde o závazek, netvoří to součást této smlouvy a může se to změnit nebo být opuštěno bez oznámení."
+          ]
+        },
+        "eligibility": {
+          "title": "Pouze pro podnikatele",
+          "body": [
+            "Musíte být způsobilí uzavřít smlouvu a službu užívat k podnikatelským účelům. Spotřebitelům službu nenabízíme a přístup, který se jeví jako užívaný jinak, můžeme odmítnout nebo ukončit.",
+            "Odpovídáte za vše, co je prostřednictvím vašeho přístupu učiněno, včetně jednání vašich zaměstnanců a dalších osob, kterým užívání umožníte."
+          ]
+        },
+        "yourContent": {
+          "title": "Vaše menu zůstává vaše",
+          "body": [
+            "Vše, co do služby vložíte — názvy jídel, popisy, ceny, fotografie, vaše ochranné známky — zůstává vaše. Udělujete nám pouze nevýhradní oprávnění nezbytné k tomu, abychom obsah hostovali, zobrazili jej vašim hostům a vykreslili do PDF a QR kódů, o které požádáte, a to po dobu užívání služby.",
+            "Potvrzujete, že k tomuto obsahu máte veškerá potřebná práva a že jeho zveřejněním neporušujete právní předpisy ani práva třetích osob.",
+            "Za obsah menu a za jeho soulad s předpisy o informacích o potravinách, alergenech, značení a uvádění cen odpovídáte výhradně vy. Obsah menu nekontrolujeme, neověřujeme ani neopravujeme a neodpovídáme za něj."
+          ]
+        },
+        "warranties": {
+          "title": "Služba je poskytována tak, jak je",
+          "body": [
+            "Služba je poskytována „tak, jak je“ a „podle dostupnosti“. V nejširším rozsahu, který české právo připouští, neposkytujeme žádné záruky ani ujištění jakéhokoli druhu, výslovné ani mlčky předpokládané, zejména co do jakosti, vhodnosti pro určitý účel, přesnosti či nepřerušovaného a bezchybného provozu.",
+            "Zejména nezaručujeme, že generovaná PDF či QR kódy jsou způsobilé k jakémukoli regulatornímu, smluvnímu nebo obchodnímu účelu, že služba splní vaše požadavky, ani že jakákoli vada bude odstraněna."
+          ]
+        },
+        "acceptableUse": {
+          "title": "Co je zakázáno",
+          "body": [
+            "Prostřednictvím služby nezveřejňujte nic protiprávního, klamavého ani zasahujícího do práv jiných. Nepokoušejte se službu narušit, přetížit, zkoumat, obejít její ochrany ani ji zpětně analyzovat, nevyužívejte ji k vytvoření konkurenčního produktu a neprodávejte ji dál ani neposkytujte podlicence.",
+            "Přístup můžeme okamžitě pozastavit či omezit, bez předchozího oznámení a bez odpovědnosti, máme-li důvodně za to, že došlo k porušení tohoto článku, nebo hrozí-li další újma službě či jiným osobám."
+          ]
+        },
+        "plans": {
+          "title": "Tarify a platba",
+          "body": [
+            "Tarif Zdarma je poskytován bezplatně, v rozsahu uvedeném na stránce s ceníkem, a bez jakéhokoli závazku ohledně jeho další dostupnosti.",
+            "Pro a Pro Plus nejsou dostupné a nelze je zakoupit. Uvedené ceny jsou pouze orientační a nezakládají nabídku ani závazek. Budou-li placené tarify zavedeny, bude platná cena, fakturační podmínky a režim DPH sjednán dříve, než dojde k jakékoli platbě."
+          ]
+        },
+        "availability": {
+          "title": "Dostupnost",
+          "body": [
+            "Neposkytujeme žádnou záruku dostupnosti, provozuschopnosti, doby odezvy ani výkonu a žádný závazek úrovně služeb. Službu i kteroukoli její funkci můžeme kdykoli změnit, omezit, pozastavit nebo zrušit.",
+            "Údržbu můžeme provádět kdykoli. Nejsme povinni vaše data uchovávat, zálohovat ani obnovovat; vlastní aktuální kopii obsahu menu si proto uchovávejte trvale."
+          ]
+        },
+        "liability": {
+          "title": "Omezení odpovědnosti",
+          "body": [
+            "V nejširším rozsahu, který české právo připouští, neodpovídáme za ušlý zisk, výnosy, obchodní příležitosti, smlouvy, dobrou pověst ani očekávané úspory; za ztrátu či poškození dat; za újmu vzniklou z obsahu menu, včetně nesprávných cen či údajů o alergenech; za újmu vzniklou z nedostupnosti, přerušení či prodlení; ani za jakoukoli nepřímou či následnou škodu, ať vznikne jakkoli.",
+            "Odpovídáme-li přes výše uvedené, je naše celková souhrnná odpovědnost ze všech nároků vzniklých v kterémkoli dvanáctiměsíčním období omezena částkou, kterou jste nám za službu v tomto období skutečně uhradili. Je-li služba poskytována bezplatně, je naše odpovědnost vyloučena v nejširším rozsahu, který právo připouští.",
+            "Nic v těchto podmínkách neomezuje odpovědnost, kterou nelze předem omezit, zejména odpovědnost za újmu způsobenou úmyslně nebo z hrubé nedbalosti a za újmu na přirozených právech člověka, včetně života a zdraví. Tento odstavec nerozšiřuje naši odpovědnost nad rámec toho, co vyžaduje zákon."
+          ]
+        },
+        "indemnity": {
+          "title": "Nároky třetích osob",
+          "body": [
+            "Odškodníte nás za jakýkoli nárok, řízení, ztrátu, škodu, sankci či náklad, včetně přiměřených nákladů právního zastoupení, který uplatní třetí osoba nebo který jí náleží a který vznikne z obsahu vašeho menu, z vašeho užívání služby nebo z porušení těchto podmínek.",
+            "O takovém nároku vás bez zbytečného odkladu vyrozumíme a bez vašeho souhlasu jej nevypořádáme; souhlas neodepřete bez rozumného důvodu."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Okolnosti mimo naši kontrolu",
+          "body": [
+            "Žádná ze stran neodpovídá za nesplnění či prodlení způsobené okolnostmi mimo její rozumnou kontrolu, zejména výpadky hostingu, sítí či jiných dodavatelů, selháním veřejných komunikačních sítí, výpadkem elektřiny, kybernetickým útokem, stávkou, epidemií, aktem orgánu veřejné moci, válkou nebo přírodní událostí."
+          ]
+        },
+        "claims": {
+          "title": "Uplatnění nároku",
+          "body": [
+            "Jakýkoli nárok nám musíte oznámit písemně a s dostatečnými podrobnostmi umožňujícími prošetření, a to do třiceti dnů ode dne, kdy jste se o rozhodných okolnostech dozvěděli.",
+            "Strany se dohodly, že promlčecí lhůta u práv vzniklých z této smlouvy nebo v souvislosti s ní činí jeden rok ode dne, kdy právo mohlo být uplatněno poprvé."
+          ]
+        },
+        "termination": {
+          "title": "Ukončení",
+          "body": [
+            "Užívání služby můžete kdykoli ukončit a svá menu smazat.",
+            "Přístup k bezplatnému tarifu můžeme kdykoli a z jakéhokoli důvodu ukončit či pozastavit, a to bez odpovědnosti. Je-li sjednán placený tarif, můžeme jej ukončit s třicetidenní výpovědní dobou, při podstatném porušení, úpadku či protiprávním užívání i okamžitě.",
+            "Po ukončení vám obsah menu zpřístupníme po dobu třiceti dnů, poté může být smazán. Ukončením nejsou dotčena práva a povinnosti vzniklé před ním."
+          ]
+        },
+        "changes": {
+          "title": "Změny podmínek",
+          "body": [
+            "Tyto podmínky můžeme změnit. Aktualizované znění zveřejníme a tam, kde se změna podstatně dotkne vás, vás o ní vyrozumíme před nabytím účinnosti. Pokračováním v užívání služby změnu přijímáte.",
+            "Každá ze stran na sebe přebírá nebezpečí změny okolností ve smyslu občanského zákoníku."
+          ]
+        },
+        "law": {
+          "title": "Rozhodné právo",
+          "body": [
+            "Tyto podmínky a vše, co z nich vzniká, se řídí českým právem s vyloučením jeho kolizních norem a Úmluvy OSN o smlouvách o mezinárodní koupi zboží.",
+            "Pokud se něco pokazí, ozvěte se nejdřív nám. Napište na {email} a v dobré víře s vámi budeme hledat nápravu; téměř vše se vyřeší touto cestou.",
+            "Tyto podmínky jsou zveřejněny v češtině, angličtině a němčině. V případě rozporu mezi jazykovými verzemi má přednost verze česká. Co mezi námi vyřešit nelze, spadá do výlučné pravomoci českých soudů příslušných podle našeho sídla."
+          ]
+        }
+      }
+    },
+    "cookies": {
+      "title": "Zásady používání cookies",
+      "meta": {
+        "title": "Zásady používání cookies",
+        "description": "Přesně to, co Restaura ukládá ve vašem zařízení: tři položky první strany, žádná analytika, žádné sledování."
+      },
+      "sections": {
+        "what": {
+          "title": "Co ukládáme a proč tak málo",
+          "body": [
+            "Nepoužíváme žádné analytické, reklamní ani sledovací cookies. Nic, co ukládáme, vás nemůže sledovat na jiném webu.",
+            "Ukládáme jen to, co si pamatuje volby, které jste sami provedli, a odpověď, kterou jste dali našemu upozornění o cookies."
+          ]
+        },
+        "necessary": {
+          "title": "Nezbytně nutné úložiště",
+          "body": [
+            "Tyto položky existují proto, že jste si vyžádali něco, co je potřebuje; evropské právo proto nevyžaduje, abychom se nejprve ptali. Všechny jsou první strany a žádná se nesdílí."
+          ]
+        },
+        "analytics": {
+          "title": "Analytika a marketing",
+          "body": [
+            "Dnes žádné. Pokud někdy něco takového přidáme, nespustí se dřív, než k tomu aktivně svolíte, a tato stránka i upozornění předem popíší, co dělá."
+          ]
+        },
+        "thirdParty": {
+          "title": "Třetí strany",
+          "body": [
+            "Žádná třetí strana prostřednictvím tohoto webu nic ve vašem zařízení neukládá. Jedna třetí strana však vidí požadavek: video na úvodní stránce se doručuje z Cloudflare, který obdrží vaši IP adresu, aby jej mohl odeslat.",
+            "Toto video se vůbec nevyžádá, pokud váš prohlížeč nebo systém žádá o omezení dat či pohybu, nebo máte malou obrazovku."
+          ]
+        },
+        "managing": {
+          "title": "Změna rozhodnutí",
+          "body": [
+            "Cookies a data tohoto webu můžete kdykoli smazat v nastavení prohlížeče, čímž se resetují i zde zapamatované volby.",
+            "Odpověď, kterou jste dali našemu upozornění, můžete odvolat nebo změnit tlačítkem níže."
+          ]
+        }
+      },
+      "table": {
+        "caption": "Vše, co tento web ukládá ve vašem zařízení",
+        "name": "Název",
+        "purpose": "Účel",
+        "type": "Typ",
+        "duration": "Doba",
+        "category": "Kategorie"
+      },
+      "entries": {
+        "locale": "Pamatuje si zvolený jazyk, abyste se při další návštěvě nevrátili na výchozí.",
+        "appearance": "Pamatuje si, zda jste zvolili světlý, nebo tmavý vzhled.",
+        "consent": "Pamatuje si odpověď na upozornění o cookies, abychom se neptali znovu."
+      },
+      "durations": {
+        "session": "Do zavření karty",
+        "persistent": "6 měsíců"
+      },
+      "categories": {
+        "necessary": "Nezbytně nutné",
+        "analytics": "Analytické"
+      },
+      "reset": "Změnit mou volbu cookies",
+      "resetDone": "Vaše volba byla smazána. Upozornění se zobrazí znovu."
+    },
+    "banner": {
+      "label": "Upozornění o cookies",
+      "title": "O cookies na tomto webu",
+      "noticeBody": "Ukládáme jen to, co je potřeba k zapamatování jazyka, světlého či tmavého vzhledu a této volby. Žádná analytika, žádná reklama, žádné sledování.",
+      "consentBody": "Rádi bychom používali volitelné cookies, abychom rozuměli tomu, jak se web používá. Bez vašeho souhlasu se nenastaví a rozhodnutí můžete kdykoli změnit.",
+      "acknowledge": "Rozumím",
+      "accept": "Přijmout volitelné",
+      "reject": "Odmítnout volitelné",
+      "more": "Přečíst zásady cookies"
+    }
   },
   "LocaleSwitcher": {
     "label": "Jazyk"
-  },
-  "HomePage": {
-    "title": "Vítejte v Restaura",
-    "description": "Aplikace je připravena v češtině, angličtině a němčině. Začněte úpravou <code>app/[locale]/page.tsx</code>.",
-    "cta": "Začít"
   },
   "Appearance": {
     "label": "Vzhled",

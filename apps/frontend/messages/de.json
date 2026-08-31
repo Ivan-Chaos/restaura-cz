@@ -1,15 +1,416 @@
 {
   "Metadata": {
     "title": "Restaura",
-    "description": "Restaura – Restaurantverwaltung leicht gemacht"
+    "description": "Digitale Speisekarten für Restaurants — Karte veröffentlichen, druckfertiges PDF exportieren und Tisch-QR-Codes erzeugen."
+  },
+  "Landing": {
+    "meta": {
+      "title": "Restaura — Ihre Speisekarte auf jedem Tisch",
+      "description": "Digitale Speisekarte veröffentlichen, druckfertiges PDF exportieren und Tisch-QR-Codes erzeugen. Kostenlos starten."
+    },
+    "brand": {
+      "name": "Restaura",
+      "wordmarkLabel": "Restaura — Startseite"
+    },
+    "hero": {
+      "headline": "Ihre Speisekarte auf jedem Tisch",
+      "subheadline": "Digitale Karte, druckfertiges PDF und Tisch-QR-Codes — an einem Ort, in wenigen Minuten.",
+      "cta": "Kostenlos starten",
+      "seePricing": "Preise ansehen"
+    },
+    "capabilities": {
+      "sectionTitle": "Das bekommen Sie",
+      "digitalMenu": {
+        "eyebrow": "Digitale Speisekarte",
+        "title": "Eine Karte, die sich auf jedem Handy gut liest",
+        "body": "Ihre Gerichte, Preise und Allergene auf einer Seite, die sofort öffnet — ohne App, ohne Zoomen. Sie ändern einen Preis einmal, und jeder Gast sieht ihn.",
+        "demo": "Beispielkarte ansehen"
+      },
+      "pdf": {
+        "eyebrow": "PDF-Export",
+        "title": "Druckfertig und immer aktuell",
+        "body": "Exportieren Sie dieselbe Karte als sauberes PDF, sobald die Küche etwas ändert. Drucken, mailen, dem Lieferanten geben — ohne Grafiker, ohne Warten."
+      },
+      "qr": {
+        "eyebrow": "Tisch-QR-Codes",
+        "title": "Ein Scan vom Tisch zur Karte",
+        "body": "Erzeugen Sie einen QR-Code für jeden Tisch und platzieren Sie ihn dort, wo Ihre Gäste ohnehin hinschauen. Scannen, Karte öffnet sich, fertig."
+      }
+    },
+    "steps": {
+      "title": "Fertig, bevor der Service beginnt",
+      "create": {
+        "title": "Karte anlegen",
+        "body": "Kategorien und Gerichte eintippen oder aus dem übernehmen, was Sie schon haben."
+      },
+      "generate": {
+        "title": "PDF und QR-Codes erzeugen",
+        "body": "Ein Klick liefert ein druckfertiges PDF und einen QR-Code für jeden Tisch."
+      },
+      "scan": {
+        "title": "Gäste scannen am Tisch",
+        "body": "Sie öffnen die Karte auf dem eigenen Handy — immer die aktuelle."
+      }
+    },
+    "pricing": {
+      "title": "Kostenlos starten. Wachsen, wenn es nötig wird.",
+      "subtitle": "Der Free-Tarif reicht, um heute eine echte Karte auf Ihre Tische zu bringen. Pro und Pro Plus kommen bald.",
+      "comingSoon": "Demnächst",
+      "recommended": "Empfohlen",
+      "perMonth": "{price}/Monat",
+      "free": "Kostenlos",
+      "noPriceYet": "Demnächst",
+      "ctaSignup": "Kostenlos starten",
+      "ctaNotify": "Benachrichtigen"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "tagline": "Alles, was eine Karte braucht.",
+        "features": {
+          "oneMenu": "1 Speisekarte",
+          "thirtyItems": "Bis zu 30 Gerichte",
+          "brandedPdf": "PDF-Export mit Restaura-Branding",
+          "brandedQr": "Tisch-QR-Codes mit Restaura-Branding"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Für eine volle À-la-carte-Küche.",
+        "features": {
+          "fiveMenus": "5 Speisekarten",
+          "unlimitedItems": "Unbegrenzt viele Gerichte",
+          "noBranding": "Kein Restaura-Branding"
+        }
+      },
+      "proPlus": {
+        "name": "Pro Plus",
+        "tagline": "Für Gruppen und Häuser, die täglich wechseln.",
+        "features": {
+          "menuParsing": "Bestehende Karte automatisch übernehmen",
+          "unlimitedMenus": "Unbegrenzt viele Speisekarten",
+          "unlimitedSize": "Unbegrenzte Kartengröße",
+          "timeMenus": "Zeitabhängige Karten (morgens, abends)",
+          "qrCodes": "Tisch-QR-Codes",
+          "pdfTemplates": "PDF-Export mit unbegrenzten Vorlagen"
+        }
+      }
+    },
+    "cta": {
+      "mailSubjectSignup": "Ich möchte mit Restaura starten",
+      "mailSubjectNotify": "Benachrichtigen Sie mich zum Start von {plan}"
+    },
+    "assets": {
+      "hero": {
+        "alt": "Ein Gastraum im warmen Tageslicht, Tische mit weißen Decken und Gläsern eingedeckt"
+      },
+      "digitalMenu": {
+        "alt": "Nahaufnahme zweier Hände, die ein Handy an einem hölzernen Cafétresen halten"
+      },
+      "pdf": {
+        "alt": "Eine Hand hält eine gedruckte Speisekarte über einem Cafétisch mit Kaffee und Kuchen"
+      },
+      "qr": {
+        "alt": "Ein Tischaufsteller mit QR-Code und dem Hinweis Für die Karte scannen"
+      },
+      "og": {
+        "alt": "Ein Gastraum im warmen Tageslicht, Tische eingedeckt und bereit für den Service"
+      }
+    },
+    "footer": {
+      "tagline": "Digitale Speisekarten für Restaurants.",
+      "legal": "AGB",
+      "privacy": "Datenschutz",
+      "contact": "Kontakt",
+      "copyright": "© {year} Restaura",
+      "cookies": "Cookies"
+    }
+  },
+  "Legal": {
+    "updated": "Zuletzt aktualisiert am {date}",
+    "backHome": "Zurück zur Startseite",
+    "draftNotice": {
+      "title": "Entwurf — noch nicht in Kraft",
+      "body": "Die Registerangaben des Betreibers sind für diese Installation nicht konfiguriert. Das Dokument ist daher unvollständig und nicht belastbar. Setzen Sie die Umgebungsvariablen NEXT_PUBLIC_LEGAL_* und lassen Sie den Text vor der Veröffentlichung anwaltlich prüfen."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "meta": {
+        "title": "Datenschutzerklärung",
+        "description": "Was Restaura mit personenbezogenen Daten macht: was wir verarbeiten, warum, wer sonst beteiligt ist und welche Rechte Sie haben."
+      },
+      "sections": {
+        "who": {
+          "title": "Wer verantwortlich ist",
+          "body": [
+            "Diesen Dienst betreibt {name}, Handelsregisternummer {companyId}, mit Sitz in {address}. Bei Fragen zu dieser Erklärung schreiben Sie an {email}.",
+            "Sie gilt für die Website von Restaura und die darüber veröffentlichten digitalen Speisekarten. Nicht erfasst sind die eigene Website eines Restaurants und alles, was nach dem Verlassen unserer Seiten geschieht."
+          ]
+        },
+        "whatWeCollect": {
+          "title": "Was wir verarbeiten",
+          "body": [
+            "Besuch der Website: Unser Hosting-Anbieter verarbeitet die technischen Daten, die jeder Webserver erhält — Ihre IP-Adresse, die angeforderte Seite, den Zeitpunkt und die Kennung Ihres Browsers — um die Seite auszuliefern und den Dienst abzusichern.",
+            "Ihre Einstellungen: Die gewählte Sprache und die Vorliebe für helles oder dunkles Erscheinungsbild werden auf Ihrem Gerät gespeichert. An uns übermittelt werden sie nicht.",
+            "Wenn Sie uns schreiben: Wir verarbeiten Ihre Adresse und den Inhalt Ihrer Nachricht, um zu antworten.",
+            "Wir setzen keinerlei Analyse, Werbung oder Tracking ein. Wir erstellen keine Profile und verkaufen personenbezogene Daten nicht und geben sie niemandem für dessen eigene Zwecke weiter."
+          ]
+        },
+        "legalBasis": {
+          "title": "Auf welcher Grundlage",
+          "body": [
+            "Auslieferung und Absicherung der Website stützen sich auf unser berechtigtes Interesse an einem funktionierenden und nicht missbrauchten Dienst — Art. 6 Abs. 1 lit. f DSGVO.",
+            "Die Beantwortung Ihrer Anfrage stützt sich auf vorvertragliche Maßnahmen auf Ihre Anfrage hin oder auf unser berechtigtes Interesse, Schreibenden zu antworten — Art. 6 Abs. 1 lit. b und f.",
+            "Alles, was nicht unbedingt erforderlich ist, würde auf Ihrer Einwilligung nach Art. 6 Abs. 1 lit. a beruhen, die Sie jederzeit widerrufen könnten. Derzeit erfordert nichts auf dieser Website eine solche."
+          ]
+        },
+        "storage": {
+          "title": "Was wir auf Ihrem Gerät speichern",
+          "body": [
+            "Drei Dinge, alle von uns selbst gesetzt, und keines davon kann Ihnen auf eine andere Website folgen: die gewählte Sprache, die Vorliebe für helles oder dunkles Erscheinungsbild und die Antwort auf unseren Cookie-Hinweis.",
+            "Die Cookie-Richtlinie führt zu jedem Eintrag auf, wozu er dient und wie lange er bleibt."
+          ]
+        },
+        "processors": {
+          "title": "Wer sonst beteiligt ist",
+          "body": [
+            "Hosting: Die Website wird von unserem Hosting-Anbieter ausgeliefert, der Verbindungsdaten in unserem Auftrag auf Grundlage eines Auftragsverarbeitungsvertrags verarbeitet.",
+            "Medienauslieferung: Das Video auf unserer Startseite wird aus Cloudflare R2 gestreamt. Beim Abruf gelangt Ihre IP-Adresse zu Cloudflare, das als unser Auftragsverarbeiter handelt. Dieser Abruf unterbleibt vollständig, wenn Ihr Browser oder System reduzierte Daten oder reduzierte Bewegung anfordert oder Ihr Bildschirm klein ist.",
+            "Schriften liefern wir von unserer eigenen Domain aus. Beim Besuch geht keine Anfrage an Google oder einen anderen Schriftanbieter."
+          ]
+        },
+        "transfers": {
+          "title": "Übermittlungen außerhalb des EWR",
+          "body": [
+            "Cloudflare betreibt ein globales Netz, daher können Medienanfragen von Servern außerhalb des Europäischen Wirtschaftsraums beantwortet oder über solche geleitet werden. Diese Übermittlungen stützen sich auf die Standardvertragsklauseln der Europäischen Kommission."
+          ]
+        },
+        "retention": {
+          "title": "Wie lange wir speichern",
+          "body": [
+            "Serverprotokolle bewahren wir nur so lange auf, wie es für Betrieb und Sicherheit nötig ist, danach werden sie gelöscht oder aggregiert.",
+            "E-Mail-Korrespondenz bewahren wir so lange auf, wie es zur Bearbeitung nötig ist, und darüber hinaus nur, soweit Aufbewahrungspflichten bestehen.",
+            "Was auf Ihrem Gerät gespeichert ist, bleibt, bis es abläuft oder Sie es löschen; die Fristen nennt die Cookie-Richtlinie."
+          ]
+        },
+        "rights": {
+          "title": "Ihre Rechte",
+          "body": [
+            "Sie können Auskunft über Ihre personenbezogenen Daten verlangen, deren Berichtigung oder Löschung, die Einschränkung der Verarbeitung, Widerspruch einlegen und Datenübertragbarkeit verlangen. Soweit wir uns auf eine Einwilligung stützen, können Sie diese jederzeit widerrufen, ohne dass die Rechtmäßigkeit der davor erfolgten Verarbeitung berührt wird.",
+            "Schreiben Sie an {email}; wir antworten innerhalb eines Monats.",
+            "Wenn Sie meinen, wir hätten etwas falsch gemacht, können Sie sich bei der {authority} ({authorityUrl}) oder bei der Aufsichtsbehörde Ihres Wohnorts beschweren."
+          ]
+        },
+        "children": {
+          "title": "Kinder",
+          "body": [
+            "Dies ist ein Dienst für Unternehmen. Er richtet sich nicht an Kinder, und wir erheben deren personenbezogene Daten nicht wissentlich."
+          ]
+        },
+        "changes": {
+          "title": "Änderungen",
+          "body": [
+            "Ändert sich diese Erklärung wesentlich, aktualisieren wir das Datum oben und informieren bestehende Nutzer unmittelbar, soweit die Änderung sie betrifft."
+          ]
+        }
+      }
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "meta": {
+        "title": "Allgemeine Geschäftsbedingungen",
+        "description": "Die Bedingungen, zu denen Restaura digitale Speisekarten, PDF-Export und Tisch-QR-Codes bereitstellt."
+      },
+      "sections": {
+        "scope": {
+          "title": "Diese Bedingungen",
+          "body": [
+            "Diese Bedingungen regeln die Bereitstellung und Nutzung von Restaura, betrieben von {name}, Registernummer {companyId}, mit Sitz in {address}. Sie sind Bestandteil jeder Vereinbarung, auf deren Grundlage wir den Dienst bereitstellen; mit der Nutzung stimmen Sie ihnen zu.",
+            "Der Dienst wird ausschließlich Unternehmern bereitgestellt. Mit der Nutzung bestätigen Sie, dass Sie in Ausübung Ihrer gewerblichen oder beruflichen Tätigkeit und nicht als Verbraucher handeln und dass Sie berechtigt sind, diese Bedingungen für das von Ihnen vertretene Unternehmen anzunehmen.",
+            "Da beide Parteien als Unternehmer handeln, vereinbaren die Parteien, dass die Bestimmungen des tschechischen Bürgerlichen Gesetzbuchs über im Wege des Beitritts geschlossene Verträge auf diese Vereinbarung keine Anwendung finden."
+          ]
+        },
+        "service": {
+          "title": "Was der Dienst leistet",
+          "body": [
+            "Restaura ermöglicht es einem Restaurant, eine digitale Speisekarte zu veröffentlichen, dieselbe Karte als druckfertiges PDF zu exportieren und QR-Codes zu erzeugen, die sie am Tisch öffnen.",
+            "Was auf unserer Website als geplant oder demnächst verfügbar bezeichnet wird, ist lediglich eine Absichtserklärung. Es ist keine Zusage, wird nicht Bestandteil dieser Vereinbarung und kann sich ohne Ankündigung ändern oder entfallen."
+          ]
+        },
+        "eligibility": {
+          "title": "Nur für Unternehmen",
+          "body": [
+            "Sie müssen geschäftsfähig sein und den Dienst zu geschäftlichen Zwecken nutzen. Verbrauchern bieten wir den Dienst nicht an; Zugänge, die anderweitig genutzt zu werden scheinen, können wir ablehnen oder beenden.",
+            "Sie sind für alles verantwortlich, was über Ihren Zugang geschieht, einschließlich durch Ihre Mitarbeiter und sonstige Personen, denen Sie die Nutzung gestatten."
+          ]
+        },
+        "yourContent": {
+          "title": "Ihre Karte bleibt Ihre",
+          "body": [
+            "Alles, was Sie einstellen — Gerichtsnamen, Beschreibungen, Preise, Fotos, Ihre Marken — bleibt Ihres. Sie räumen uns nur das einfache Recht ein, das wir benötigen, um es zu hosten, Ihren Gästen anzuzeigen und in die von Ihnen angeforderten PDFs und QR-Codes zu überführen, und zwar für die Dauer Ihrer Nutzung.",
+            "Sie bestätigen, dass Ihnen sämtliche für diese Inhalte erforderlichen Rechte zustehen und dass deren Veröffentlichung weder Gesetze noch Rechte Dritter verletzt.",
+            "Für den Inhalt Ihrer Karte und dessen Vereinbarkeit mit den Vorschriften über Lebensmittelinformation, Allergene, Kennzeichnung und Preisangaben sind allein Sie verantwortlich. Wir prüfen, verifizieren und korrigieren Karteninhalte nicht und haften nicht dafür."
+          ]
+        },
+        "warranties": {
+          "title": "Bereitstellung wie besehen",
+          "body": [
+            "Der Dienst wird „wie besehen“ und „nach Verfügbarkeit“ bereitgestellt. Im weitestmöglichen nach tschechischem Recht zulässigen Umfang geben wir keinerlei Gewährleistungen oder Zusicherungen ab, weder ausdrücklich noch stillschweigend, insbesondere nicht hinsichtlich Qualität, Eignung für einen bestimmten Zweck, Richtigkeit oder unterbrechungs- und fehlerfreien Betriebs.",
+            "Insbesondere sichern wir nicht zu, dass erzeugte PDFs oder QR-Codes für regulatorische, vertragliche oder geschäftliche Zwecke geeignet sind, dass der Dienst Ihren Anforderungen entspricht oder dass Mängel behoben werden."
+          ]
+        },
+        "acceptableUse": {
+          "title": "Was untersagt ist",
+          "body": [
+            "Veröffentlichen Sie über den Dienst nichts Rechtswidriges, Irreführendes oder Rechte Verletzendes. Versuchen Sie nicht, ihn zu stören, zu überlasten, auszuspähen, Schutzmaßnahmen zu umgehen oder zurückzuentwickeln, ihn zum Aufbau eines Konkurrenzprodukts zu nutzen, ihn weiterzuverkaufen oder unterzulizenzieren.",
+            "Wir können den Zugang sofort, ohne Ankündigung und ohne Haftung sperren oder einschränken, wenn wir begründet annehmen, dass gegen diesen Abschnitt verstoßen wurde oder eine weitere Nutzung dem Dienst oder Dritten zu schaden droht."
+          ]
+        },
+        "plans": {
+          "title": "Tarife und Zahlung",
+          "body": [
+            "Der Free-Tarif wird kostenlos im Umfang unserer Preisseite bereitgestellt, ohne jede Zusage zu seiner weiteren Verfügbarkeit.",
+            "Pro und Pro Plus sind nicht verfügbar und können nicht erworben werden. Dafür genannte Preise sind unverbindlich und begründen weder Angebot noch Verpflichtung. Werden bezahlte Tarife eingeführt, werden Preis, Abrechnungsbedingungen und umsatzsteuerliche Behandlung vor jeder Zahlung vereinbart."
+          ]
+        },
+        "availability": {
+          "title": "Verfügbarkeit",
+          "body": [
+            "Wir sagen keine Verfügbarkeit, Betriebszeit, Reaktionszeit oder Leistung zu und geben keinerlei Service-Level-Zusage. Wir können den Dienst und jede Funktion jederzeit ändern, einschränken, aussetzen oder einstellen.",
+            "Wartungsarbeiten können wir jederzeit durchführen. Wir sind nicht verpflichtet, Ihre Daten aufzubewahren, zu sichern oder wiederherzustellen; halten Sie daher jederzeit eine eigene aktuelle Kopie Ihrer Karteninhalte vor."
+          ]
+        },
+        "liability": {
+          "title": "Haftungsbeschränkung",
+          "body": [
+            "Im weitestmöglichen nach tschechischem Recht zulässigen Umfang haften wir nicht für entgangenen Gewinn, Umsatz, Geschäfte, Verträge, Geschäftswert oder erwartete Einsparungen; für Verlust oder Beschädigung von Daten; für Schäden aus Karteninhalten, einschließlich unrichtiger Preise oder Allergenangaben; für Schäden aus Nichtverfügbarkeit, Unterbrechung oder Verzögerung; sowie für mittelbare Schäden und Folgeschäden, gleich aus welchem Grund.",
+            "Soweit wir dennoch haften, ist unsere Gesamthaftung für sämtliche in einem Zwölfmonatszeitraum entstehenden Ansprüche auf den Betrag begrenzt, den Sie uns in diesem Zeitraum tatsächlich für den Dienst gezahlt haben. Wird der Dienst unentgeltlich bereitgestellt, ist unsere Haftung im weitestmöglichen zulässigen Umfang ausgeschlossen.",
+            "Nichts in diesen Bedingungen beschränkt eine Haftung, die im Voraus nicht beschränkt werden kann, insbesondere für vorsätzlich oder grob fahrlässig verursachte Schäden sowie für Schäden an den natürlichen Rechten einer Person einschließlich Leben und Gesundheit. Dieser Absatz erweitert unsere Haftung nicht über das gesetzlich Gebotene hinaus."
+          ]
+        },
+        "indemnity": {
+          "title": "Ansprüche Dritter",
+          "body": [
+            "Sie stellen uns von allen Ansprüchen, Verfahren, Verlusten, Schäden, Sanktionen und Kosten einschließlich angemessener Rechtsverfolgungskosten frei, die von Dritten erhoben werden oder diesen zustehen und aus Ihren Karteninhalten, Ihrer Nutzung des Dienstes oder Ihrem Verstoß gegen diese Bedingungen entstehen.",
+            "Wir werden Sie über solche Ansprüche unverzüglich informieren und sie nicht ohne Ihre Zustimmung regeln; die Zustimmung werden Sie nicht unbillig verweigern."
+          ]
+        },
+        "forceMajeure": {
+          "title": "Umstände außerhalb unserer Kontrolle",
+          "body": [
+            "Keine Partei haftet für Ausfälle oder Verzögerungen aufgrund von Umständen außerhalb ihres zumutbaren Einflussbereichs, insbesondere Störungen bei Hosting-, Netz- oder anderen Anbietern, Ausfall öffentlicher Kommunikationsnetze, Stromausfall, Cyberangriff, Arbeitskampf, Epidemie, hoheitlicher Maßnahme, Krieg oder Naturereignis."
+          ]
+        },
+        "claims": {
+          "title": "Geltendmachung von Ansprüchen",
+          "body": [
+            "Sie müssen uns jeden Anspruch schriftlich und mit für eine Prüfung ausreichenden Angaben innerhalb von dreißig Tagen anzeigen, nachdem Sie von den zugrunde liegenden Umständen Kenntnis erlangt haben.",
+            "Die Parteien vereinbaren, dass die Verjährungsfrist für Rechte aus oder im Zusammenhang mit dieser Vereinbarung ein Jahr beträgt, gerechnet ab dem Tag, an dem das Recht erstmals hätte ausgeübt werden können."
+          ]
+        },
+        "termination": {
+          "title": "Beendigung",
+          "body": [
+            "Sie können die Nutzung jederzeit beenden und Ihre Karten löschen.",
+            "Den Zugang zu einem kostenlosen Tarif können wir jederzeit und aus beliebigem Grund ohne Haftung beenden oder aussetzen. Besteht ein bezahlter Tarif, können wir ihn mit einer Frist von dreißig Tagen beenden, bei wesentlicher Vertragsverletzung, Insolvenz oder rechtswidriger Nutzung auch fristlos.",
+            "Nach Beendigung halten wir Ihre Karteninhalte dreißig Tage für Sie bereit; danach können sie gelöscht werden. Vor der Beendigung entstandene Rechte und Pflichten bleiben unberührt."
+          ]
+        },
+        "changes": {
+          "title": "Änderungen dieser Bedingungen",
+          "body": [
+            "Wir können diese Bedingungen ändern. Wir veröffentlichen die aktualisierte Fassung und informieren Sie vor Wirksamwerden, soweit eine Änderung Sie wesentlich betrifft. Die weitere Nutzung gilt als Annahme.",
+            "Jede Partei übernimmt das Risiko einer Änderung der Umstände im Sinne des tschechischen Bürgerlichen Gesetzbuchs."
+          ]
+        },
+        "law": {
+          "title": "Anwendbares Recht",
+          "body": [
+            "Diese Bedingungen und alles, was aus ihnen entsteht, unterliegen tschechischem Recht unter Ausschluss seiner Kollisionsnormen und des UN-Kaufrechts.",
+            "Wenn etwas schiefgeht, wenden Sie sich zuerst an uns. Schreiben Sie an {email}, und wir suchen gemeinsam nach Treu und Glauben eine Lösung; fast alles klärt sich auf diesem Weg.",
+            "Diese Bedingungen werden auf Tschechisch, Englisch und Deutsch veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist die tschechische Fassung maßgeblich. Was zwischen uns nicht geklärt werden kann, unterliegt der ausschließlichen Zuständigkeit der für unseren Sitz zuständigen tschechischen Gerichte."
+          ]
+        }
+      }
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie",
+      "meta": {
+        "title": "Cookie-Richtlinie",
+        "description": "Genau das, was Restaura auf Ihrem Gerät speichert: drei eigene Einträge, keine Analyse, kein Tracking."
+      },
+      "sections": {
+        "what": {
+          "title": "Was wir speichern, und warum so wenig",
+          "body": [
+            "Wir setzen keine Analyse-, Werbe- oder Tracking-Cookies ein. Nichts, was wir speichern, kann Ihnen auf eine andere Website folgen.",
+            "Gespeichert wird nur, was Ihre eigenen Entscheidungen festhält, und die Antwort, die Sie unserem Cookie-Hinweis gegeben haben."
+          ]
+        },
+        "necessary": {
+          "title": "Unbedingt erforderliche Speicherung",
+          "body": [
+            "Diese Einträge bestehen, weil Sie etwas angefordert haben, das sie benötigt; europäisches Recht verlangt daher keine vorherige Einwilligung. Alle stammen von uns selbst und keiner wird geteilt."
+          ]
+        },
+        "analytics": {
+          "title": "Analyse und Marketing",
+          "body": [
+            "Heute keine. Sollten wir je etwas Derartiges einsetzen, läuft es erst, wenn Sie aktiv zugestimmt haben, und diese Seite sowie der Hinweis beschreiben vorher, was es tut."
+          ]
+        },
+        "thirdParty": {
+          "title": "Dritte",
+          "body": [
+            "Kein Dritter speichert über diese Website etwas auf Ihrem Gerät. Ein Dritter sieht allerdings eine Anfrage: Das Video auf unserer Startseite wird von Cloudflare ausgeliefert, das dafür Ihre IP-Adresse erhält.",
+            "Dieses Video wird gar nicht erst angefordert, wenn Ihr Browser oder System reduzierte Daten oder reduzierte Bewegung anfordert oder Ihr Bildschirm klein ist."
+          ]
+        },
+        "managing": {
+          "title": "Meinung ändern",
+          "body": [
+            "Sie können Cookies und Websitedaten für diese Seite jederzeit in den Browsereinstellungen löschen; damit werden auch die hier gemerkten Entscheidungen zurückgesetzt.",
+            "Ihre Antwort auf unseren Hinweis können Sie mit der Schaltfläche unten widerrufen oder ändern."
+          ]
+        }
+      },
+      "table": {
+        "caption": "Alles, was diese Website auf Ihrem Gerät speichert",
+        "name": "Name",
+        "purpose": "Zweck",
+        "type": "Art",
+        "duration": "Dauer",
+        "category": "Kategorie"
+      },
+      "entries": {
+        "locale": "Merkt sich die gewählte Sprache, damit Sie beim nächsten Besuch nicht wieder auf der Standardsprache landen.",
+        "appearance": "Merkt sich, ob Sie helles oder dunkles Erscheinungsbild gewählt haben.",
+        "consent": "Merkt sich Ihre Antwort auf den Cookie-Hinweis, damit wir nicht erneut fragen."
+      },
+      "durations": {
+        "session": "Bis zum Schließen des Tabs",
+        "persistent": "6 Monate"
+      },
+      "categories": {
+        "necessary": "Unbedingt erforderlich",
+        "analytics": "Analyse"
+      },
+      "reset": "Cookie-Auswahl ändern",
+      "resetDone": "Ihre Auswahl wurde gelöscht. Der Hinweis erscheint erneut."
+    },
+    "banner": {
+      "label": "Cookie-Hinweis",
+      "title": "Cookies auf dieser Website",
+      "noticeBody": "Wir speichern nur, was nötig ist, um Ihre Sprache, Ihr helles oder dunkles Erscheinungsbild und diese Auswahl zu merken. Keine Analyse, keine Werbung, kein Tracking.",
+      "consentBody": "Wir würden gern optionale Cookies einsetzen, um zu verstehen, wie die Website genutzt wird. Ohne Ihre Zustimmung werden sie nicht gesetzt, und Sie können Ihre Meinung jederzeit ändern.",
+      "acknowledge": "Verstanden",
+      "accept": "Optionale zulassen",
+      "reject": "Optionale ablehnen",
+      "more": "Cookie-Richtlinie lesen"
+    }
   },
   "LocaleSwitcher": {
     "label": "Sprache"
-  },
-  "HomePage": {
-    "title": "Willkommen bei Restaura",
-    "description": "Ihre App ist mit Tschechisch, Englisch und Deutsch eingerichtet. Bearbeiten Sie <code>app/[locale]/page.tsx</code>, um loszulegen.",
-    "cta": "Loslegen"
   },
   "Appearance": {
     "label": "Erscheinungsbild",

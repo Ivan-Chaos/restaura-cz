@@ -30,7 +30,7 @@ const Box = ({ children }: { children: React.ReactNode }) => (
 export const Containers: Story = {
   render: () => (
     <div className="bg-background flex flex-col gap-4 py-6">
-      {(["sm", "md", "lg", "full"] as const).map((size) => (
+      {(["sm", "md", "lg", "xl", "full"] as const).map((size) => (
         <Container key={size} size={size}>
           <Box>Container size=&quot;{size}&quot;</Box>
         </Container>

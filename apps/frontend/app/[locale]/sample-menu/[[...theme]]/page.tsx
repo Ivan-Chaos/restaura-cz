@@ -45,7 +45,14 @@ export async function generateMetadata({
   if (!hasLocale(routing.locales, locale)) notFound();
 
   const t = await getTranslations({ locale, namespace: "SampleMenu" });
-  return { title: t("metaTitle"), description: t("metaDescription") };
+  return {
+    // Absolute, so the locale layout's "| Restaura" template does not append
+    // our name to a restaurant's own menu. A guest menu is the restaurant's
+    // page; stamping the platform onto its title is exactly the branding the
+    // paid tiers promise to remove.
+    title: { absolute: t("metaTitle") },
+    description: t("metaDescription"),
+  };
 }
 
 export default async function SampleMenuPage({

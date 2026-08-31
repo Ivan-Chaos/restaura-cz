@@ -47,6 +47,8 @@ export const MENU_COLOR_TOKENS = [
   "price",
   "surface-raised",
   "surface-raised-foreground",
+  "overlay",
+  "overlay-foreground",
 ] as const;
 
 /** Non-colour tokens every theme must set. */
@@ -136,6 +138,10 @@ export const TOKEN_PURPOSE: Record<RequiredToken, string> = {
   price: "Price text. Emphasised without shouting.",
   "surface-raised": "Dish cards lifted off `background`.",
   "surface-raised-foreground": "Text on `surface-raised`.",
+  overlay:
+    "Dark scrim laid over photography and video so text stays legible; also the background a hero falls back to when its media fails. Deliberately the same in light and dark — a scrim is dark either way.",
+  "overlay-foreground":
+    "Text and icons on `overlay`, or on media covered by it. Always light, in both appearances.",
   radius: "Base corner radius; the sm/md/lg/xl scale derives from it.",
   density: "Unitless spacing multiplier (0.8–1.2). 1 = default rhythm.",
   "font-display": "Headings, establishment name, dish names.",
@@ -190,6 +196,9 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   { foreground: "price", background: "background", min: 4.5 },
   { foreground: "price", background: "card", min: 4.5 },
   { foreground: "price", background: "surface-raised", min: 4.5 },
+  // Text over photography. The scrim is what makes a hero headline legible on
+  // top of an image we do not control, so the pair is held to the text bar.
+  { foreground: "overlay-foreground", background: "overlay", min: 4.5 },
   // Non-text contrast (WCAG 1.4.11).
   { foreground: "ring", background: "background", min: 3 },
   { foreground: "ring", background: "card", min: 3 },
