@@ -615,7 +615,11 @@
       "VALIDATION_FAILED": "Zkontrolujte prosím pole níže.",
       "NOT_FOUND": "Nepodařilo se najít, co hledáte.",
       "INTERNAL": "Na naší straně došlo k chybě. Zkuste to prosím znovu.",
-      "NETWORK": "Nepodařilo se spojit se serverem. Zkontrolujte připojení a zkuste to znovu."
+      "NETWORK": "Nepodařilo se spojit se serverem. Zkontrolujte připojení a zkuste to znovu.",
+      "CODE_INVALID": "Tento kód není správný. Zkontrolujte e-mail a zkuste to znovu.",
+      "CODE_EXPIRED": "Platnost kódu vypršela. Nechte si poslat nový.",
+      "TOO_MANY_ATTEMPTS": "Příliš mnoho pokusů. Chvíli počkejte a nechte si poslat nový kód.",
+      "EMAIL_UNVERIFIED": "Nejprve potvrďte svou e-mailovou adresu."
     },
     "fieldErrors": {
       "IS_EMAIL": "Zadejte platnou e-mailovou adresu.",
@@ -646,6 +650,14 @@
     "phonesLabel": "Telefonní čísla",
     "phoneLabel": "Telefonní číslo {position}",
     "phonePlaceholder": "+420 601 234 567",
+    "phoneCountryLabel": "Předvolba země",
+    "phoneCountries": {
+      "CZ": "Česko",
+      "SK": "Slovensko",
+      "AT": "Rakousko",
+      "DE": "Německo",
+      "PL": "Polsko"
+    },
     "phonesHint": "Alespoň jedno, nejvýše tři.",
     "addPhone": "Přidat další číslo",
     "removePhone": "Odebrat telefonní číslo {position}",
@@ -663,6 +675,18 @@
       "phonesMin": "Přidejte alespoň jedno telefonní číslo.",
       "phonesMax": "Přidejte nejvýše tři telefonní čísla."
     }
+  },
+  "VerifyEmail": {
+    "title": "Potvrďte svůj e-mail",
+    "subtitle": "Poslali jsme šestimístný kód na {email}. Zadejte jej níže.",
+    "codeLabel": "Potvrzovací kód",
+    "hint": "Kód platí 15 minut.",
+    "submit": "Potvrdit e-mail",
+    "pending": "Potvrzujeme…",
+    "resend": "Poslat kód znovu",
+    "resendCountdown": "Poslat znovu za {seconds} s",
+    "resent": "Poslali jsme nový kód.",
+    "wrongAddress": "Zadali jste špatnou adresu? Odhlaste se a začněte znovu."
   },
   "Dashboard": {
     "brand": "Restaura",

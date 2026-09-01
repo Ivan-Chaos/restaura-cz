@@ -42,7 +42,12 @@ const KNOWN_FIELD_CODES: readonly FieldErrorCode[] = [
   "ARRAY_MAX_SIZE",
 ];
 
-function toFieldCode(code: string): FieldErrorCode | "INVALID" {
+/**
+ * Exported because the zod schemas in `lib/validation` label their issues with
+ * these same codes, so a locally-found failure and an API one are narrowed by
+ * one function rather than two that could disagree.
+ */
+export function toFieldCode(code: string): FieldErrorCode | "INVALID" {
   return (KNOWN_FIELD_CODES as readonly string[]).includes(code)
     ? (code as FieldErrorCode)
     : "INVALID";

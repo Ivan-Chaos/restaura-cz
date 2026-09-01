@@ -25,10 +25,52 @@ export const ownerAccount = pgTable(
     email: text('email').notNull(),
     /** Argon2id PHC string. */
     passwordHash: text('password_hash').notNull(),
+    /**
+     * When the owner proved they can read this address. NULL means unproven,
+     * and that is the whole gate signal — a timestamp rather than a boolean
+     * because "when" answers questions a flag cannot (how long an account sat
+     * unverified, whether a code was used before or after a policy change).
+     */
+    emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     uniqueIndex('owner_account_email_lower_idx').on(sql`lower(${table.email})`),
+  ],
+);
+
+/**
+ * The outstanding email confirmation code for an account, if any.
+ *
+ * `accountId` is primary key and foreign key, so an account can only ever have
+ * one code outstanding: resending replaces the row rather than adding to it,
+ * which is what makes the attempt counter and the resend cooldown answerable
+ * from a single row instead of a "latest of many" query. The row is deleted on
+ * success, so its presence alone means "still waiting".
+ *
+ * Only the hash is stored, following the same reasoning as `session.tokenHash`:
+ * a leaked database must not hand out working codes. The account id is mixed
+ * into the hash so one precomputed table cannot be tried against every row at
+ * once.
+ */
+export const emailConfirmation = pgTable(
+  'email_confirmation',
+  {
+    accountId: uuid('account_id')
+      .primaryKey()
+      .references(() => ownerAccount.id, { onDelete: 'cascade' }),
+    /** SHA-256 of `<accountId>.<code>`. The code itself exists only in the email. */
+    codeHash: text('code_hash').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    /**
+     * Failed guesses against this code. The cap is the real defence: six digits
+     * is a million possibilities, which is only enough if guessing is bounded.
+     */
+    attempts: integer('attempts').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check('email_confirmation_attempts_range', sql`${table.attempts} between 0 and 5`),
   ],
 );
 
@@ -155,6 +197,7 @@ export const menuItem = pgTable(
 
 export type OwnerAccountRow = typeof ownerAccount.$inferSelect;
 export type RestaurantProfileRow = typeof restaurantProfile.$inferSelect;
+export type EmailConfirmationRow = typeof emailConfirmation.$inferSelect;
 export type MenuRow = typeof menu.$inferSelect;
 export type MenuSectionRow = typeof menuSection.$inferSelect;
 export type MenuItemRow = typeof menuItem.$inferSelect;

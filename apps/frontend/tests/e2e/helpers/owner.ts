@@ -4,6 +4,8 @@ import cs from "../../../messages/cs.json";
 import de from "../../../messages/de.json";
 import en from "../../../messages/en.json";
 
+import { setConfirmationCode } from "./database";
+
 const BANNER_LABELS = [cs.Legal.banner.label, en.Legal.banner.label, de.Legal.banner.label];
 
 /**
@@ -50,11 +52,29 @@ export interface Owner {
   restaurantName: string;
 }
 
-/** A valid profile, for the suites whose subject is something other than it. */
+/**
+ * A valid profile, for the suites whose subject is something other than it.
+ *
+ * The phone number has three forms now that the field is masked, and mixing
+ * them up is the easiest way to write a test that passes for the wrong reason:
+ * the owner types digits, the field shows them grouped, and the profile stores
+ * the number with its dialling code.
+ */
 export const PROFILE = {
   restaurantName: "U Zlaté Lípy",
-  phone: "+420 601 234 567",
+  /** What gets typed. The country picker owns the `+420`, so this is national. */
+  phone: "601234567",
+  /** What the field shows once `AsYouType` has grouped it. */
+  phoneFormatted: "601 234 567",
+  /** What the API is sent and what a menu prints. */
+  phoneStored: "+420 601 234 567",
   location: "Náměstí Míru 12, 120 00 Praha 2",
+};
+
+/** A second number, in the same three forms. */
+export const SECOND_PHONE = {
+  typed: "222333444",
+  formatted: "222 333 444",
 };
 
 export const LABELS = {
@@ -67,7 +87,18 @@ export const LABELS = {
   createAccount: /vytvořit účet|create account|konto erstellen/i,
   addPhone: /přidat další číslo|add another number|weitere nummer hinzufügen/i,
   signOut: /odhlásit se|sign out|abmelden/i,
+  confirmationCode: /potvrzovací kód|confirmation code|bestätigungscode/i,
+  confirmEmail: /potvrdit e-mail|confirm email|e-mail bestätigen/i,
+  resendCode: /poslat kód znovu|send a new code|neuen code senden/i,
+  resendCountdown: /poslat znovu za|resend in|erneut senden in/i,
 };
+
+/**
+ * The code the suites confirm with. Any six digits will do — what matters is
+ * that the test writes its hash into the database first, since the API never
+ * reveals the code it generated.
+ */
+export const CONFIRMATION_CODE = "123456";
 
 /** Fills the restaurant half of the registration or completion form. */
 export async function fillProfile(
@@ -80,8 +111,12 @@ export async function fillProfile(
   await page.getByLabel(LABELS.location).fill(values.location);
 }
 
-/** Registers a new owner and leaves the page on their menus. */
-export async function signUp(page: Page, locale = "cs"): Promise<Owner> {
+/**
+ * Fills and submits the registration form, leaving the page on the
+ * confirmation step. Split out from `signUp` for the suites whose subject is
+ * confirmation itself.
+ */
+export async function register(page: Page, locale = "cs"): Promise<Owner> {
   const email = uniqueEmail();
 
   await page.goto(`/${locale}/sign-up`);
@@ -92,8 +127,38 @@ export async function signUp(page: Page, locale = "cs"): Promise<Owner> {
   await fillProfile(page);
   await page.getByRole("button", { name: LABELS.createAccount }).click();
 
-  await page.waitForURL(`**/${locale}/workspace/menus`);
+  await page.waitForURL(`**/${locale}/verify-email**`);
   return { email, restaurantName: PROFILE.restaurantName };
+}
+
+/**
+ * Confirms an owner's email with a code the test plants.
+ *
+ * Ends wherever the `?next=` said, which for a fresh registration is the menus
+ * page.
+ */
+export async function confirmEmail(page: Page, email: string): Promise<void> {
+  await setConfirmationCode(email, CONFIRMATION_CODE);
+  await page.getByLabel(LABELS.confirmationCode).fill(CONFIRMATION_CODE);
+  await page.getByRole("button", { name: LABELS.confirmEmail }).click();
+}
+
+/**
+ * Registers a new owner, confirms their email, and leaves the page on their
+ * menus.
+ *
+ * The confirmation step is part of this helper rather than of every test,
+ * because for all but the confirmation suite it is setup: the API refuses menu
+ * writes from an unconfirmed account, so a test that skipped it would fail on a
+ * 403 that has nothing to do with its subject.
+ */
+export async function signUp(page: Page, locale = "cs"): Promise<Owner> {
+  const owner = await register(page, locale);
+
+  await confirmEmail(page, owner.email);
+  await page.waitForURL(`**/${locale}/workspace/menus`);
+
+  return owner;
 }
 
 /** Creates a menu from the menus section and returns its editor URL. */

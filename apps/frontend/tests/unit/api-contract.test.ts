@@ -18,15 +18,16 @@ import type {
  *
  * The API's e2e suite proves it *serves* these shapes; this proves we *expect*
  * them. The fixtures below are copied from
- * `specs/001-menu-creation-publishing/contracts/http-api.md` and its amendment
- * `specs/002-signup-dashboard-revamp/contracts/http-api.md`, so if the contract
+ * `specs/001-menu-creation-publishing/contracts/http-api.md` and its amendments
+ * `specs/002-signup-dashboard-revamp/contracts/http-api.md` and
+ * `specs/003-email-verification/contracts/http-api.md`, so if the contract
  * changes and only one app is updated, one of the two suites fails.
  */
 
 describe("response shapes match the contract", () => {
   it("accepts the documented account response, profile and all", () => {
     const payload = {
-      account: { id: "8d1c…", email: "owner@example.com" },
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true },
       profile: {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567"],
@@ -39,9 +40,30 @@ describe("response shapes match the contract", () => {
   });
 
   it("accepts a null profile, which is how an incomplete account is reported", () => {
-    const payload = { account: { id: "8d1c…", email: "owner@example.com" }, profile: null };
+    const payload = {
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true },
+      profile: null,
+    };
     expectTypeOf(payload).toExtend<AccountResponse>();
     expect(payload.profile).toBeNull();
+  });
+
+  /**
+   * A freshly registered account. `emailVerified: false` is what sends its
+   * owner to the confirmation step, and what the API's VerifiedGuard refuses
+   * menu writes on.
+   */
+  it("accepts an unverified account, which is how every new one starts", () => {
+    const payload = {
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: false },
+      profile: {
+        restaurantName: "U Zlaté Lípy",
+        phones: ["+420 601 234 567"],
+        location: "Náměstí Míru 12, 120 00 Praha 2",
+      },
+    };
+    expectTypeOf(payload).toExtend<AccountResponse>();
+    expect(payload.account.emailVerified).toBe(false);
   });
 
   it("accepts the documented profile response", () => {
@@ -232,12 +254,22 @@ describe("toFormState", () => {
     expect(toFormState(error)).toMatchObject({ fields: { name: "INVALID" } });
   });
 
-  it.each(["EMAIL_TAKEN", "INVALID_CREDENTIALS", "UNAUTHENTICATED", "NOT_FOUND", "INTERNAL", "NETWORK"] as const)(
-    "reports %s as a form-level error with no field errors",
-    (code) => {
-      expect(toFormState({ code, message: "whatever" })).toEqual({ status: "error", code });
-    },
-  );
+  it.each([
+    "EMAIL_TAKEN",
+    "INVALID_CREDENTIALS",
+    "UNAUTHENTICATED",
+    "NOT_FOUND",
+    "INTERNAL",
+    "NETWORK",
+    // The confirmation codes are form-level by design: they describe the code
+    // that was sent, not how it was typed, and the form has one input anyway.
+    "CODE_INVALID",
+    "CODE_EXPIRED",
+    "TOO_MANY_ATTEMPTS",
+    "EMAIL_UNVERIFIED",
+  ] as const)("reports %s as a form-level error with no field errors", (code) => {
+    expect(toFormState({ code, message: "whatever" })).toEqual({ status: "error", code });
+  });
 
   it("treats a validation failure with no details as form-level", () => {
     expect(toFormState({ code: "VALIDATION_FAILED", message: "x", details: [] })).toEqual({

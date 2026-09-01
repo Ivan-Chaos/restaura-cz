@@ -1,0 +1,78 @@
+import { localValidationError, type FormState } from "../api/form-state";
+import { profileSchema, signInSchema, signUpSchema, verifyCodeSchema } from "./schemas";
+import { zodToFields } from "./zod-fields";
+
+/**
+ * Reading a submitted form into the shape a schema validates.
+ *
+ * Deliberately not a `"use server"` module: the client component runs these on
+ * submit for instant feedback and the Server Action runs them again as the
+ * authority for the no-JS path. One module, two callers, no chance of the two
+ * checking different things.
+ */
+
+function text(formData: FormData, name: string): string {
+  return String(formData.get(name) ?? "");
+}
+
+function rows(formData: FormData, name: string): string[] {
+  // `getAll`, because the phone inputs all post under one name — that is what
+  // lets a row be removed without renumbering the others.
+  return formData.getAll(name).map((value) => String(value));
+}
+
+export type Parsed<T> = { ok: true; values: T } | { ok: false; state: FormState };
+
+/**
+ * `safeParse` rather than `parse`: a rejected field is an expected outcome a
+ * form has to render, not an exception.
+ */
+function parsed<T>(result: {
+  success: boolean;
+  data?: T;
+  error?: Parameters<typeof zodToFields>[0];
+}): Parsed<T> {
+  if (result.success && result.data !== undefined) {
+    return { ok: true, values: result.data };
+  }
+  return {
+    ok: false,
+    state: localValidationError(result.error ? zodToFields(result.error) : {}),
+  };
+}
+
+export function readSignUp(formData: FormData) {
+  return parsed(
+    signUpSchema.safeParse({
+      email: text(formData, "email"),
+      password: text(formData, "password"),
+      confirmPassword: text(formData, "confirmPassword"),
+      restaurantName: text(formData, "restaurantName"),
+      phones: rows(formData, "phones"),
+      location: text(formData, "location"),
+    }),
+  );
+}
+
+export function readSignIn(formData: FormData) {
+  return parsed(
+    signInSchema.safeParse({
+      email: text(formData, "email"),
+      password: text(formData, "password"),
+    }),
+  );
+}
+
+export function readProfileValues(formData: FormData) {
+  return parsed(
+    profileSchema.safeParse({
+      restaurantName: text(formData, "restaurantName"),
+      phones: rows(formData, "phones"),
+      location: text(formData, "location"),
+    }),
+  );
+}
+
+export function readVerifyCode(formData: FormData) {
+  return parsed(verifyCodeSchema.safeParse({ code: text(formData, "code") }));
+}

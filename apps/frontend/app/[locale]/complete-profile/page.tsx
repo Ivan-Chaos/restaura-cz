@@ -9,7 +9,7 @@ import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { completeProfileAction } from "@/lib/api/actions/auth";
 import { sanitizeDestination, toDestination } from "@/lib/api/next-path";
-import { requireSession } from "@/lib/api/session";
+import { requireVerified } from "@/lib/api/session";
 
 export async function generateMetadata({
   params,
@@ -34,7 +34,10 @@ export default async function CompleteProfilePage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  const session = await requireSession(locale);
+  // Confirmed, but not necessarily profiled: an owner whose address is still
+  // unconfirmed is sent to do that first, because a profile they cannot use is
+  // not worth collecting.
+  const session = await requireVerified(locale);
 
   // Nothing to complete: send them where they were going.
   const next = (await searchParams).next;

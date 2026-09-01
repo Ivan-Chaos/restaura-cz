@@ -14,6 +14,7 @@ import {
 import type { Request } from 'express';
 import { SessionGuard, type AuthenticatedRequest } from '../common/session.guard.js';
 import { UuidParam } from '../common/uuid-param.pipe.js';
+import { VerifiedGuard } from '../common/verified.guard.js';
 import { CreateItemDto, UpdateItemDto } from './dto/item.dto.js';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto.js';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto.js';
@@ -26,9 +27,18 @@ import {
   type SectionView,
 } from './menus.service.js';
 
-/** Every route here is owner-only and scoped to the caller's own menus. */
+/**
+ * Every route here is owner-only, scoped to the caller's own menus, and closed
+ * to an account whose email is unconfirmed. Guard order matters: VerifiedGuard
+ * reads the account SessionGuard attaches.
+ *
+ * Declared once on the controller rather than per route, because a guard each
+ * new endpoint has to remember is one a new endpoint will forget. The public
+ * guest-menu routes live in PublicMenusController and are deliberately
+ * untouched — a diner is not an account.
+ */
 @Controller('menus')
-@UseGuards(SessionGuard)
+@UseGuards(SessionGuard, VerifiedGuard)
 export class MenusController {
   constructor(private readonly menus: MenusService) {}
 

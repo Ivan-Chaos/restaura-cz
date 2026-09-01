@@ -31,7 +31,27 @@ export const PROFILE = {
   location: 'Náměstí Míru 12, 120 00 Praha 2',
 } as const;
 
+/**
+ * A fully usable owner: registered *and* email-confirmed.
+ *
+ * The confirmation is applied straight to the database rather than by reading a
+ * code, because for every suite except the confirmation one it is setup, not
+ * subject — and menus routes are closed to an unconfirmed account, so without
+ * this every owner-flow test would fail on a 403 that has nothing to do with
+ * what it is testing.
+ */
 export async function signUp(
+  testApp: TestApp,
+  email = uniqueEmail(),
+  password = 'correct horse battery',
+): Promise<SignedUpOwner> {
+  const owner = await signUpUnverified(testApp, email, password);
+  await markEmailVerified(owner.accountId);
+  return owner;
+}
+
+/** Registered but not confirmed — the state every new account starts in. */
+export async function signUpUnverified(
   testApp: TestApp,
   email = uniqueEmail(),
   password = 'correct horse battery',
@@ -46,6 +66,80 @@ export async function signUp(
     accountId: response.body.account.id,
     email,
   };
+}
+
+async function withDatabase<T>(run: (client: import('pg').Client) => Promise<T>): Promise<T> {
+  const { Client } = await import('pg');
+  const { testDatabaseUrl } = await import('./database.js');
+
+  const client = new Client({ connectionString: testDatabaseUrl() });
+  await client.connect();
+  try {
+    return await run(client);
+  } finally {
+    await client.end();
+  }
+}
+
+export async function markEmailVerified(accountId: string): Promise<void> {
+  await withDatabase(async (client) => {
+    await client.query('update "owner_account" set "email_verified_at" = now() where "id" = $1', [
+      accountId,
+    ]);
+    await client.query('delete from "email_confirmation" where "account_id" = $1', [accountId]);
+  });
+}
+
+/**
+ * Replaces the outstanding code with one the test knows.
+ *
+ * The API stores only a hash, so a test cannot read the code that was
+ * generated — it writes the hash of a known code instead. Same reasoning as
+ * `deleteProfile`: reach for the database only for state the API deliberately
+ * will not hand out.
+ */
+export async function setConfirmationCode(accountId: string, code: string): Promise<void> {
+  const { createHash } = await import('node:crypto');
+  const codeHash = createHash('sha256').update(`${accountId}.${code}`).digest('hex');
+
+  await withDatabase(async (client) => {
+    await client.query(
+      `update "email_confirmation"
+         set "code_hash" = $1, "expires_at" = now() + interval '15 minutes', "attempts" = 0
+       where "account_id" = $2`,
+      [codeHash, accountId],
+    );
+  });
+}
+
+/** Ages the outstanding code past its expiry, without waiting fifteen minutes. */
+export async function expireConfirmationCode(accountId: string): Promise<void> {
+  await withDatabase(async (client) => {
+    await client.query(
+      `update "email_confirmation" set "expires_at" = now() - interval '1 minute' where "account_id" = $1`,
+      [accountId],
+    );
+  });
+}
+
+/** Backdates the code's creation so the resend cooldown has elapsed. */
+export async function clearResendCooldown(accountId: string): Promise<void> {
+  await withDatabase(async (client) => {
+    await client.query(
+      `update "email_confirmation" set "created_at" = now() - interval '5 minutes' where "account_id" = $1`,
+      [accountId],
+    );
+  });
+}
+
+export async function confirmationAttempts(accountId: string): Promise<number | null> {
+  return withDatabase(async (client) => {
+    const result = await client.query<{ attempts: number }>(
+      'select "attempts" from "email_confirmation" where "account_id" = $1',
+      [accountId],
+    );
+    return result.rows[0]?.attempts ?? null;
+  });
 }
 
 /**
@@ -64,16 +158,9 @@ export async function signUpWithoutProfile(
 }
 
 async function deleteProfile(accountId: string): Promise<void> {
-  const { Client } = await import('pg');
-  const { testDatabaseUrl } = await import('./database.js');
-
-  const client = new Client({ connectionString: testDatabaseUrl() });
-  await client.connect();
-  try {
+  await withDatabase(async (client) => {
     await client.query('delete from "restaurant_profile" where "account_id" = $1', [accountId]);
-  } finally {
-    await client.end();
-  }
+  });
 }
 
 /** Creates a menu and returns its id. */

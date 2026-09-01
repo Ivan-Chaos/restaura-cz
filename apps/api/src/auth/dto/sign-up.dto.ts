@@ -1,4 +1,6 @@
-import { IsEmail, IsString, Length, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsEmail, IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { EMAIL_LOCALES } from '../../mail/mail.service.js';
 import { ProfileDto } from './profile.dto.js';
 
 /**
@@ -12,6 +14,12 @@ import { ProfileDto } from './profile.dto.js';
  * would add exposure for no integrity gain.
  */
 export class SignUpDto extends ProfileDto {
+  /**
+   * Trimmed before validation: a trailing space pasted from a password manager
+   * would otherwise create an account whose address the owner cannot sign in
+   * with, since sign-in compares the trimmed form.
+   */
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsEmail({}, { message: 'must be a valid email address' })
   @MaxLength(254)
   email!: string;
@@ -23,4 +31,13 @@ export class SignUpDto extends ProfileDto {
   @IsString()
   @Length(8, 128)
   password!: string;
+
+  /**
+   * Which language to send the confirmation email in. Optional so a caller
+   * that does not care gets Czech, and declared because the ValidationPipe
+   * rejects undeclared properties outright.
+   */
+  @IsOptional()
+  @IsIn(EMAIL_LOCALES)
+  locale?: (typeof EMAIL_LOCALES)[number];
 }

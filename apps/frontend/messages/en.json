@@ -615,7 +615,11 @@
       "VALIDATION_FAILED": "Please check the fields below.",
       "NOT_FOUND": "We could not find what you were looking for.",
       "INTERNAL": "Something went wrong on our side. Please try again.",
-      "NETWORK": "We could not reach the server. Check your connection and try again."
+      "NETWORK": "We could not reach the server. Check your connection and try again.",
+      "CODE_INVALID": "That code is not correct. Check the email and try again.",
+      "CODE_EXPIRED": "That code has expired. Request a new one.",
+      "TOO_MANY_ATTEMPTS": "Too many attempts. Wait a moment, then request a new code.",
+      "EMAIL_UNVERIFIED": "Confirm your email address first."
     },
     "fieldErrors": {
       "IS_EMAIL": "Enter a valid email address.",
@@ -646,6 +650,14 @@
     "phonesLabel": "Phone numbers",
     "phoneLabel": "Phone number {position}",
     "phonePlaceholder": "+420 601 234 567",
+    "phoneCountryLabel": "Country code",
+    "phoneCountries": {
+      "CZ": "Czechia",
+      "SK": "Slovakia",
+      "AT": "Austria",
+      "DE": "Germany",
+      "PL": "Poland"
+    },
     "phonesHint": "At least one, up to three.",
     "addPhone": "Add another number",
     "removePhone": "Remove phone number {position}",
@@ -663,6 +675,18 @@
       "phonesMin": "Add at least one phone number.",
       "phonesMax": "Add at most three phone numbers."
     }
+  },
+  "VerifyEmail": {
+    "title": "Confirm your email",
+    "subtitle": "We sent a six-digit code to {email}. Enter it below.",
+    "codeLabel": "Confirmation code",
+    "hint": "The code is valid for 15 minutes.",
+    "submit": "Confirm email",
+    "pending": "Confirming…",
+    "resend": "Send a new code",
+    "resendCountdown": "Resend in {seconds}s",
+    "resent": "We sent a new code.",
+    "wrongAddress": "Wrong address? Sign out and start again."
   },
   "Dashboard": {
     "brand": "Restaura",

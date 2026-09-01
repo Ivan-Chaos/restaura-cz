@@ -615,7 +615,11 @@
       "VALIDATION_FAILED": "Bitte prüfen Sie die Felder unten.",
       "NOT_FOUND": "Wir konnten nicht finden, wonach Sie gesucht haben.",
       "INTERNAL": "Auf unserer Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-      "NETWORK": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+      "NETWORK": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "CODE_INVALID": "Dieser Code ist nicht korrekt. Prüfen Sie die E-Mail und versuchen Sie es erneut.",
+      "CODE_EXPIRED": "Dieser Code ist abgelaufen. Fordern Sie einen neuen an.",
+      "TOO_MANY_ATTEMPTS": "Zu viele Versuche. Warten Sie einen Moment und fordern Sie einen neuen Code an.",
+      "EMAIL_UNVERIFIED": "Bestätigen Sie zuerst Ihre E-Mail-Adresse."
     },
     "fieldErrors": {
       "IS_EMAIL": "Geben Sie eine gültige E-Mail-Adresse ein.",
@@ -646,6 +650,14 @@
     "phonesLabel": "Telefonnummern",
     "phoneLabel": "Telefonnummer {position}",
     "phonePlaceholder": "+420 601 234 567",
+    "phoneCountryLabel": "Ländervorwahl",
+    "phoneCountries": {
+      "CZ": "Tschechien",
+      "SK": "Slowakei",
+      "AT": "Österreich",
+      "DE": "Deutschland",
+      "PL": "Polen"
+    },
     "phonesHint": "Mindestens eine, höchstens drei.",
     "addPhone": "Weitere Nummer hinzufügen",
     "removePhone": "Telefonnummer {position} entfernen",
@@ -663,6 +675,18 @@
       "phonesMin": "Fügen Sie mindestens eine Telefonnummer hinzu.",
       "phonesMax": "Fügen Sie höchstens drei Telefonnummern hinzu."
     }
+  },
+  "VerifyEmail": {
+    "title": "Bestätigen Sie Ihre E-Mail",
+    "subtitle": "Wir haben einen sechsstelligen Code an {email} gesendet. Geben Sie ihn unten ein.",
+    "codeLabel": "Bestätigungscode",
+    "hint": "Der Code ist 15 Minuten gültig.",
+    "submit": "E-Mail bestätigen",
+    "pending": "Wird bestätigt…",
+    "resend": "Neuen Code senden",
+    "resendCountdown": "Erneut senden in {seconds} s",
+    "resent": "Wir haben einen neuen Code gesendet.",
+    "wrongAddress": "Falsche Adresse? Melden Sie sich ab und beginnen Sie neu."
   },
   "Dashboard": {
     "brand": "Restaura",

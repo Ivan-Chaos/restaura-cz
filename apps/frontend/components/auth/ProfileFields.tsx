@@ -1,20 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useFormContext } from "react-hook-form";
 
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { RestaurantProfile } from "@/lib/api/types";
-import type { FieldErrorCode } from "@/lib/api/types";
+import { fieldCode } from "@/hooks/use-action-form";
+import type { ProfileFormValues } from "@/lib/validation/schemas";
 
 import { PhoneListField } from "./PhoneListField";
-
-export interface ProfileFieldsProps {
-  /** Existing values, when editing rather than registering. */
-  defaultValues?: RestaurantProfile;
-  /** Errors pinned to `restaurantName`, `phones`, `phones.<index>`, `location`. */
-  fields?: Record<string, FieldErrorCode | "INVALID">;
-}
 
 /**
  * The restaurant's identity: name, phone numbers, address.
@@ -22,13 +16,19 @@ export interface ProfileFieldsProps {
  * Registration, the profile-completion step and the settings form all collect
  * exactly the same values under exactly the same rules, so they collect them
  * through one component — three copies would drift the first time a rule moved.
+ *
+ * Values and errors come from form context rather than props: every caller
+ * already owns a `useForm`, and threading `register`/`errors` through would be
+ * the same wiring written three times.
  */
-export function ProfileFields({ defaultValues, fields }: ProfileFieldsProps) {
+export function ProfileFields() {
   const t = useTranslations("Registration");
   const tFields = useTranslations("Registration.fieldErrors");
 
-  const nameError = fields?.restaurantName;
-  const locationError = fields?.location;
+  const { register, formState } = useFormContext<ProfileFormValues>();
+
+  const nameError = fieldCode(formState.errors.restaurantName?.message);
+  const locationError = fieldCode(formState.errors.location?.message);
 
   return (
     <>
@@ -36,32 +36,28 @@ export function ProfileFields({ defaultValues, fields }: ProfileFieldsProps) {
         <FieldLabel htmlFor="restaurantName">{t("restaurantNameLabel")}</FieldLabel>
         <Input
           id="restaurantName"
-          name="restaurantName"
           autoComplete="organization"
-          defaultValue={defaultValues?.restaurantName}
           placeholder={t("restaurantNamePlaceholder")}
-          required
           aria-invalid={nameError ? true : undefined}
           aria-describedby={nameError ? "restaurantName-error" : undefined}
+          {...register("restaurantName")}
         />
         {nameError ? (
           <FieldError id="restaurantName-error">{tFields("restaurantName")}</FieldError>
         ) : null}
       </Field>
 
-      <PhoneListField defaultValues={defaultValues?.phones} fields={fields} />
+      <PhoneListField />
 
       <Field data-invalid={locationError ? true : undefined}>
         <FieldLabel htmlFor="location">{t("locationLabel")}</FieldLabel>
         <Input
           id="location"
-          name="location"
           autoComplete="street-address"
-          defaultValue={defaultValues?.location}
           placeholder={t("locationPlaceholder")}
-          required
           aria-invalid={locationError ? true : undefined}
           aria-describedby={locationError ? "location-error" : undefined}
+          {...register("location")}
         />
         {locationError ? (
           <FieldError id="location-error">{tFields("location")}</FieldError>

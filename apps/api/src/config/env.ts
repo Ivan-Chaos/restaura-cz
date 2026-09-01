@@ -25,6 +25,15 @@ function required(name: string): string {
   return value;
 }
 
+/**
+ * A variable the process runs without. Returns undefined rather than an empty
+ * string so a caller can branch on "configured at all" with `??`.
+ */
+function optional(name: string): string | undefined {
+  const value = process.env[name];
+  return value === undefined || value.trim() === '' ? undefined : value;
+}
+
 function port(name: string, fallback: number): number {
   const raw = process.env[name];
   if (raw === undefined || raw.trim() === '') return fallback;
@@ -48,6 +57,15 @@ export interface Env {
   port: number;
   /** Adds Secure to the session cookie. Must be true anywhere that is not localhost. */
   cookieSecure: boolean;
+  /**
+   * Undefined in local development, where MailService logs confirmation codes
+   * to the console instead of sending them. Deliberately optional: requiring a
+   * third-party key to run the sign-up flow locally would make the whole
+   * registration path undevelopable offline.
+   */
+  resendApiKey: string | undefined;
+  /** The From address on confirmation emails. Must be a domain Resend has verified. */
+  emailFrom: string;
 }
 
 export function loadEnv(): Env {
@@ -56,5 +74,7 @@ export function loadEnv(): Env {
     databaseUrl: required('DATABASE_URL'),
     port: port('PORT', 3001),
     cookieSecure: boolean('COOKIE_SECURE', false),
+    resendApiKey: optional('RESEND_API_KEY'),
+    emailFrom: optional('EMAIL_FROM') ?? 'Restaura <onboarding@resend.dev>',
   };
 }

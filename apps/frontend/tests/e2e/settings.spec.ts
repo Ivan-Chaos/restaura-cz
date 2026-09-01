@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { LABELS, PASSWORD, PROFILE, signUp } from "./helpers/owner";
+import { LABELS, PASSWORD, PROFILE, SECOND_PHONE, signUp } from "./helpers/owner";
 
 /**
  * User Story 4: settings is its own page with addressable tabs, one of which
@@ -61,7 +61,7 @@ test.describe("settings", () => {
     await page.getByLabel(LABELS.restaurantName).fill("Restaurace U Lípy");
     await page.getByLabel(LABELS.location).fill("Vinohradská 5, Praha 2");
     await page.getByRole("button", { name: LABELS.addPhone }).click();
-    await page.getByLabel(/telefonní číslo 2/i).fill("222 333 444");
+    await page.getByLabel(/telefonní číslo 2/i).fill(SECOND_PHONE.typed);
     await page.getByRole("button", { name: "Uložit změny" }).click();
 
     await expect(page.getByText("Uloženo")).toBeVisible();
@@ -77,7 +77,7 @@ test.describe("settings", () => {
     await page.goto("/cs/workspace/settings/profile");
     await expect(page.getByLabel(LABELS.restaurantName)).toHaveValue("Restaurace U Lípy");
     await expect(page.getByLabel(LABELS.location)).toHaveValue("Vinohradská 5, Praha 2");
-    await expect(page.getByLabel(/telefonní číslo 2/i)).toHaveValue("222 333 444");
+    await expect(page.getByLabel(/telefonní číslo 2/i)).toHaveValue(SECOND_PHONE.formatted);
   });
 
   /** FR-020: a rejected edit must not overwrite what is stored. */
@@ -105,7 +105,7 @@ test.describe("settings", () => {
     await expect(page.getByText("Přidejte alespoň jedno telefonní číslo.")).toBeVisible();
 
     await page.reload();
-    await expect(page.getByLabel(/telefonní číslo 1/i)).toHaveValue(PROFILE.phone);
+    await expect(page.getByLabel(/telefonní číslo 1/i)).toHaveValue(PROFILE.phoneFormatted);
   });
 
   test("removes a phone number the owner deleted", async ({ page }) => {
@@ -113,7 +113,7 @@ test.describe("settings", () => {
     await page.goto("/cs/workspace/settings/profile");
 
     await page.getByRole("button", { name: LABELS.addPhone }).click();
-    await page.getByLabel(/telefonní číslo 2/i).fill("222 333 444");
+    await page.getByLabel(/telefonní číslo 2/i).fill(SECOND_PHONE.typed);
     await page.getByRole("button", { name: "Uložit změny" }).click();
     await expect(page.getByText("Uloženo")).toBeVisible();
 

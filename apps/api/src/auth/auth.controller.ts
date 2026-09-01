@@ -21,8 +21,10 @@ import {
   type PublicProfile,
 } from './auth.service.js';
 import { ProfileDto } from './dto/profile.dto.js';
+import { ResendConfirmationDto } from './dto/resend-confirmation.dto.js';
 import { SignInDto } from './dto/sign-in.dto.js';
 import { SignUpDto } from './dto/sign-up.dto.js';
+import { VerifyEmailDto } from './dto/verify-email.dto.js';
 import {
   clearedCookieOptions,
   sessionCookieOptions,
@@ -41,8 +43,10 @@ export class AuthController {
     @Body() dto: SignUpDto,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AccountPayload> {
-    const { email, password, ...profile } = dto;
-    const issued = await this.auth.signUp(email, password, profile);
+    // `locale` steers the confirmation email and is not part of the profile;
+    // spreading the rest keeps ProfileDto the single definition of one.
+    const { email, password, locale, ...profile } = dto;
+    const issued = await this.auth.signUp(email, password, profile, locale);
     return this.respondWithSession(issued, response);
   }
 
@@ -82,6 +86,47 @@ export class AuthController {
     if (!account) throw AppError.unauthenticated();
 
     return { account, profile: await this.auth.getProfile(account.id) };
+  }
+
+  /**
+   * Confirms the address using the code that was emailed to it.
+   *
+   * Session-guarded, which is what keeps this off the enumeration surface: a
+   * caller can only ever confirm the account they are already signed in as, so
+   * there is no email in the body to probe with.
+   */
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SessionGuard)
+  async verifyEmail(
+    @Req() request: Request,
+    @Body() dto: VerifyEmailDto,
+  ): Promise<AccountPayload> {
+    const { account } = request as AuthenticatedRequest;
+    if (!account) throw AppError.unauthenticated();
+
+    await this.auth.verifyEmail(account.id, dto.code);
+
+    // Re-stated rather than reusing the guard's copy: that one was resolved
+    // before the address was confirmed, and answering with `emailVerified:
+    // false` right after succeeding would send the frontend straight back.
+    return {
+      account: { ...account, emailVerified: true },
+      profile: await this.auth.getProfile(account.id),
+    };
+  }
+
+  @Post('verify-email/resend')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(SessionGuard)
+  async resendConfirmation(
+    @Req() request: Request,
+    @Body() dto: ResendConfirmationDto,
+  ): Promise<void> {
+    const { account } = request as AuthenticatedRequest;
+    if (!account) throw AppError.unauthenticated();
+
+    await this.auth.resendConfirmation(account.id, dto.locale);
   }
 
   /**

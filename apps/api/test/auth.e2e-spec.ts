@@ -318,7 +318,11 @@ describe('auth (US1)', () => {
         .set('Cookie', owner.cookie)
         .expect(200);
 
-      expect(response.body.account).toEqual({ id: owner.accountId, email: owner.email });
+      expect(response.body.account).toEqual({
+        id: owner.accountId,
+        email: owner.email,
+        emailVerified: true,
+      });
       expect(response.body.profile).toEqual(PROFILE);
     });
 

@@ -1,38 +1,18 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId } from "react";
 import { Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldTitle } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { fieldCode } from "@/hooks/use-action-form";
 import { MAX_PHONES } from "@/lib/api/phone";
 import type { FieldErrorCode } from "@/lib/api/types";
+import type { ProfileFormValues } from "@/lib/validation/schemas";
 
-export interface PhoneListFieldProps {
-  /** Numbers to start from. One empty row is shown when this is empty. */
-  defaultValues?: readonly string[];
-  /**
-   * Errors pinned by the Server Action: `phones` for the list as a whole,
-   * `phones.<index>` for one entry.
-   */
-  fields?: Record<string, FieldErrorCode | "INVALID">;
-}
-
-interface Row {
-  /**
-   * Rows are keyed, not indexed: removing the middle row must not let React
-   * reuse its DOM node — and its typed value — for the row that follows.
-   */
-  key: string;
-  value: string;
-}
-
-function initialRows(defaultValues: readonly string[]): Row[] {
-  const values = defaultValues.length > 0 ? defaultValues : [""];
-  return values.map((value, index) => ({ key: `initial-${index}`, value }));
-}
+import { PhoneInput } from "./PhoneInput";
 
 /** Which message explains a list-level failure. */
 function listErrorKey(code: FieldErrorCode | "INVALID"): "phonesMin" | "phonesMax" | "phone" {
@@ -44,52 +24,63 @@ function listErrorKey(code: FieldErrorCode | "INVALID"): "phonesMin" | "phonesMa
 /**
  * One to three phone numbers, in the owner's own order.
  *
- * Every row posts under the same `phones` name, so the action reads them with
- * `formData.getAll("phones")` and the list arrives already ordered — no index
- * bookkeeping in the request, and the form still submits if client JavaScript
- * never loads (the owner simply gets the rows the server rendered).
+ * Rows are managed by `useFieldArray`, which is the reason this form uses
+ * react-hook-form at all: removing the middle row has to drop that row's value
+ * and renumber the rest, and hand-rolled keyed state got that right only as
+ * long as nobody touched it.
+ *
+ * Each row is a `Controller` because `PhoneInput` is a controlled pair of
+ * widgets — the country picker and the text field agree on one string — and it
+ * keeps its `name`, so the browser still posts every row when client JavaScript
+ * never loads.
  */
-export function PhoneListField({ defaultValues = [], fields }: PhoneListFieldProps) {
+export function PhoneListField() {
   const t = useTranslations("Registration");
   const tFields = useTranslations("Registration.fieldErrors");
   const labelId = useId();
 
-  const [rows, setRows] = useState<Row[]>(() => initialRows(defaultValues));
+  const { control, formState } = useFormContext<ProfileFormValues>();
+  const { fields, append, remove } = useFieldArray({ control, name: "phones" });
 
-  const listError = fields?.phones;
+  // The list's own failure — too few, too many — as opposed to one bad entry.
+  const listError = fieldCode(formState.errors.phones?.root?.message ?? formState.errors.phones?.message);
 
   return (
     <Field data-invalid={listError ? true : undefined} aria-labelledby={labelId}>
       <FieldTitle id={labelId}>{t("phonesLabel")}</FieldTitle>
 
       <div className="flex flex-col gap-2">
-        {rows.map((row, index) => {
-          const entryError = fields?.[`phones.${index}`];
+        {fields.map((row, index) => {
+          const entryError = fieldCode(formState.errors.phones?.[index]?.value?.message);
           const inputId = `${labelId}-${index}`;
           const errorId = `${inputId}-error`;
 
           return (
-            <div key={row.key} className="flex flex-col gap-1">
+            <div key={row.id} className="flex flex-col gap-1">
               <div className="flex items-start gap-2">
-                <Input
-                  id={inputId}
-                  name="phones"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete={index === 0 ? "tel" : "off"}
-                  defaultValue={row.value}
-                  placeholder={t("phonePlaceholder")}
-                  aria-label={t("phoneLabel", { position: index + 1 })}
-                  aria-invalid={entryError ? true : undefined}
-                  aria-describedby={entryError ? errorId : undefined}
-                  className="flex-1"
+                <Controller
+                  control={control}
+                  name={`phones.${index}.value`}
+                  render={({ field }) => (
+                    <PhoneInput
+                      id={inputId}
+                      name="phones"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      aria-label={t("phoneLabel", { position: index + 1 })}
+                      aria-invalid={entryError ? true : undefined}
+                      aria-describedby={entryError ? errorId : undefined}
+                      className="flex-1"
+                    />
+                  )}
                 />
-                {rows.length > 1 ? (
+                {fields.length > 1 ? (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => setRows(rows.filter((candidate) => candidate.key !== row.key))}
+                    onClick={() => remove(index)}
                   >
                     <X aria-hidden="true" />
                     <span className="sr-only">{t("removePhone", { position: index + 1 })}</span>
@@ -102,15 +93,13 @@ export function PhoneListField({ defaultValues = [], fields }: PhoneListFieldPro
         })}
       </div>
 
-      {rows.length < MAX_PHONES ? (
+      {fields.length < MAX_PHONES ? (
         <Button
           type="button"
           variant="outline"
           size="sm"
           className="self-start"
-          onClick={() =>
-            setRows([...rows, { key: `added-${rows.length}-${Date.now()}`, value: "" }])
-          }
+          onClick={() => append({ value: "" })}
         >
           <Plus aria-hidden="true" />
           {t("addPhone")}

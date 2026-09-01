@@ -99,7 +99,7 @@ test.describe("the dashboard gate", () => {
     await becomeProfileless(page);
     await page.goto("/cs/complete-profile");
 
-    await fillProfile(page, { phone: "nope" });
+    await fillProfile(page, { phone: "12" });
     await page.getByRole("button", { name: /uložit a pokračovat/i }).click();
 
     await expect(page.getByText("Zadejte platné telefonní číslo.")).toBeVisible();

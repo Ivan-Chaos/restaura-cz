@@ -68,3 +68,43 @@ export async function removeProfile(email: string): Promise<void> {
     throw new Error(`No restaurant profile to remove for ${email}; the seed did not take.`);
   }
 }
+
+/**
+ * Replaces the outstanding confirmation code with one the test knows.
+ *
+ * The API stores only a hash — deliberately, so a leaked database hands out no
+ * working codes — which means no test can read the code that was generated. It
+ * writes the hash of a known code instead. The alternative, a test-only
+ * endpoint that reveals codes, would put a hole in production to serve the
+ * suite; this keeps the product honest and the test specific.
+ */
+export async function setConfirmationCode(email: string, code: string): Promise<void> {
+  const { createHash } = await import("node:crypto");
+
+  const updated = await withClient(async (client) => {
+    const account = await client.query<{ id: string }>(
+      'select "id" from "owner_account" where lower("email") = lower($1)',
+      [email],
+    );
+    const accountId = account.rows[0]?.id;
+    if (!accountId) throw new Error(`No account for ${email}; the sign-up did not take.`);
+
+    // Keyed with the account id, matching `hashCode` in
+    // apps/api/src/auth/email-confirmation.ts.
+    const codeHash = createHash("sha256").update(`${accountId}.${code}`).digest("hex");
+
+    return client.query(
+      `update "email_confirmation"
+         set "code_hash" = $1,
+             "expires_at" = now() + interval '15 minutes',
+             "attempts" = 0,
+             "created_at" = now() - interval '5 minutes'
+       where "account_id" = $2`,
+      [codeHash, accountId],
+    );
+  });
+
+  if (updated.rowCount === 0) {
+    throw new Error(`No confirmation code outstanding for ${email}; sign-up should issue one.`);
+  }
+}

@@ -1,13 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { IDLE, type FormState } from "@/lib/api/form-state";
+import { fieldCode, useActionForm, type ServerAction } from "@/hooks/use-action-form";
+import { signInFormData } from "@/lib/validation/form-values";
+import { signInFormSchema } from "@/lib/validation/schemas";
 
 export interface AuthFormProps {
   /**
@@ -15,7 +16,7 @@ export interface AuthFormProps {
    * Storybook and tests without pulling a Server Action into the browser
    * bundle.
    */
-  action: (state: FormState, formData: FormData) => Promise<FormState>;
+  action: ServerAction;
   locale: string;
   /** Where to go once signed in. Passed through to the action. */
   next?: string;
@@ -27,22 +28,29 @@ export interface AuthFormProps {
  * Registration used to share this component, and stopped when it grew a
  * restaurant profile — see `RegistrationForm`. Two forms that no longer collect
  * the same things are better apart than behind a mode flag.
+ *
+ * Validation here is shape only. Nothing in the browser may comment on whether
+ * a password is *right*, and nothing may claim a minimum length: an account
+ * older than the current rule must still be able to sign in.
  */
 export function AuthForm({ action, locale, next }: AuthFormProps) {
   const t = useTranslations("Auth");
   const tErrors = useTranslations("Auth.errors");
   const tFields = useTranslations("Auth.fieldErrors");
-  const [state, formAction, pending] = useActionState(action, IDLE);
 
-  const fields = state.status === "error" ? state.fields : undefined;
-  const emailError = fields?.email;
-  const passwordError = fields?.password;
-  // A summary only when nothing is pinned to a specific input; otherwise the
-  // same problem would be reported twice.
-  const summary = state.status === "error" && !fields ? state.code : undefined;
+  const { form, formAction, onSubmit, pending, summary } = useActionForm({
+    action,
+    schema: signInFormSchema,
+    defaultValues: { email: "", password: "" },
+    toFormData: (values) => signInFormData(values, { locale, next }),
+  });
+
+  const { errors } = form.formState;
+  const emailError = fieldCode(errors.email?.message);
+  const passwordError = fieldCode(errors.password?.message);
 
   return (
-    <form action={formAction} noValidate className="flex flex-col gap-6">
+    <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
       <input type="hidden" name="locale" value={locale} />
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
@@ -67,12 +75,11 @@ export function AuthForm({ action, locale, next }: AuthFormProps) {
           <FieldLabel htmlFor="email">{t("emailLabel")}</FieldLabel>
           <Input
             id="email"
-            name="email"
             type="email"
             autoComplete="email"
-            required
             aria-invalid={emailError ? true : undefined}
             aria-describedby={emailError ? "email-error" : undefined}
+            {...form.register("email")}
           />
           {emailError ? (
             <FieldError id="email-error">{tFields(emailError)}</FieldError>
@@ -83,12 +90,11 @@ export function AuthForm({ action, locale, next }: AuthFormProps) {
           <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
           <Input
             id="password"
-            name="password"
             type="password"
             autoComplete="current-password"
-            required
             aria-invalid={passwordError ? true : undefined}
             aria-describedby={passwordError ? "password-error" : undefined}
+            {...form.register("password")}
           />
           {passwordError ? (
             <FieldError id="password-error">{tFields(passwordError)}</FieldError>

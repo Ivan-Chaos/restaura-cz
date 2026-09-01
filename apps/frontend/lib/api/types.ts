@@ -2,10 +2,10 @@
  * The frontend's half of the cross-app contract.
  *
  * These mirror `specs/001-menu-creation-publishing/contracts/http-api.md`, as
- * amended by `specs/002-signup-dashboard-revamp/contracts/http-api.md`. The API
- * proves it serves these shapes; `tests/unit/api-contract.test.ts` proves we
- * expect them. Change one side and you must change the other in the same
- * change set.
+ * amended by `specs/002-signup-dashboard-revamp/contracts/http-api.md` and
+ * `specs/003-email-verification/contracts/http-api.md`. The API proves it
+ * serves these shapes; `tests/unit/api-contract.test.ts` proves we expect them.
+ * Change one side and you must change the other in the same change set.
  */
 
 /** Every code the API can return, plus one the browser side can produce. */
@@ -16,6 +16,14 @@ export type ApiErrorCode =
   | "INVALID_CREDENTIALS"
   | "NOT_FOUND"
   | "INTERNAL"
+  /** A well-formed confirmation code that is simply wrong. */
+  | "CODE_INVALID"
+  /** The confirmation code has lapsed, or none was ever issued. */
+  | "CODE_EXPIRED"
+  /** Too many wrong codes, or a resend asked for before the cooldown elapsed. */
+  | "TOO_MANY_ATTEMPTS"
+  /** A valid session whose account has not confirmed its email address. */
+  | "EMAIL_UNVERIFIED"
   /** Not from the API: the request never completed. */
   | "NETWORK";
 
@@ -66,6 +74,13 @@ export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: ApiError 
 export interface Account {
   id: string;
   email: string;
+  /**
+   * False until the owner enters the 6-digit code emailed to them. The
+   * dashboard gate keys off this before it looks at the profile, and the API
+   * refuses menu writes without it, so an unverified session can see the
+   * confirmation screen and nothing else.
+   */
+  emailVerified: boolean;
 }
 
 /**

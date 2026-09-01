@@ -1,18 +1,20 @@
 "use client";
 
-import { useActionState } from "react";
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { FormProvider } from "react-hook-form";
 
 import { ProfileFields } from "@/components/auth/ProfileFields";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
-import { IDLE, type FormState } from "@/lib/api/form-state";
+import { useActionForm, type ServerAction } from "@/hooks/use-action-form";
 import type { RestaurantProfile } from "@/lib/api/types";
+import { profileFieldPath, profileFormData } from "@/lib/validation/form-values";
+import { profileFormSchema } from "@/lib/validation/schemas";
 
 export interface ProfileSettingsFormProps {
   profile: RestaurantProfile;
-  action: (state: FormState, formData: FormData) => Promise<FormState>;
+  action: ServerAction;
   locale: string;
 }
 
@@ -25,45 +27,62 @@ export interface ProfileSettingsFormProps {
  *
  * Success keeps the owner on the page: they came to settings to change things,
  * possibly several, and being redirected after the first would be a worse
- * version of what they asked for.
+ * version of what they asked for. A rejection keeps their edits for the same
+ * reason.
  */
 export function ProfileSettingsForm({ profile, action, locale }: ProfileSettingsFormProps) {
   const t = useTranslations("Settings");
   const tErrors = useTranslations("Auth.errors");
-  const [state, formAction, pending] = useActionState(action, IDLE);
 
-  const fields = state.status === "error" ? state.fields : undefined;
-  const summary = state.status === "error" && !fields ? state.code : undefined;
+  const { form, formAction, onSubmit, pending, state, summary } = useActionForm({
+    action,
+    schema: profileFormSchema,
+    defaultValues: {
+      restaurantName: profile.restaurantName,
+      // The stored list, one row per number, in the owner's own order.
+      phones: profile.phones.map((value) => ({ value })),
+      location: profile.location,
+    },
+    toFormData: (values) => profileFormData(values, { locale }),
+    toFieldPath: profileFieldPath,
+  });
 
   return (
-    <form action={formAction} noValidate className="flex max-w-md flex-col gap-6">
-      <input type="hidden" name="locale" value={locale} />
+    <FormProvider {...form}>
+      <form
+        action={formAction}
+        onSubmit={onSubmit}
+        noValidate
+        className="flex max-w-md flex-col gap-6"
+      >
+        <input type="hidden" name="locale" value={locale} />
 
-      {summary ? (
-        <p
-          role="alert"
-          className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm"
-        >
-          {tErrors(summary)}
-        </p>
-      ) : null}
-
-      <FieldGroup>
-        <ProfileFields defaultValues={profile} fields={fields} />
-      </FieldGroup>
-
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={pending}>
-          {pending ? t("saving") : t("save")}
-        </Button>
-
-        {state.status === "success" ? (
-          <p role="status" className="text-success flex items-center gap-1.5 text-sm">
-            <Check aria-hidden="true" className="size-4" />
-            {t("saved")}
+        {summary ? (
+          <p
+            role="alert"
+            className="border-destructive/30 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm"
+          >
+            {tErrors(summary)}
           </p>
         ) : null}
-      </div>
-    </form>
+
+        <FieldGroup>
+          <ProfileFields />
+        </FieldGroup>
+
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={pending}>
+            {pending ? t("saving") : t("save")}
+          </Button>
+
+          {state.status === "success" ? (
+            <p role="status" className="text-success flex items-center gap-1.5 text-sm">
+              <Check aria-hidden="true" className="size-4" />
+              {t("saved")}
+            </p>
+          ) : null}
+        </div>
+      </form>
+    </FormProvider>
   );
 }

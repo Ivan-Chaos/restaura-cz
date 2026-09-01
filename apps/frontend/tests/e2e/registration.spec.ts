@@ -1,11 +1,13 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import {
+  confirmEmail,
   dismissCookieNotice,
   fillProfile,
   LABELS,
   PASSWORD,
   PROFILE,
+  SECOND_PHONE,
   signUp,
   uniqueEmail,
 } from "./helpers/owner";
@@ -86,15 +88,31 @@ test.describe("registration", () => {
       await expect(page).toHaveURL(/\/cs\/sign-up$/);
     });
 
-    test("a phone number that is not one", async ({ page }) => {
+    test("a phone number with too few digits to be one", async ({ page }) => {
       await openSignUp(page);
       await fillCredentials(page);
-      await fillProfile(page, { phone: "zavolejte mi" });
+      await fillProfile(page, { phone: "12" });
 
       await page.getByRole("button", { name: LABELS.createAccount }).click();
 
       await expect(page.getByText("Zadejte platné telefonní číslo.")).toBeVisible();
       await expect(page).toHaveURL(/\/cs\/sign-up$/);
+    });
+
+    /**
+     * Letters never reach the value at all — the masked field keeps the digits
+     * and drops the rest — so this fails as a missing number rather than an
+     * invalid one. Asserted because it is the behaviour, not an accident of it.
+     */
+    test("letters typed into the phone field, which the mask refuses", async ({ page }) => {
+      await openSignUp(page);
+      await fillCredentials(page);
+      await fillProfile(page, { phone: "zavolejte mi" });
+
+      await expect(page.getByLabel(LABELS.phone)).toHaveValue("");
+
+      await page.getByRole("button", { name: LABELS.createAccount }).click();
+      await expect(page.getByText("Přidejte alespoň jedno telefonní číslo.")).toBeVisible();
     });
 
     test("no phone number at all", async ({ page }) => {
@@ -151,18 +169,78 @@ test.describe("registration", () => {
 
   test("stores every phone number the owner entered", async ({ page }) => {
     await openSignUp(page);
-    await fillCredentials(page);
+    const email = await fillCredentials(page);
     await fillProfile(page);
 
     await page.getByRole("button", { name: LABELS.addPhone }).click();
-    await page.getByLabel(/telefonní číslo 2/i).fill("222 333 444");
+    await page.getByLabel(/telefonní číslo 2/i).fill(SECOND_PHONE.typed);
     await page.getByRole("button", { name: LABELS.createAccount }).click();
+
+    await page.waitForURL("**/cs/verify-email**");
+    await confirmEmail(page, email);
 
     await page.waitForURL("**/cs/workspace/menus");
     await page.goto("/cs/workspace/settings/profile");
 
-    await expect(page.getByLabel(/telefonní číslo 1/i)).toHaveValue(PROFILE.phone);
-    await expect(page.getByLabel(/telefonní číslo 2/i)).toHaveValue("222 333 444");
+    await expect(page.getByLabel(/telefonní číslo 1/i)).toHaveValue(PROFILE.phoneFormatted);
+    await expect(page.getByLabel(/telefonní číslo 2/i)).toHaveValue(SECOND_PHONE.formatted);
+  });
+
+  /**
+   * The longest form in the product must not empty itself because of one bad
+   * field. React resets an uncontrolled form once its action completes, so a
+   * taken email used to take the restaurant name, phones and address with it —
+   * asking the owner to retype all of it to fix something else entirely.
+   */
+  test("keeps everything typed when the API rejects the email (AS5)", async ({ page }) => {
+    const { email } = await signUp(page);
+    await page.getByRole("button", { name: LABELS.signOut }).click();
+    await page.waitForURL("**/cs/sign-in");
+
+    await openSignUp(page);
+    await fillCredentials(page, { email });
+    await fillProfile(page);
+    await page.getByRole("button", { name: LABELS.createAccount }).click();
+
+    await expect(formAlert(page)).toContainText("Účet s tímto e-mailem už existuje");
+
+    // Everything is still there to correct.
+    await expect(page.getByLabel(LABELS.email)).toHaveValue(email);
+    await expect(page.getByLabel(LABELS.restaurantName)).toHaveValue(PROFILE.restaurantName);
+    await expect(page.getByLabel(LABELS.phone)).toHaveValue(PROFILE.phoneFormatted);
+    await expect(page.getByLabel(LABELS.location)).toHaveValue(PROFILE.location);
+    await expect(page.getByLabel(LABELS.password)).toHaveValue(PASSWORD);
+  });
+
+  /**
+   * Caught in the browser, so the form never posts: the URL does not change and
+   * no request is spent learning what the field already showed.
+   */
+  test("marks a malformed email without leaving the page", async ({ page }) => {
+    await openSignUp(page);
+    await page.getByLabel(LABELS.email).fill("not-an-email");
+    await page.getByLabel(LABELS.password).fill(PASSWORD);
+    await page.getByLabel(LABELS.confirmPassword).fill(PASSWORD);
+    await fillProfile(page);
+
+    await page.getByRole("button", { name: LABELS.createAccount }).click();
+
+    await expect(page.getByText("Zadejte platnou e-mailovou adresu.")).toBeVisible();
+    await expect(page).toHaveURL(/\/cs\/sign-up$/);
+  });
+
+  /** A message must clear as the owner fixes the field, not linger until submit. */
+  test("clears a field's message once it is corrected", async ({ page }) => {
+    await openSignUp(page);
+    await page.getByLabel(LABELS.email).fill("not-an-email");
+    await fillProfile(page);
+    await page.getByRole("button", { name: LABELS.createAccount }).click();
+
+    const message = page.getByText("Zadejte platnou e-mailovou adresu.");
+    await expect(message).toBeVisible();
+
+    await page.getByLabel(LABELS.email).fill("owner@example.com");
+    await expect(message).toHaveCount(0);
   });
 
   test("explains that an email is already taken and offers sign-in (AS5)", async ({ page }) => {

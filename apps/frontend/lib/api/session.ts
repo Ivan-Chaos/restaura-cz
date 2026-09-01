@@ -59,8 +59,8 @@ function withDestination(pathname: string, destination: string | undefined) {
 }
 
 /**
- * Requires a session but not a profile — the profile-completion step itself,
- * which an owner reaches precisely because they have no profile yet.
+ * Requires a session and nothing else — the confirmation step itself, which an
+ * owner reaches precisely because their address is unconfirmed.
  */
 export async function requireSession(locale: Locale): Promise<Session> {
   const session = await getSession();
@@ -72,13 +72,43 @@ export async function requireSession(locale: Locale): Promise<Session> {
 }
 
 /**
+ * A session whose email is confirmed, but with no requirement of a profile —
+ * the gate for the profile-completion step.
+ *
+ * Confirmation is checked before the profile everywhere, because an
+ * unconfirmed account cannot use the dashboard however complete its profile is,
+ * and filling in a restaurant's details is wasted effort until it can.
+ */
+export async function requireVerified(locale: Locale): Promise<Session> {
+  const destination = await currentDestination();
+  const session = await getSession();
+
+  if (!session) {
+    redirect({ href: withDestination("/sign-in", destination), locale });
+    throw new Error("unreachable");
+  }
+
+  if (!session.account.emailVerified) {
+    redirect({ href: withDestination("/verify-email", destination), locale });
+    throw new Error("unreachable");
+  }
+
+  return session;
+}
+
+/**
  * The gate for every dashboard route.
  *
  * Applied once, in the workspace layout, rather than page by page: a gate that
  * has to be remembered is a gate that will eventually be forgotten on a new
- * page. An expired session sends the visitor to sign in; a signed-in owner who
- * never completed their restaurant profile is sent to finish it, because a
- * dashboard is not much use without one (spec FR-004, FR-005, FR-013).
+ * page. An expired session sends the visitor to sign in; an unconfirmed address
+ * sends them to enter their code; a signed-in owner who never completed their
+ * restaurant profile is sent to finish it, because a dashboard is not much use
+ * without one (spec FR-004, FR-005, FR-013).
+ *
+ * The API enforces the confirmation rule too (VerifiedGuard), so this redirect
+ * is the courtesy, not the security: without it the dashboard would render and
+ * then fail every request it made.
  */
 export async function requireProfile(
   locale: Locale,
@@ -88,6 +118,11 @@ export async function requireProfile(
 
   if (!session) {
     redirect({ href: withDestination("/sign-in", destination), locale });
+    throw new Error("unreachable");
+  }
+
+  if (!session.account.emailVerified) {
+    redirect({ href: withDestination("/verify-email", destination), locale });
     throw new Error("unreachable");
   }
 

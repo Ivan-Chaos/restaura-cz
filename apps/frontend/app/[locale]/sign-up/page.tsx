@@ -9,6 +9,7 @@ import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { signUpAction } from "@/lib/api/actions/auth";
 import { sanitizeDestination } from "@/lib/api/next-path";
+import { nextStep } from "@/lib/api/next-step";
 import { getSession } from "@/lib/api/session";
 
 export async function generateMetadata({
@@ -29,13 +30,17 @@ export default async function SignUpPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  // Someone already signed in has no business on this page.
+  const next = sanitizeDestination((await searchParams).next);
+
+  // Someone already signed in has no business on this page — they go to
+  // whichever step they still owe.
   const session = await getSession();
   if (session) {
-    redirect({ href: session.profile ? "/workspace" : "/complete-profile", locale });
+    redirect({
+      href: nextStep(session.account, session.profile, next ?? "/workspace"),
+      locale,
+    });
   }
-
-  const next = sanitizeDestination((await searchParams).next);
 
   return (
     <main className="flex flex-1 items-center justify-center py-12">

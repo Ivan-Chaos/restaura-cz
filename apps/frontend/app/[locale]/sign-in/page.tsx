@@ -9,6 +9,7 @@ import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { signInAction } from "@/lib/api/actions/auth";
 import { sanitizeDestination } from "@/lib/api/next-path";
+import { nextStep } from "@/lib/api/next-step";
 import { getSession } from "@/lib/api/session";
 
 export async function generateMetadata({
@@ -29,14 +30,17 @@ export default async function SignInPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  const session = await getSession();
-  if (session) {
-    redirect({ href: session.profile ? "/workspace" : "/complete-profile", locale });
-  }
-
   // Where the gate wanted them to end up, carried through sign-in so they
   // arrive at the page they asked for rather than a generic landing spot.
   const next = sanitizeDestination((await searchParams).next);
+
+  const session = await getSession();
+  if (session) {
+    redirect({
+      href: nextStep(session.account, session.profile, next ?? "/workspace"),
+      locale,
+    });
+  }
 
   return (
     <main className="flex flex-1 items-center justify-center py-12">
