@@ -1,5 +1,13 @@
 import { localValidationError, type FormState } from "../api/form-state";
-import { profileSchema, signInSchema, signUpSchema, verifyCodeSchema } from "./schemas";
+import {
+  inlineTextSchema,
+  menuItemSchema,
+  profileSchema,
+  signInSchema,
+  signUpSchema,
+  verifyCodeSchema,
+  type InlineTextField,
+} from "./schemas";
 import { zodToFields } from "./zod-fields";
 
 /**
@@ -75,4 +83,24 @@ export function readProfileValues(formData: FormData) {
 
 export function readVerifyCode(formData: FormData) {
   return parsed(verifyCodeSchema.safeParse({ code: text(formData, "code") }));
+}
+
+/**
+ * A dish. The price arrives as whatever was typed and leaves as a number, so
+ * the action never has to parse it — and never has to decide what a
+ * half-written price means.
+ */
+export function readItem(formData: FormData) {
+  return parsed(
+    menuItemSchema.safeParse({
+      name: text(formData, "name"),
+      description: text(formData, "description"),
+      priceCzk: text(formData, "priceCzk"),
+    }),
+  );
+}
+
+/** A menu name or a section title, whichever the caller is posting. */
+export function readInlineText(formData: FormData, field: InlineTextField) {
+  return parsed(inlineTextSchema(field).safeParse({ [field]: text(formData, field) }));
 }

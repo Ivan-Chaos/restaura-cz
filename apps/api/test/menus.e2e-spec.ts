@@ -220,11 +220,33 @@ describe('menus (US2)', () => {
       expect(response.body.item.priceCzk).toBe(0);
     });
 
+    it('keeps the hellers in a price that has them', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+
+      const response = await request(testApp.server)
+        .post(`/menus/${menuId}/sections/${sectionId}/items`)
+        .set('Cookie', owner.cookie)
+        .send({ name: 'Kulajda', priceCzk: 56.5 })
+        .expect(201);
+
+      expect(response.body.item.priceCzk).toBe(56.5);
+
+      // And again after a round trip through the column, which is where a
+      // float would have turned it into 56.49999999999999.
+      const reread = await request(testApp.server)
+        .get(`/menus/${menuId}`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      expect(reread.body.menu.sections[0].items[0].priceCzk).toBe(56.5);
+    });
+
     it.each([
       ['an empty name', { name: '', priceCzk: 89 }],
       ['a missing name', { priceCzk: 89 }],
       ['a negative price', { name: 'Kulajda', priceCzk: -1 }],
-      ['a fractional price', { name: 'Kulajda', priceCzk: 89.5 }],
+      ['a price with more than two decimals', { name: 'Kulajda', priceCzk: 89.555 }],
       ['a non-numeric price', { name: 'Kulajda', priceCzk: 'free' }],
       ['a missing price', { name: 'Kulajda' }],
     ])('rejects %s', async (_label, body) => {
@@ -304,6 +326,73 @@ describe('menus (US2)', () => {
         .expect(200);
 
       expect(response.body.menu.sections[0].items).toEqual([]);
+    });
+  });
+
+  describe('duplicating an item', () => {
+    it('puts the copy directly below the original, fields and all', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+      const itemId = await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Kulajda',
+        description: 'S vejcem',
+        priceCzk: 56.5,
+      });
+      await addItem(testApp, owner.cookie, menuId, sectionId, { name: 'Česnečka', priceCzk: 79 });
+
+      const response = await request(testApp.server)
+        .post(`/menus/${menuId}/sections/${sectionId}/items/${itemId}/duplicate`)
+        .set('Cookie', owner.cookie)
+        .expect(201);
+
+      expect(response.body.item).toMatchObject({
+        name: 'Kulajda',
+        description: 'S vejcem',
+        priceCzk: 56.5,
+        position: 1,
+      });
+      expect(response.body.item.id).not.toBe(itemId);
+
+      const reread = await request(testApp.server)
+        .get(`/menus/${menuId}`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      expect(reread.body.menu.sections[0].items.map((i: { name: string }) => i.name)).toEqual([
+        'Kulajda',
+        'Kulajda',
+        'Česnečka',
+      ]);
+      expect(reread.body.menu.sections[0].items.map((i: { position: number }) => i.position)).toEqual(
+        [0, 1, 2],
+      );
+    });
+
+    it('hides another owner’s dish behind a 404', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+      const itemId = await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Kulajda',
+        priceCzk: 89,
+      });
+      const intruder = await signUp(testApp);
+
+      await request(testApp.server)
+        .post(`/menus/${menuId}/sections/${sectionId}/items/${itemId}/duplicate`)
+        .set('Cookie', intruder.cookie)
+        .expect(404);
+    });
+
+    it('answers 404 for a dish that does not exist', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+
+      await request(testApp.server)
+        .post(
+          `/menus/${menuId}/sections/${sectionId}/items/00000000-0000-4000-8000-000000000000/duplicate`,
+        )
+        .set('Cookie', owner.cookie)
+        .expect(404);
     });
   });
 

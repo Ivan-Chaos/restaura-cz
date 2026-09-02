@@ -1,6 +1,13 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useForm,
@@ -33,6 +40,16 @@ export interface UseActionFormOptions<TValues extends FieldValues> {
    * strings.
    */
   toFieldPath?: (apiField: string) => string;
+  /**
+   * Runs once per submission that came back clean — to empty the form for the
+   * next dish, close an editing row, or say what was saved.
+   *
+   * Called from an effect, never during render, because a caller legitimately
+   * wants to set its own state here. Keyed on the pending edge rather than on
+   * the identity of `state`: a stubbed action that hands back the same object
+   * twice would otherwise be noticed once, which is exactly what a story does.
+   */
+  onSuccess?: (form: UseFormReturn<TValues>) => void;
 }
 
 export interface ActionForm<TValues extends FieldValues> {
@@ -78,13 +95,17 @@ export function useActionForm<TValues extends FieldValues>({
   defaultValues,
   toFormData,
   toFieldPath,
+  onSuccess,
 }: UseActionFormOptions<TValues>): ActionForm<TValues> {
   const [state, formAction, pending] = useActionState(action, IDLE);
 
   const form = useForm<TValues>({
     // The resolver is typed against the schema's *input*, which is what the
-    // form holds; the action re-parses to get the output shape.
-    resolver: zodResolver(schema) as unknown as Resolver<TValues>,
+    // form holds; the action re-parses to get the output shape. `raw` is what
+    // keeps that true for a schema that transforms — a price leaves this form
+    // as the string that was typed, and the action is the one place that turns
+    // it into a number.
+    resolver: zodResolver(schema, undefined, { raw: true }) as unknown as Resolver<TValues>,
     defaultValues,
     // Re-validate as the owner fixes a field, but do not complain before they
     // have said they are finished: an error under a field someone merely tabbed
@@ -109,6 +130,30 @@ export function useActionForm<TValues extends FieldValues>({
       }
     }
   }
+
+  /**
+   * The success callback, on the falling edge of `pending`.
+   *
+   * `useEffectEvent` so the callback the effect runs is always the current one
+   * without the callback being a dependency: a caller passing an inline closure
+   * would otherwise re-run this effect on every render.
+   */
+  const settled = useEffectEvent((outcome: FormState) => {
+    if (outcome.status === "success") onSuccess?.(form);
+  });
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (pending) {
+      wasPending.current = true;
+      return;
+    }
+    // Nothing has been submitted yet, so there is no outcome to act on: the
+    // initial state is not a result.
+    if (!wasPending.current) return;
+    wasPending.current = false;
+    settled(state);
+  }, [pending, state]);
 
   const onSubmit = form.handleSubmit((values) => {
     // Inside a transition, because dispatching outside one leaves `pending`

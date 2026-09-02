@@ -61,6 +61,8 @@ No NEEDS CLARIFICATION markers existed in the Technical Context; the questions b
 
 **Alternatives considered**:
 - Full E.164 canonicalization via `libphonenumber` — rejected: heavyweight dependency (>100 KB) for a display-only field; no dialing/SMS features exist.
+
+**Amendment (2026-09)**: `libphonenumber-js` *is* now a dependency, for **input formatting and country detection only** — `AsYouType` grouping under the selected country, reading a dialling code off a `+`/`00` prefix so a pasted foreign number lands in the right country, and the country list with its dialling codes (names from `Intl.DisplayNames`, no message keys). It is imported only by the sign-up and settings client bundles, never by the guest menu. **The decision above is unchanged where it matters**: validation is still the regex plus digit-count rule in `lib/api/phone.ts` and the API DTO, and the stored value is still the owner's own formatting (`+420 601 234 567`), not E.164. What changed is the reason: the field stopped being display-only the moment owners were expected to enter numbers outside Czechia, and a picker of five hard-coded countries could not describe them. The rejected alternative should now read: E.164 canonicalisation *for storage* — still rejected, for the display reason given above.
 - Digits-only storage — rejected: loses owner-intended formatting for display.
 
 ## R6 — Profile write endpoint shape
@@ -116,3 +118,33 @@ No NEEDS CLARIFICATION markers existed in the Technical Context; the questions b
 **Rationale**: The sidebar needs distinct destinations for Menus and Settings (spec FR-010); `/workspace/menus` already exists as the editor's parent path, so the list becomes its index — URL hierarchy matches navigation hierarchy. The redirect keeps old bookmarks working.
 
 **Alternatives considered**: leaving the list at `/workspace` with sidebar pointing there — rejected: "Menus" and "dashboard home" become the same entry, and a future dashboard home (stats) would force a URL migration.
+
+## R12 — One form architecture
+
+**Decision**: Every form that takes typed input goes through `hooks/use-action-form.ts` — react-hook-form with a zod resolver over a schema in `lib/validation/schemas.ts`, dispatching a Server Action through `useActionState`, with a `readX` reader and an `xFormData` writer bridging the two. The Server Action re-reads the same schema before it calls the API. Plain `<form action={fn}>` is reserved for posts with no typed input (reorder, delete, duplicate, publish, sign out). Schema messages are `FieldErrorCode` strings rather than prose. Recorded in `apps/frontend/AGENTS.md` under "Forms and validation".
+
+**Rationale**: The menu editor had grown a second pattern — bare `useActionState` over uncontrolled inputs — and it carried the bug `useActionForm` was written to fix: React empties an uncontrolled `<form action>` once the action resolves, and `FormState` deliberately carries codes and not values, so a rejected price took the dish name and description with it. (`tests/e2e/menu-editor.spec.ts` had a test *named* for keeping what was typed which asserted only the error message.) Unifying also moves the first check into the browser with the same rules and the same three translations, and keeps the no-JS path honest because both paths call one reader.
+
+**Alternatives considered**:
+- Extending `FormState` with the submitted values and re-seeding `defaultValue` — rejected: it puts user input into a type whose whole point is that it carries no user-facing data, and it re-renders the server component to restore something the browser never lost.
+- A lighter wrapper for one-field forms (`InlineTextForm`) — rejected: it would re-implement the `seenState` replay, the `summary` rule, the in-transition dispatch and the no-JS contract, which is the entire hook.
+- Keying the success callback on `state` identity rather than the `pending` edge — rejected: a Server Action's return value is deserialised fresh each time, but an in-process stub (every story) can return the same object twice, so the tests would drift from production.
+
+## R13 — Decimal prices
+
+**Decision**: `priceCzk` becomes `numeric(10, 2)` in Postgres (`mode: 'number'` in Drizzle) and `@IsNumber({ maxDecimalPlaces: 2 }) @Min(0)` in the DTO; the wire format stays a number of korunas, so `89` and `56.5` are both valid and `56.555` is not. Migration `0003` widens the column in place — Postgres casts integer to numeric implicitly, so existing prices keep their value and the non-negative check is untouched. The browser's half of the rule is one regex in `schemas.ts`, which also accepts a comma as the decimal separator.
+
+**Rationale**: Owners price in hellers (56,50 for a coffee) and the integer column made that unenterable, with the API answering `IS_INT` — a rule the product did not actually want. `numeric` rather than a float because a price is money: 56.50 has no exact binary representation, and `formatMoney` already prints two decimals only when the amount has them, so nothing above the column needed to change.
+
+**Alternatives considered**:
+- Integer hellers with conversion at the API boundary — rejected: every read and write in `menus.service.ts` would multiply or divide, the wire format would diverge from the display model's major units, and one missed spot is a price wrong by a factor of a hundred.
+- `numeric` returned as a string (Drizzle's default) — rejected: the contract, the adapter and `Money.amount` are all numbers; parsing at every call site to keep a column's default mode is the wrong trade.
+- Keeping whole korunas and explaining the limit in the UI — rejected: the owner asked for the price they charge.
+
+## R14 — Duplicating a dish
+
+**Decision**: `POST /menus/:menuId/sections/:sectionId/items/:itemId/duplicate` returns the copy, inserted directly after the original with the following siblings renumbered. The copy carries the same name, description and price, unaltered.
+
+**Rationale**: Building a menu means entering variations of the same dish, and the alternative — create, then reorder — is two requests that can half-succeed, leaving the owner tidying up after one button press. Positions stay the dense `0..n-1` range every read here assumes because the insert reuses `moveWithin`. The name is copied verbatim rather than suffixed: somebody duplicating a dish is about to rename it, and "Kulajda (kopie)" is text they would have to delete first.
+
+**Alternatives considered**: doing it in the Server Action with a POST plus a PATCH — rejected for the atomicity reason above; a bulk reorder endpoint to make it cheap — deferred, nothing needs one yet.

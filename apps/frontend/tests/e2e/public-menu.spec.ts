@@ -26,6 +26,8 @@ async function publishSampleMenu(page: import("@playwright/test").Page): Promise
 
   await addSection(page, "Hlavní jídla");
   await addItem(page, "Hlavní jídla", { name: "Svíčková na smetaně", price: "245" });
+  // A price with hellers, so the guest side is proven to carry them too.
+  await addItem(page, "Hlavní jídla", { name: "Chléb", price: "12,50" });
 
   return publish(page);
 }
@@ -44,6 +46,9 @@ test.describe("public menu", () => {
     await expect(guestPage.getByText("Kulajda")).toBeVisible();
     await expect(guestPage.getByText("Se zastřeným vejcem a koprem")).toBeVisible();
     await expect(guestPage.getByText("Svíčková na smetaně")).toBeVisible();
+    // Whole korunas print without decimals; a price that has hellers keeps them.
+    await expect(guestPage.getByText("245 Kč").first()).toBeVisible();
+    await expect(guestPage.getByText("12,50 Kč").first()).toBeVisible();
 
     // Never asked to sign in.
     await expect(guestPage.getByRole("button", { name: "Přihlásit se" })).toHaveCount(0);

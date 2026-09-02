@@ -192,7 +192,9 @@ export async function addSection(page: Page, title: string): Promise<void> {
     .getByRole("button", { name: /přidat sekci|add section|bereich hinzufügen/i })
     .click();
 
-  await expect(page.locator(`input[value="${title}"]`)).toBeVisible();
+  // A section reads as a heading now. The always-open text input it used to be
+  // was indistinguishable from the form for adding one.
+  await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
 }
 
 export async function addItem(

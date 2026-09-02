@@ -197,3 +197,80 @@ export type SignUpFormValues = z.input<typeof signUpFormSchema>;
 export type ProfileFormValues = z.input<typeof profileFormSchema>;
 export type SignInFormValues = z.input<typeof signInFormSchema>;
 export type VerifyCodeFormValues = z.input<typeof verifyCodeFormSchema>;
+
+// ------------------------------------------------------------ menu editor
+//
+// Bounds duplicated from `apps/api/src/menus/dto/{menu,section,item}.dto.ts`
+// for the same reason as the auth ones above, and pinned by the same test.
+
+/** A menu name and a section title are one rule in the API: `@Length(1, 120)`. */
+const title = z.string().trim().min(1, "IS_LENGTH").max(120, "IS_LENGTH");
+
+const itemName = z.string().trim().min(1, "IS_LENGTH").max(200, "IS_LENGTH");
+
+/** Optional to the owner; the action decides whether blank means absent or null. */
+const itemDescription = z.string().trim().max(2000, "MAX_LENGTH");
+
+/**
+ * A price as it is typed: korunas, with hellers allowed but not required.
+ *
+ * A comma is accepted because a Czech keyboard and a Czech reader both use one;
+ * it is normalised to a dot before the number is parsed, so `56,50` and `56.50`
+ * are the same price rather than one of them being a mistake.
+ *
+ * The pattern is what rejects `zdarma` and `56,555`, and it runs before the
+ * range check so the two never both speak: `CODE_PRIORITY` would keep IS_NUMBER
+ * anyway, and this way there is nothing to prioritise. `-5` passes the pattern
+ * and is caught by `.min(0)`, which is the only case where "cannot be negative"
+ * is the useful thing to say.
+ */
+const PRICE_PATTERN = /^-?\d+(?:[.,]\d{1,2})?$/;
+
+const priceCzk = z
+  .string()
+  .trim()
+  .min(1, "IS_LENGTH")
+  .regex(PRICE_PATTERN, "IS_NUMBER")
+  .transform((raw) => Number(raw.replace(",", ".")))
+  .pipe(z.number().min(0, "MIN"));
+
+export const menuItemSchema = z.object({
+  name: itemName,
+  description: itemDescription,
+  priceCzk,
+});
+
+/**
+ * The client flavour is the very same schema: unlike the phone list, nothing
+ * about a dish is shaped differently in the browser. The price is a string on
+ * the way in and a number on the way out either way.
+ */
+export const menuItemFormSchema = menuItemSchema;
+
+/** Which field a one-line form posts under: menus have a name, sections a title. */
+export type InlineTextField = "name" | "title";
+
+/**
+ * A one-field form's schema, built for the field it is actually posting.
+ *
+ * Named by the caller rather than by a fixed internal key because
+ * react-hook-form matches an input to its path by the DOM `name` attribute, and
+ * the browser has to post the name the Server Action reads when JavaScript
+ * never loads. One key, all three jobs.
+ */
+export function inlineTextSchema(
+  field: InlineTextField,
+): z.ZodType<Record<string, string>, Record<string, string>> {
+  // The cast is the price of a computed key: zod infers `{ [x: string]: string }`
+  // from `z.object({ [field]: … })` and cannot narrow it to the two literal
+  // field names, so the declared return type is what callers see. The runtime
+  // schema is exactly the one `title` describes, and
+  // `tests/unit/validation.test.ts` checks it under both names.
+  return z.object({ [field]: title }) as unknown as z.ZodType<
+    Record<string, string>,
+    Record<string, string>
+  >;
+}
+
+/** What the form holds: the price is still the string that was typed. */
+export type MenuItemFormValues = z.input<typeof menuItemFormSchema>;

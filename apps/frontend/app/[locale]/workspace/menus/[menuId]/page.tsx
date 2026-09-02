@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Plus } from "lucide-react";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Container } from "@/components/layout/Container";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
+import { EditableTitle } from "@/components/workspace/EditableTitle";
 import { InlineTextForm } from "@/components/workspace/InlineTextForm";
 import { PublishControls } from "@/components/workspace/PublishControls";
 import { SectionEditor } from "@/components/workspace/SectionEditor";
@@ -16,6 +18,7 @@ import {
   addSectionAction,
   deleteItemAction,
   deleteSectionAction,
+  duplicateItemAction,
   getMenu,
   moveItemAction,
   moveSectionAction,
@@ -35,7 +38,6 @@ export async function generateMetadata({
   return { title: t("metaTitle"), robots: { index: false, follow: false } };
 }
 
-/** The absolute address an owner shares. Falls back to localhost in development. */
 function publicUrlFor(locale: string, slug: string | null): string | null {
   if (!slug) return null;
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -52,21 +54,33 @@ export default async function MenuEditorPage({
   const t = await getTranslations({ locale, namespace: "MenuEditor" });
 
   const result = await getMenu(menuId);
-  // A menu that belongs to somebody else answers 404 exactly like a missing
-  // one, so this single branch covers both.
+
   if (!result.ok) notFound();
   const { menu } = result.data;
 
-  // A div, not a main: the shell's SidebarInset is already this page's main
-  // landmark, and nesting a second one inside it is invalid.
   return (
     <div className="flex-1 py-10">
       <Container size="lg" className="flex flex-col gap-6">
-        <Link href="/workspace" className="text-muted-foreground w-fit text-sm underline underline-offset-4">
+        <Link
+          href="/workspace"
+          className="text-muted-foreground w-fit text-sm underline underline-offset-4"
+        >
           {t("back")}
         </Link>
 
-        <h1 className="text-2xl font-semibold tracking-tight">{menu.name}</h1>
+        <EditableTitle
+          value={menu.name}
+          as="h1"
+          action={renameMenuAction}
+          field="name"
+          label={t("nameLabel")}
+          renameLabel={t("renameMenu")}
+          submitLabel={t("rename")}
+          pendingLabel={t("saving")}
+          successMessage={t("menuRenamed")}
+          hidden={{ locale, menuId: menu.id }}
+          headingClassName="text-2xl font-semibold tracking-tight"
+        />
 
         <PublishControls
           status={menu.status}
@@ -77,28 +91,12 @@ export default async function MenuEditorPage({
           unpublishAction={unpublishAction}
         />
 
-        <section
-          aria-labelledby="menu-name-heading"
-          className="border-border bg-card rounded-lg border p-4"
-        >
-          <h2 id="menu-name-heading" className="mb-3 text-sm font-medium">
-            {t("nameLabel")}
-          </h2>
-          <InlineTextForm
-            action={renameMenuAction}
-            field="name"
-            label={t("nameLabel")}
-            labelHidden
-            submitLabel={t("rename")}
-            pendingLabel={t("saving")}
-            defaultValue={menu.name}
-            hidden={{ locale, menuId: menu.id }}
-          />
-        </section>
-
         <VariantSwitcher selected={menu.visualVariant} />
 
-        <section aria-labelledby="sections-heading" className="flex flex-col gap-4">
+        <section
+          aria-labelledby="sections-heading"
+          className="flex flex-col gap-4"
+        >
           <h2 id="sections-heading" className="text-lg font-medium">
             {t("sections")}
           </h2>
@@ -124,21 +122,25 @@ export default async function MenuEditorPage({
                 updateItemAction={updateItemAction}
                 moveItemAction={moveItemAction}
                 deleteItemAction={deleteItemAction}
+                duplicateItemAction={duplicateItemAction}
               />
             ))
           )}
 
-          <div className="border-border bg-card rounded-lg border p-4">
-            <h3 className="mb-3 text-sm font-medium">{t("addSection")}</h3>
+          <div className="border-border bg-muted/60 rounded-lg border border-dashed p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-medium">
+              <Plus aria-hidden="true" className="size-4" />
+              {t("addSection")}
+            </h3>
             <InlineTextForm
-              // Remounts once the section count changes, clearing the input.
-              key={`add-section-${menu.sections.length}`}
               action={addSectionAction}
               field="title"
               label={t("addSectionLabel")}
               placeholder={t("addSectionPlaceholder")}
               submitLabel={t("addSection")}
               pendingLabel={t("saving")}
+              successMessage={t("sectionAdded")}
+              resetOnSuccess
               hidden={{ locale, menuId: menu.id }}
             />
           </div>

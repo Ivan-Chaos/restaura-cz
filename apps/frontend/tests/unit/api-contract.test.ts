@@ -240,19 +240,37 @@ describe("toFormState", () => {
     expect(toFormState(error)).toMatchObject({ fields: { name: "IS_STRING" } });
   });
 
-  it("prefers 'enter a whole number' over 'cannot be negative' for a word", () => {
-    // A price of "free" trips both isInt and min. Telling the owner their word
-    // is negative explains nothing; telling them to enter a number does.
+  it("prefers 'enter a price' over 'cannot be negative' for a word", () => {
+    // A price of "free" trips both isNumber and min. Telling the owner their
+    // word is negative explains nothing; telling them to enter a price does.
     const error: ApiError = {
       code: "VALIDATION_FAILED",
       message: "Request body failed validation.",
       details: [
         { field: "priceCzk", code: "MIN", message: "must not be less than 0" },
-        { field: "priceCzk", code: "IS_INT", message: "must be an integer" },
+        { field: "priceCzk", code: "IS_NUMBER", message: "must be a number" },
       ],
     };
 
-    expect(toFormState(error)).toMatchObject({ fields: { priceCzk: "IS_INT" } });
+    expect(toFormState(error)).toMatchObject({ fields: { priceCzk: "IS_NUMBER" } });
+  });
+
+  it("keeps IS_NUMBER, which is what a price with three decimals reports", () => {
+    // maxDecimalPlaces fails under the same constraint name as a non-number,
+    // deliberately: "enter a price such as 89 or 56,50" fixes both.
+    const error: ApiError = {
+      code: "VALIDATION_FAILED",
+      message: "Request body failed validation.",
+      details: [
+        {
+          field: "priceCzk",
+          code: "IS_NUMBER",
+          message: "must be a number with at most 2 decimal places",
+        },
+      ],
+    };
+
+    expect(toFormState(error)).toMatchObject({ fields: { priceCzk: "IS_NUMBER" } });
   });
 
   it("degrades an unrecognised constraint to a generic message rather than dropping it", () => {

@@ -5,7 +5,12 @@ import type { MenuSectionView } from "@/lib/api/types";
 
 import { SectionEditor } from "./SectionEditor";
 
-const succeeds = async (): Promise<FormState> => ({ status: "idle" });
+/**
+ * A fresh object per call, not a shared constant: the hook notices a completed
+ * submission on the pending edge, and a story that handed back the same object
+ * twice would still be one submission as far as any identity check goes.
+ */
+const succeeds = async (): Promise<FormState> => ({ status: "success" });
 const noop = async (): Promise<void> => {};
 
 const filled: MenuSectionView = {
@@ -40,6 +45,7 @@ const meta = {
     deleteSectionAction: noop,
     moveItemAction: noop,
     deleteItemAction: noop,
+    duplicateItemAction: noop,
   },
 } satisfies Meta<typeof SectionEditor>;
 

@@ -37,8 +37,8 @@ function toItem(
     id: `${categorySlug}-item-${index + 1}`,
     name: item.name,
     ...(item.description === null ? {} : { description: item.description }),
-    // Major units, matching the design system's Money contract: menus are never
-    // priced in hundredths.
+    // Major units, matching the design system's Money contract: korunas, with
+    // hellers as a decimal rather than as a separate unit.
     price: { kind: "single", amount: { amount: item.priceCzk, currency: "CZK" } },
   };
 }

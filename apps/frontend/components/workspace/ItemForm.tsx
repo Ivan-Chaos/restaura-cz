@@ -1,23 +1,26 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { IDLE, type FormState } from "@/lib/api/form-state";
+import { fieldCode, useActionForm, type ServerAction } from "@/hooks/use-action-form";
+import { itemFormData } from "@/lib/validation/form-values";
+import { menuItemFormSchema, type MenuItemFormValues } from "@/lib/validation/schemas";
 
-export interface ItemFormValues {
-  name: string;
-  description: string;
-  /** Kept as a string so a half-typed price survives a failed submit. */
-  priceCzk: string;
-}
+export type ItemFormValues = MenuItemFormValues;
 
 export interface ItemFormProps {
-  action: (state: FormState, formData: FormData) => Promise<FormState>;
+  action: ServerAction;
   /** Ids the action needs: locale, menuId, sectionId and, when editing, itemId. */
   hidden: Record<string, string>;
   defaults?: Partial<ItemFormValues>;
@@ -26,6 +29,8 @@ export interface ItemFormProps {
   onCancel?: () => void;
   /** Called once the save has come back clean, so an editing row can close. */
   onSuccess?: () => void;
+  /** Announced once the save lands, so a quiet success is not a silent one. */
+  successMessage?: string;
   /** Unique within the page, so labels and errors point at the right inputs. */
   idPrefix: string;
 }
@@ -33,6 +38,11 @@ export interface ItemFormProps {
 /**
  * Adding a dish and editing one take the same three fields, so they share a
  * form. The only difference is whether an itemId is present in `hidden`.
+ *
+ * Validated by react-hook-form against the same schema the Server Action
+ * re-reads, which is what makes a rejected submit keep what was typed: the
+ * values live in the form, not in the DOM that React resets once an action
+ * completes.
  */
 export function ItemForm({
   action,
@@ -41,96 +51,105 @@ export function ItemForm({
   submitLabel,
   onCancel,
   onSuccess,
+  successMessage,
   idPrefix,
 }: ItemFormProps) {
   const t = useTranslations("MenuEditor");
   const tErrors = useTranslations("Auth.errors");
   const tFields = useTranslations("MenuEditor.fieldErrors");
-  const [state, formAction, pending] = useActionState(action, IDLE);
 
-  // The initial state is also "idle", so a submission has to have happened
-  // before this counts as a success — hence tracking the pending edge rather
-  // than watching the state alone.
-  const submitted = useRef(false);
-  useEffect(() => {
-    if (pending) {
-      submitted.current = true;
-      return;
-    }
-    if (submitted.current && state.status === "idle") {
-      submitted.current = false;
+  const isEditing = hidden.itemId !== undefined;
+
+  const { form, formAction, onSubmit, pending, summary } = useActionForm<ItemFormValues>({
+    action,
+    schema: menuItemFormSchema,
+    defaultValues: {
+      name: defaults?.name ?? "",
+      description: defaults?.description ?? "",
+      priceCzk: defaults?.priceCzk ?? "",
+    },
+    toFormData: (values) => itemFormData(values, hidden),
+    onSuccess: (saved) => {
+      if (successMessage) toast.success(successMessage);
+      // Adding: an empty form, ready for the next dish. Editing: the row is
+      // about to close, so clearing it would only be a flicker.
+      if (!isEditing) saved.reset();
       onSuccess?.();
-    }
-  }, [pending, state, onSuccess]);
+    },
+  });
 
-  const fields = state.status === "error" ? state.fields : undefined;
-  const summary = state.status === "error" && !fields ? state.code : undefined;
+  const { errors } = form.formState;
+  const nameError = fieldCode(errors.name?.message);
+  const descriptionError = fieldCode(errors.description?.message);
+  const priceError = fieldCode(errors.priceCzk?.message);
 
   return (
-    <form action={formAction} noValidate className="flex flex-col gap-3">
+    <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
       {Object.entries(hidden).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
 
       <FieldGroup className="gap-3">
-        <Field data-invalid={fields?.name ? true : undefined}>
+        <Field data-invalid={nameError ? true : undefined}>
           <FieldLabel htmlFor={`${idPrefix}-name`}>{t("itemName")}</FieldLabel>
           <Input
             id={`${idPrefix}-name`}
-            name="name"
             defaultValue={defaults?.name}
             placeholder={t("itemNamePlaceholder")}
-            required
-            aria-invalid={fields?.name ? true : undefined}
-            aria-describedby={fields?.name ? `${idPrefix}-name-error` : undefined}
+            aria-invalid={nameError ? true : undefined}
+            aria-describedby={nameError ? `${idPrefix}-name-error` : undefined}
+            {...form.register("name")}
           />
-          {fields?.name ? (
-            <FieldError id={`${idPrefix}-name-error`}>{tFields(fields.name)}</FieldError>
+          {nameError ? (
+            <FieldError id={`${idPrefix}-name-error`}>{tFields(nameError)}</FieldError>
           ) : null}
         </Field>
 
-        <Field data-invalid={fields?.description ? true : undefined}>
+        <Field data-invalid={descriptionError ? true : undefined}>
           <FieldLabel htmlFor={`${idPrefix}-description`}>{t("itemDescription")}</FieldLabel>
           <Textarea
             id={`${idPrefix}-description`}
-            name="description"
             rows={2}
             defaultValue={defaults?.description}
             placeholder={t("itemDescriptionPlaceholder")}
-            aria-invalid={fields?.description ? true : undefined}
+            aria-invalid={descriptionError ? true : undefined}
             aria-describedby={
-              fields?.description ? `${idPrefix}-description-error` : undefined
+              descriptionError ? `${idPrefix}-description-error` : undefined
             }
+            {...form.register("description")}
           />
-          {fields?.description ? (
+          {descriptionError ? (
             <FieldError id={`${idPrefix}-description-error`}>
-              {tFields(fields.description)}
+              {tFields(descriptionError)}
             </FieldError>
           ) : null}
         </Field>
 
-        <Field data-invalid={fields?.priceCzk ? true : undefined}>
+        <Field data-invalid={priceError ? true : undefined}>
           <FieldLabel htmlFor={`${idPrefix}-price`}>{t("itemPrice")}</FieldLabel>
           <div className="flex items-center gap-2">
             <Input
               id={`${idPrefix}-price`}
-              name="priceCzk"
-              // `inputMode` gets a numeric keypad on phones; the field stays a
-              // text input so a typo is preserved and explained rather than
-              // silently discarded by the browser.
-              inputMode="numeric"
+              // `inputMode` gets a numeric keypad with a decimal separator on
+              // phones; the field stays a text input so a typo is preserved and
+              // explained rather than silently discarded by the browser.
+              inputMode="decimal"
               defaultValue={defaults?.priceCzk}
               placeholder={t("pricePlaceholder")}
-              required
               className="max-w-32"
-              aria-invalid={fields?.priceCzk ? true : undefined}
-              aria-describedby={fields?.priceCzk ? `${idPrefix}-price-error` : undefined}
+              aria-invalid={priceError ? true : undefined}
+              aria-describedby={
+                priceError ? `${idPrefix}-price-error` : `${idPrefix}-price-hint`
+              }
+              {...form.register("priceCzk")}
             />
             <span className="text-muted-foreground text-sm">{t("priceSuffix")}</span>
           </div>
-          {fields?.priceCzk ? (
-            <FieldError id={`${idPrefix}-price-error`}>{tFields(fields.priceCzk)}</FieldError>
-          ) : null}
+          {priceError ? (
+            <FieldError id={`${idPrefix}-price-error`}>{tFields(priceError)}</FieldError>
+          ) : (
+            <FieldDescription id={`${idPrefix}-price-hint`}>{t("priceHint")}</FieldDescription>
+          )}
         </Field>
       </FieldGroup>
 

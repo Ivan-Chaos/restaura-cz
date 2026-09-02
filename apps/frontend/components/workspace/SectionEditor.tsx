@@ -1,12 +1,13 @@
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
-import type { FormState } from "@/lib/api/form-state";
+import type { ServerAction } from "@/hooks/use-action-form";
 import type { MenuSectionView } from "@/lib/api/types";
 
 import { ConfirmDialog } from "./ConfirmDialog";
-import { InlineTextForm } from "./InlineTextForm";
+import { EditableTitle } from "./EditableTitle";
 import { ItemForm } from "./ItemForm";
 import { ItemRow } from "./ItemRow";
 
@@ -16,22 +17,17 @@ export interface SectionEditorProps {
   menuId: string;
   isFirst: boolean;
   isLast: boolean;
-  renameAction: (state: FormState, formData: FormData) => Promise<FormState>;
+  renameAction: ServerAction;
   moveSectionAction: (formData: FormData) => Promise<void>;
   deleteSectionAction: (formData: FormData) => Promise<void>;
-  addItemAction: (state: FormState, formData: FormData) => Promise<FormState>;
-  updateItemAction: (state: FormState, formData: FormData) => Promise<FormState>;
+  addItemAction: ServerAction;
+  updateItemAction: ServerAction;
   moveItemAction: (formData: FormData) => Promise<void>;
   deleteItemAction: (formData: FormData) => Promise<void>;
+  duplicateItemAction: (formData: FormData) => Promise<void>;
 }
 
-/**
- * One section and its dishes.
- *
- * A Server Component: only the pieces that genuinely need the browser — the
- * forms and the confirm dialogs — are client components, so the editor ships
- * markup rather than a renderer.
- */
+
 export function SectionEditor({
   section,
   locale,
@@ -45,6 +41,7 @@ export function SectionEditor({
   updateItemAction,
   moveItemAction,
   deleteItemAction,
+  duplicateItemAction,
 }: SectionEditorProps) {
   const t = useTranslations("MenuEditor");
 
@@ -55,21 +52,20 @@ export function SectionEditor({
       aria-labelledby={`section-${section.id}-heading`}
       className="border-border bg-card rounded-lg border p-4"
     >
-      <h3 id={`section-${section.id}-heading`} className="sr-only">
-        {section.title}
-      </h3>
-
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <InlineTextForm
+        <EditableTitle
+          value={section.title}
+          as="h3"
+          id={`section-${section.id}-heading`}
           action={renameAction}
           field="title"
           label={t("sectionTitleLabel")}
-          labelHidden
+          renameLabel={t("renameSectionButton")}
           submitLabel={t("renameSection")}
           pendingLabel={t("saving")}
-          defaultValue={section.title}
+          successMessage={t("sectionRenamed")}
           hidden={hidden}
-          className="min-w-60 flex-1"
+          headingClassName="text-lg font-medium"
         />
 
         <div className="flex items-center gap-1">
@@ -79,8 +75,9 @@ export function SectionEditor({
                 <input key={name} type="hidden" name={name} value={value} />
               ),
             )}
-            <Button type="submit" variant="ghost" size="sm" disabled={isFirst}>
-              {t("moveUp")}
+            <Button type="submit" variant="ghost" size="icon" disabled={isFirst}>
+              <ChevronUp aria-hidden="true" />
+              <span className="sr-only">{t("moveUp")}</span>
             </Button>
           </form>
 
@@ -90,8 +87,9 @@ export function SectionEditor({
                 <input key={name} type="hidden" name={name} value={value} />
               ),
             )}
-            <Button type="submit" variant="ghost" size="sm" disabled={isLast}>
-              {t("moveDown")}
+            <Button type="submit" variant="ghost" size="icon" disabled={isLast}>
+              <ChevronDown aria-hidden="true" />
+              <span className="sr-only">{t("moveDown")}</span>
             </Button>
           </form>
 
@@ -110,7 +108,7 @@ export function SectionEditor({
       {section.items.length === 0 ? (
         <Empty className="py-6">
           <EmptyTitle>{t("noItems")}</EmptyTitle>
-          <EmptyDescription>{t("addItem")}</EmptyDescription>
+          <EmptyDescription>{t("noItemsHint")}</EmptyDescription>
         </Empty>
       ) : (
         <ul className="mt-4">
@@ -121,6 +119,7 @@ export function SectionEditor({
               hidden={hidden}
               updateAction={updateItemAction}
               deleteAction={deleteItemAction}
+              duplicateAction={duplicateItemAction}
               moveAction={moveItemAction}
               isFirst={index === 0}
               isLast={index === section.items.length - 1}
@@ -129,16 +128,18 @@ export function SectionEditor({
         </ul>
       )}
 
-      <div className="border-border mt-4 border-t pt-4">
-        <h4 className="mb-3 text-sm font-medium">{t("addItem")}</h4>
+
+      <div className="border-border bg-muted/60 mt-4 rounded-md border border-dashed p-4">
+        <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
+          <Plus aria-hidden="true" className="size-4" />
+          {t("addItem")}
+        </h4>
         <ItemForm
-          // Remounts after a successful add so the inputs come back empty
-          // instead of holding the dish that was just saved.
-          key={`add-${section.id}-${section.items.length}`}
           action={addItemAction}
           hidden={hidden}
           idPrefix={`add-item-${section.id}`}
           submitLabel={t("addItem")}
+          successMessage={t("itemAdded")}
         />
       </div>
     </section>

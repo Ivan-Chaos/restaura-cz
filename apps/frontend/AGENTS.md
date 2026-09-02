@@ -87,10 +87,13 @@ at the repository root, with the cross-app contract in its `contracts/http-api.m
   Field codes are class-validator constraint names uppercased, so `@Length` arrives as
   `IS_LENGTH`, not `LENGTH`. An unrecognised code degrades to `INVALID` rather than vanishing.
   When one field breaks several rules, `CODE_PRIORITY` prefers the type problem over the range
-  problem: for a price of "free", "enter a whole number" is the useful half.
+  problem: for a price of "free", "enter a price such as 89" is the useful half.
 - **Forms take their action as a prop.** `AuthForm`, `InlineTextForm`, `ItemForm` and
   `ConfirmDialog` never import a Server Action. Pages inject the real one; stories inject a stub.
   Importing a `"use server"` module into the Storybook browser bundle does not work.
+- **Prices are korunas with up to two decimal places.** `numeric(10, 2)` in the database, a
+  plain number on the wire, and `formatMoney` decides how it reads. Never a float column: 56.50
+  is not representable in binary, and a menu that prints 56,49 is a bug nobody can explain.
 - **The workspace gate lives in one place: `app/[locale]/workspace/layout.tsx`.** It calls
   `requireProfile(locale)`, which sends a visitor with no session to sign-in and a signed-in
   owner with no restaurant profile to `/complete-profile`. Pages under `/workspace` therefore
@@ -124,11 +127,62 @@ at the repository root, with the cross-app contract in its `contracts/http-api.m
   declared tells guests something untrue. When the editor starts collecting photos, markers and
   allergens, grow `GuestMenu` to match — the components already exist.
 - **`lib/menu-display/adapter.ts` is the only seam** between the API's shape and the design
-  system's `Menu`. Prices are whole korunas both sides (`{ kind: "single", … }`); category ids
+  system's `Menu`. Prices are korunas both sides (`{ kind: "single", … }`); category ids
   are slugified titles plus an index, because they double as element ids and two sections may
   share a title.
 - **A draft menu and an address that never existed answer identically** (404 plus the
   not-available page). Anything else lets the public route enumerate which menus exist.
+
+# Forms and validation
+
+**Every form that takes typed input is `useActionForm`.** One hook
+(`hooks/use-action-form.ts`), one schema per form in `lib/validation/schemas.ts`, and a
+`readX`/`xFormData` pair in `lib/validation/{form-data,form-values}.ts`. There is no second
+pattern — a bare `useActionState` over uncontrolled inputs is what the menu editor used to do,
+and it is what this replaced.
+
+Three things depend on it, which is why it is not a preference:
+
+- **What was typed survives a rejection.** React empties an uncontrolled `<form action={…}>`
+  once its action completes, and `FormState` carries codes, never values. With react-hook-form
+  owning the values and `handleSubmit` preventing the default, a rejected price no longer takes
+  the dish name with it.
+- **One error catalogue, wherever the failure was noticed.** Schema messages are
+  `FieldErrorCode` strings, not prose (`"IS_LENGTH"`, `"IS_NUMBER"`, `"MIN"`), so a rule the
+  browser caught and the same rule the API caught render through the same translation, and
+  adding a rule needs no new message key.
+- **It still works with no client JavaScript.** The Server Action calls the same `readX` before
+  it calls the API, so the browser's check is a courtesy and the action is the authority. That
+  is also why `xFormData` posts the raw typed string — `priceCzk` as `"56,50"`, not as `56.5` —
+  and why `zodResolver` is given `{ raw: true }`.
+
+Rules and traps:
+
+- **Plain `<form action={fn}>` is only for a button.** Move up, move down, duplicate, delete,
+  publish, sign out: nothing typed, no state, works before hydration. `ConfirmDialog` is one of
+  these.
+- **Actions return `SAVED` on success, not `IDLE`.** `onSuccess` fires from an effect on the
+  falling edge of `pending`, never on the identity of `state` — a story's stub can hand back the
+  same object twice and it is still two submissions. Use it to `form.reset()`, close an editing
+  row, or `toast` what was saved.
+- **Keep `defaultValue` on an `<Input>` alongside `register`.** `register` sets the value through
+  a ref and leaves the attribute alone, so without it the server-rendered markup shows an empty
+  field until hydration.
+- **Register under the name the action reads.** react-hook-form matches an input to its path by
+  the DOM `name`, and the no-JS post uses that same name. `InlineTextForm` takes `field` for
+  exactly this reason.
+- **A title is a heading, not an open input.** `EditableTitle` shows the name and a Rename button
+  that swaps in the form. Every save in the editor is its own request, and a permanently open
+  field beside "Save" made a section that exists look like the form for adding one.
+
+**Phone numbers**: `components/auth/PhoneInput.tsx` is the country picker and the number as one
+control; all the reading of what was typed lives in `lib/phone/` and is unit-tested there.
+Typing or pasting a dialling code moves the picker and strips the code from the number — `+49`,
+`0049` and a paste all work. Half a code (`+4`) is left alone rather than guessed. Country names
+come from `Intl.DisplayNames`, never from the message catalogues, and they appear only in the
+popup: ICU data differs between Node and the browser, so a name in the server-rendered trigger
+would be a hydration mismatch waiting for a version bump. libphonenumber decides *formatting*;
+`lib/api/phone.ts` still decides what is *acceptable*, mirroring the API.
 
 # Legal pages and cookie consent
 

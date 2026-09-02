@@ -356,6 +356,76 @@ export class MenusService {
     });
   }
 
+  /**
+   * Copies a dish, landing the copy directly below the original.
+   *
+   * One endpoint rather than a create followed by a move, because the two
+   * halves have to succeed together: a copy that appended itself to the end of
+   * the section and then failed to move would leave the owner tidying up after
+   * a button they pressed once. The name is copied verbatim — an owner
+   * duplicating a dish is about to edit it, and a guessed "Kulajda (copy)"
+   * would only be text they have to delete.
+   */
+  async duplicateItem(
+    accountId: string,
+    menuId: string,
+    sectionId: string,
+    itemId: string,
+  ): Promise<ItemView> {
+    return this.db.transaction(async (tx) => {
+      await this.requireOwnedMenu(tx, accountId, menuId);
+      await this.requireSection(tx, menuId, sectionId);
+
+      const [source] = await tx
+        .select({
+          name: menuItem.name,
+          description: menuItem.description,
+          priceCzk: menuItem.priceCzk,
+          position: menuItem.position,
+        })
+        .from(menuItem)
+        .where(and(eq(menuItem.id, itemId), eq(menuItem.sectionId, sectionId)))
+        .limit(1);
+      if (!source) throw AppError.notFound();
+
+      const siblings = await this.itemIdsInOrder(tx, sectionId);
+      const [copy] = await tx
+        .insert(menuItem)
+        .values({
+          sectionId,
+          name: source.name,
+          description: source.description,
+          priceCzk: source.priceCzk,
+          position: siblings.length,
+        })
+        .returning();
+      if (!copy) throw new Error('Item insert returned no row');
+
+      // Appended, then moved into place: `moveWithin` renumbers the siblings
+      // it displaces, which is what keeps positions the dense 0..n-1 range
+      // every other read here assumes.
+      await this.writeItemPositions(
+        tx,
+        moveWithin([...siblings, { id: copy.id }], copy.id, source.position + 1),
+      );
+      await this.touchMenu(tx, menuId);
+
+      const [row] = await tx
+        .select({
+          id: menuItem.id,
+          name: menuItem.name,
+          description: menuItem.description,
+          priceCzk: menuItem.priceCzk,
+          position: menuItem.position,
+        })
+        .from(menuItem)
+        .where(eq(menuItem.id, copy.id))
+        .limit(1);
+      if (!row) throw new Error('Duplicated item vanished inside its own transaction');
+      return row;
+    });
+  }
+
   async updateItem(
     accountId: string,
     menuId: string,

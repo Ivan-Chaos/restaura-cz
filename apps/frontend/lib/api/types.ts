@@ -35,6 +35,8 @@ export type FieldErrorCode =
   | "IS_EMAIL"
   | "IS_STRING"
   | "IS_INT"
+  /** A price that is not a number, or carries more than two decimal places. */
+  | "IS_NUMBER"
   | "IS_IN"
   | "IS_EMPTY"
   /** class-validator names the `@Length` constraint `isLength`. */

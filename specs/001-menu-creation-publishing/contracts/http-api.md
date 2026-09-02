@@ -9,7 +9,7 @@ This document is the single source of truth for the frontend ↔ API contract. P
 - Base URL: `API_URL` env var (e.g. `http://localhost:3001`). All bodies are JSON (`Content-Type: application/json`).
 - **Authentication**: opaque session token in an `httpOnly` cookie named `restaura_session` (`Secure` outside dev, `SameSite=Lax`, `Path=/`, 30-day expiry). Endpoints marked 🔒 require it and return `401 UNAUTHENTICATED` without a valid, unexpired session.
 - **Ownership**: 🔒 endpoints addressing a menu/section/item that doesn't exist *or* isn't owned by the caller return `404 NOT_FOUND` — never `403` (no existence leak).
-- **IDs** are UUID strings. **Prices** are integers, whole CZK (major units), ≥ 0. **Timestamps** are ISO 8601 UTC strings.
+- **IDs** are UUID strings. **Prices** are numbers in CZK (major units) with at most two decimal places, ≥ 0 — `89` and `56.5` are both valid, `56.555` is not. **Timestamps** are ISO 8601 UTC strings.
 
 ### Error shape (every non-2xx response)
 
@@ -136,12 +136,16 @@ Request (at least one): `{ "title": "…", "position": 2 }` — position is clam
 
 Request: `{ "name": "1–200 chars", "description": "≤ 2000 chars, optional", "priceCzk": 89 }`
 
-- Validation (FR-009): `name` required; `priceCzk` required, integer, ≥ 0; `description` optional/nullable.
+- Validation (FR-009): `name` required; `priceCzk` required, number with at most two decimal places, ≥ 0; `description` optional/nullable.
 - `201` → `{ "item": { "id", "name", "description", "priceCzk", "position" } }` — appended at the end.
 
 ### PATCH /menus/:menuId/sections/:sectionId/items/:itemId
 
 Request (at least one): `{ "name", "description", "priceCzk", "position" }` — same validation; `description: null` clears it. `200` → `{ "item": … }`.
+
+### POST /menus/:menuId/sections/:sectionId/items/:itemId/duplicate
+
+No body. `201` → `{ "item": … }` — a copy of the dish carrying the same name, description and price, inserted directly **after** the original, with the following siblings renumbered. One endpoint rather than a create plus a reorder, so a half-applied duplicate cannot exist.
 
 ### DELETE /menus/:menuId/sections/:sectionId/items/:itemId
 

@@ -30,6 +30,7 @@ const KNOWN_FIELD_CODES: readonly FieldErrorCode[] = [
   "IS_EMAIL",
   "IS_STRING",
   "IS_INT",
+  "IS_NUMBER",
   "IS_IN",
   "IS_EMPTY",
   "IS_LENGTH",
@@ -56,14 +57,15 @@ export function toFieldCode(code: string): FieldErrorCode | "INVALID" {
 /**
  * Which failure to show when one field breaks several rules at once.
  *
- * A price of "free" fails both `isInt` and `min`, and "enter a whole number" is
- * the useful half of that: telling someone their word is negative explains
- * nothing. Type problems therefore outrank range problems.
+ * A price of "free" fails both `isNumber` and `min`, and "enter a price such as
+ * 89" is the useful half of that: telling someone their word is negative
+ * explains nothing. Type problems therefore outrank range problems.
  */
 const CODE_PRIORITY: readonly (FieldErrorCode | "INVALID")[] = [
   "IS_STRING",
   "IS_ARRAY",
   "IS_INT",
+  "IS_NUMBER",
   "IS_EMAIL",
   "IS_PHONE",
   "IS_IN",

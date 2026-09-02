@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 
 import { redirect } from "@/i18n/navigation";
+import { readInlineText, readItem } from "@/lib/validation/form-data";
 import { apiGet, apiRequest } from "../client";
-import { IDLE, toFormState, type FormState } from "../form-state";
+import { SAVED, toFormState, type FormState } from "../form-state";
 import { toLocale } from "../locale";
 import type {
   ItemResponse,
@@ -16,19 +17,16 @@ import type {
 /**
  * Server Actions for the workspace. Each returns a FormState the form renders,
  * and revalidates the editor so the next render shows what was just saved.
+ *
+ * Every action that carries typed input validates it through the same schema
+ * the browser used, before spending a request on it. That is not a duplicate
+ * check: with client JavaScript this is the second opinion, and without it this
+ * is the only one, so the rules have to live somewhere both paths reach.
  */
 
 function revalidateEditor(locale: string, menuId: string): void {
   revalidatePath(`/${locale}/workspace/menus/${menuId}`);
   revalidatePath(`/${locale}/workspace`);
-}
-
-function priceFromForm(value: FormDataEntryValue | null): number | string {
-  const raw = String(value ?? "").trim().replace(",", ".");
-  const parsed = Number(raw);
-  // Hand a non-number through untouched so the API's validator, not this
-  // parser, decides what the message says.
-  return raw !== "" && Number.isFinite(parsed) ? parsed : raw;
 }
 
 // ----------------------------------------------------------------- menus
@@ -46,16 +44,20 @@ export async function createMenuAction(
   formData: FormData,
 ): Promise<FormState> {
   const locale = toLocale(formData.get("locale"));
+
+  const parsed = readInlineText(formData, "name");
+  if (!parsed.ok) return parsed.state;
+
   const { result } = await apiRequest<MenuDetailResponse>("/menus", {
     method: "POST",
-    body: { name: String(formData.get("name") ?? "") },
+    body: { name: parsed.values.name },
   });
 
   if (!result.ok) return toFormState(result.error);
 
   revalidatePath(`/${locale}/workspace`);
   redirect({ href: `/workspace/menus/${result.data.menu.id}`, locale });
-  return IDLE;
+  return SAVED;
 }
 
 export async function renameMenuAction(
@@ -65,15 +67,18 @@ export async function renameMenuAction(
   const locale = toLocale(formData.get("locale"));
   const menuId = String(formData.get("menuId") ?? "");
 
+  const parsed = readInlineText(formData, "name");
+  if (!parsed.ok) return parsed.state;
+
   const { result } = await apiRequest<MenuDetailResponse>(`/menus/${menuId}`, {
     method: "PATCH",
-    body: { name: String(formData.get("name") ?? "") },
+    body: { name: parsed.values.name },
   });
 
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
-  return IDLE;
+  return SAVED;
 }
 
 export async function deleteMenuAction(formData: FormData): Promise<void> {
@@ -95,15 +100,18 @@ export async function addSectionAction(
   const locale = toLocale(formData.get("locale"));
   const menuId = String(formData.get("menuId") ?? "");
 
+  const parsed = readInlineText(formData, "title");
+  if (!parsed.ok) return parsed.state;
+
   const { result } = await apiRequest<SectionResponse>(`/menus/${menuId}/sections`, {
     method: "POST",
-    body: { title: String(formData.get("title") ?? "") },
+    body: { title: parsed.values.title },
   });
 
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
-  return IDLE;
+  return SAVED;
 }
 
 export async function renameSectionAction(
@@ -114,15 +122,18 @@ export async function renameSectionAction(
   const menuId = String(formData.get("menuId") ?? "");
   const sectionId = String(formData.get("sectionId") ?? "");
 
+  const parsed = readInlineText(formData, "title");
+  if (!parsed.ok) return parsed.state;
+
   const { result } = await apiRequest<SectionResponse>(
     `/menus/${menuId}/sections/${sectionId}`,
-    { method: "PATCH", body: { title: String(formData.get("title") ?? "") } },
+    { method: "PATCH", body: { title: parsed.values.title } },
   );
 
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
-  return IDLE;
+  return SAVED;
 }
 
 export async function moveSectionAction(formData: FormData): Promise<void> {
@@ -158,15 +169,20 @@ export async function addItemAction(
   const locale = toLocale(formData.get("locale"));
   const menuId = String(formData.get("menuId") ?? "");
   const sectionId = String(formData.get("sectionId") ?? "");
-  const description = String(formData.get("description") ?? "").trim();
+
+  const parsed = readItem(formData);
+  if (!parsed.ok) return parsed.state;
+  const { name, description, priceCzk } = parsed.values;
 
   const { result } = await apiRequest<ItemResponse>(
     `/menus/${menuId}/sections/${sectionId}/items`,
     {
       method: "POST",
       body: {
-        name: String(formData.get("name") ?? ""),
-        priceCzk: priceFromForm(formData.get("priceCzk")),
+        name,
+        priceCzk,
+        // Absent rather than empty: a dish with no description does not have a
+        // blank one.
         ...(description === "" ? {} : { description }),
       },
     },
@@ -175,7 +191,7 @@ export async function addItemAction(
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
-  return IDLE;
+  return SAVED;
 }
 
 export async function updateItemAction(
@@ -186,15 +202,18 @@ export async function updateItemAction(
   const menuId = String(formData.get("menuId") ?? "");
   const sectionId = String(formData.get("sectionId") ?? "");
   const itemId = String(formData.get("itemId") ?? "");
-  const description = String(formData.get("description") ?? "").trim();
+
+  const parsed = readItem(formData);
+  if (!parsed.ok) return parsed.state;
+  const { name, description, priceCzk } = parsed.values;
 
   const { result } = await apiRequest<ItemResponse>(
     `/menus/${menuId}/sections/${sectionId}/items/${itemId}`,
     {
       method: "PATCH",
       body: {
-        name: String(formData.get("name") ?? ""),
-        priceCzk: priceFromForm(formData.get("priceCzk")),
+        name,
+        priceCzk,
         // Explicit null clears it; the API distinguishes null from absent.
         description: description === "" ? null : description,
       },
@@ -204,7 +223,21 @@ export async function updateItemAction(
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
-  return IDLE;
+  return SAVED;
+}
+
+export async function duplicateItemAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get("locale"));
+  const menuId = String(formData.get("menuId") ?? "");
+  const sectionId = String(formData.get("sectionId") ?? "");
+  const itemId = String(formData.get("itemId") ?? "");
+
+  await apiRequest<ItemResponse>(
+    `/menus/${menuId}/sections/${sectionId}/items/${itemId}/duplicate`,
+    { method: "POST" },
+  );
+
+  revalidateEditor(locale, menuId);
 }
 
 export async function moveItemAction(formData: FormData): Promise<void> {

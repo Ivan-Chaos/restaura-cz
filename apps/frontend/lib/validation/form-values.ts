@@ -1,4 +1,6 @@
 import type {
+  InlineTextField,
+  MenuItemFormValues,
   ProfileFormValues,
   SignInFormValues,
   SignUpFormValues,
@@ -66,6 +68,40 @@ export function verifyCodeFormData(
   const formData = new FormData();
   formData.set("code", values.code);
   return withContext(formData, context);
+}
+
+/**
+ * The ids a workspace action needs — locale, menuId, sectionId, itemId — which
+ * the editor's forms already carry as hidden inputs for the no-JS path. Copied
+ * from that same map so the two paths cannot post different ids.
+ */
+function withHidden(formData: FormData, hidden: Record<string, string>): FormData {
+  for (const [name, value] of Object.entries(hidden)) formData.set(name, value);
+  return formData;
+}
+
+export function itemFormData(
+  values: MenuItemFormValues,
+  hidden: Record<string, string>,
+): FormData {
+  const formData = new FormData();
+  formData.set("name", values.name);
+  formData.set("description", values.description);
+  // The price goes as typed, not as parsed: the action re-reads it through the
+  // same schema, and sending a number here would mean the two paths validated
+  // different things.
+  formData.set("priceCzk", values.priceCzk);
+  return withHidden(formData, hidden);
+}
+
+export function inlineTextFormData(
+  field: InlineTextField,
+  values: Record<string, string>,
+  hidden: Record<string, string>,
+): FormData {
+  const formData = new FormData();
+  formData.set(field, values[field] ?? "");
+  return withHidden(formData, hidden);
 }
 
 /**

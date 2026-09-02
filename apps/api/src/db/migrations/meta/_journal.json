@@ -22,6 +22,13 @@
       "when": 1788278869032,
       "tag": "0002_silent_mordo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788374002866,
+      "tag": "0003_faulty_bedlam",
+      "breakpoints": true
     }
   ]
 }

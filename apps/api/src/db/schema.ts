@@ -3,6 +3,7 @@ import {
   check,
   index,
   integer,
+  numeric,
   pgTable,
   text,
   timestamp,
@@ -179,8 +180,16 @@ export const menuItem = pgTable(
       .references(() => menuSection.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     description: text('description'),
-    /** Whole korunas. Menus are never priced in hundredths. */
-    priceCzk: integer('price_czk').notNull(),
+    /**
+     * Korunas, to at most two decimal places.
+     *
+     * `numeric` rather than a float because a price is money: binary floating
+     * point cannot hold 56.50 exactly, and a menu that prints 56,49 because of
+     * it is a bug an owner cannot explain. `mode: 'number'` because the scale
+     * is fixed at 2 and no menu price comes close to losing precision in a
+     * double, so the whole stack above this row keeps working in korunas.
+     */
+    priceCzk: numeric('price_czk', { precision: 10, scale: 2, mode: 'number' }).notNull(),
     position: integer('position').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

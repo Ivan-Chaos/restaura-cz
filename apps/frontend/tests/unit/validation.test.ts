@@ -1,14 +1,20 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  readInlineText,
+  readItem,
   readProfileValues,
   readSignIn,
   readSignUp,
   readVerifyCode,
   type Parsed,
 } from "@/lib/validation/form-data";
-import { profileFieldPath } from "@/lib/validation/form-values";
-import { signUpFormSchema, signUpSchema } from "@/lib/validation/schemas";
+import {
+  inlineTextFormData,
+  itemFormData,
+  profileFieldPath,
+} from "@/lib/validation/form-values";
+import { menuItemFormSchema, signUpFormSchema, signUpSchema } from "@/lib/validation/schemas";
 
 /**
  * The client-side rules, pinned against the API's DTOs.
@@ -348,4 +354,181 @@ describe("readVerifyCode", () => {
       expect(fieldsOf(readVerifyCode(form({ code })))).toMatchObject({ code: "INVALID" });
     },
   );
+});
+
+/**
+ * The menu editor's rules, pinned against `apps/api/src/menus/dto/*.dto.ts` in
+ * the same way and for the same reason.
+ *
+ * The price cases are the interesting half: the owner types a string, the API
+ * wants a number of korunas with at most two decimals, and which of the two
+ * failures gets reported decides whether the message under the field is useful.
+ */
+describe("readItem", () => {
+  const VALID_ITEM = { name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: "89" };
+
+  it("accepts a complete dish and sends the price as a number", () => {
+    const result = readItem(form(VALID_ITEM));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values).toEqual({
+      name: "Kulajda",
+      description: "Se zastřeným vejcem",
+      priceCzk: 89,
+    });
+  });
+
+  it("trims what was typed", () => {
+    const result = readItem(form({ name: "  Kulajda  ", description: "  ", priceCzk: " 89 " }));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values).toEqual({ name: "Kulajda", description: "", priceCzk: 89 });
+  });
+
+  it.each([
+    ["89", 89],
+    ["0", 0],
+    ["56.50", 56.5],
+    // A Czech keyboard and a Czech reader both use a comma; it is the same price.
+    ["56,50", 56.5],
+    ["56.5", 56.5],
+    ["1234.99", 1234.99],
+  ])("reads %j as %d korunas", (typed, expected) => {
+    const result = readItem(form({ ...VALID_ITEM, priceCzk: typed }));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values.priceCzk).toBe(expected);
+  });
+
+  it.each([
+    // A word is not a price, and neither is a third decimal place. Both have
+    // the same fix, so both report IS_NUMBER.
+    ["zdarma", "IS_NUMBER"],
+    ["89 Kč", "IS_NUMBER"],
+    ["56.555", "IS_NUMBER"],
+    ["56,555", "IS_NUMBER"],
+    [".5", "IS_NUMBER"],
+    // Negative passes the pattern, so the range check is what speaks — and
+    // "cannot be negative" is the useful thing to say about it.
+    ["-5", "MIN"],
+    ["-0.01", "MIN"],
+    // Nothing typed at all is a missing field, not a malformed number.
+    ["", "IS_LENGTH"],
+    ["   ", "IS_LENGTH"],
+  ])("rejects the price %j as %s", (typed, code) => {
+    expect(fieldsOf(readItem(form({ ...VALID_ITEM, priceCzk: typed })))).toMatchObject({
+      priceCzk: code,
+    });
+  });
+
+  it("requires a name and bounds it at 200 characters", () => {
+    expect(fieldsOf(readItem(form({ ...VALID_ITEM, name: "" })))).toMatchObject({
+      name: "IS_LENGTH",
+    });
+    expect(readItem(form({ ...VALID_ITEM, name: "K".repeat(200) })).ok).toBe(true);
+    expect(fieldsOf(readItem(form({ ...VALID_ITEM, name: "K".repeat(201) })))).toMatchObject({
+      name: "IS_LENGTH",
+    });
+  });
+
+  it("allows no description and bounds one at 2000 characters", () => {
+    expect(readItem(form({ ...VALID_ITEM, description: "" })).ok).toBe(true);
+    expect(readItem(form({ ...VALID_ITEM, description: "d".repeat(2000) })).ok).toBe(true);
+    expect(
+      fieldsOf(readItem(form({ ...VALID_ITEM, description: "d".repeat(2001) }))),
+    ).toMatchObject({ description: "MAX_LENGTH" });
+  });
+
+  it("reports every bad field at once, so one submit explains the whole form", () => {
+    expect(fieldsOf(readItem(form({ name: "", description: "", priceCzk: "zdarma" })))).toEqual({
+      name: "IS_LENGTH",
+      priceCzk: "IS_NUMBER",
+    });
+  });
+});
+
+describe("readInlineText", () => {
+  it.each(["name", "title"] as const)("accepts a %s of one to 120 characters", (field) => {
+    expect(readInlineText(form({ [field]: "Polední menu" }), field).ok).toBe(true);
+    expect(readInlineText(form({ [field]: "P".repeat(120) }), field).ok).toBe(true);
+    expect(fieldsOf(readInlineText(form({ [field]: "" }), field))).toMatchObject({
+      [field]: "IS_LENGTH",
+    });
+    expect(fieldsOf(readInlineText(form({ [field]: "P".repeat(121) }), field))).toMatchObject({
+      [field]: "IS_LENGTH",
+    });
+  });
+
+  it("marks the field the caller posts under, not a fixed one", () => {
+    // The code has to land on the input the owner can see, and a section
+    // posts "title" while a menu posts "name".
+    expect(fieldsOf(readInlineText(form({ title: "  " }), "title"))).toEqual({
+      title: "IS_LENGTH",
+    });
+    expect(fieldsOf(readInlineText(form({ name: "  " }), "name"))).toEqual({
+      name: "IS_LENGTH",
+    });
+  });
+
+  it("trims the stored value", () => {
+    const result = readInlineText(form({ title: "  Polévky  " }), "title");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values.title).toBe("Polévky");
+  });
+});
+
+/**
+ * The client posts through these, the no-JS path posts the same names straight
+ * from the DOM, and the action reads both with `readItem`/`readInlineText`.
+ * These assertions are what prove the two paths agree.
+ */
+describe("itemFormData and inlineTextFormData", () => {
+  const hidden = { locale: "cs", menuId: "menu-1", sectionId: "section-1" };
+
+  it("round-trips a dish through the same reader the action uses", () => {
+    const values = { name: "Kulajda", description: "S vejcem", priceCzk: "56,50" };
+    const result = readItem(itemFormData(values, hidden));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values).toEqual({ name: "Kulajda", description: "S vejcem", priceCzk: 56.5 });
+  });
+
+  it("carries the ids the action needs", () => {
+    const formData = itemFormData(
+      { name: "Kulajda", description: "", priceCzk: "89" },
+      { ...hidden, itemId: "item-1" },
+    );
+    expect(formData.get("locale")).toBe("cs");
+    expect(formData.get("menuId")).toBe("menu-1");
+    expect(formData.get("sectionId")).toBe("section-1");
+    expect(formData.get("itemId")).toBe("item-1");
+  });
+
+  it("posts the price as typed, so the action validates what the owner wrote", () => {
+    const formData = itemFormData({ name: "K", description: "", priceCzk: "56,50" }, hidden);
+    expect(formData.get("priceCzk")).toBe("56,50");
+  });
+
+  it("round-trips a title under the field it was built for", () => {
+    const formData = inlineTextFormData("title", { title: "Polévky" }, hidden);
+    expect(formData.get("title")).toBe("Polévky");
+    expect(formData.get("menuId")).toBe("menu-1");
+    expect(readInlineText(formData, "title").ok).toBe(true);
+  });
+});
+
+describe("menuItemFormSchema", () => {
+  it("is the same schema the action uses, so the browser cannot be laxer", () => {
+    // Same object, not merely equivalent rules: a dish has no container that
+    // differs between the two sides, unlike the phone list.
+    const client = menuItemFormSchema.safeParse({
+      name: "Kulajda",
+      description: "",
+      priceCzk: "56,50",
+    });
+    expect(client.success).toBe(true);
+    if (!client.success) return;
+    expect(client.data.priceCzk).toBe(56.5);
+  });
 });

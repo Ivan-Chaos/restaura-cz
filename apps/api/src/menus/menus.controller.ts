@@ -155,6 +155,19 @@ export class MenusController {
     };
   }
 
+  @Post(':menuId/sections/:sectionId/items/:itemId/duplicate')
+  @HttpCode(HttpStatus.CREATED)
+  async duplicateItem(
+    @Req() request: Request,
+    @Param('menuId', UuidParam) menuId: string,
+    @Param('sectionId', UuidParam) sectionId: string,
+    @Param('itemId', UuidParam) itemId: string,
+  ): Promise<{ item: ItemView }> {
+    return {
+      item: await this.menus.duplicateItem(this.accountId(request), menuId, sectionId, itemId),
+    };
+  }
+
   @Patch(':menuId/sections/:sectionId/items/:itemId')
   async updateItem(
     @Req() request: Request,

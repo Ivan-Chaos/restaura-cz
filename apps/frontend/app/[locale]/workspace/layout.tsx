@@ -7,6 +7,7 @@ import { AppearanceScope } from "@/components/dashboard/AppearanceScope";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { signOutAction } from "@/lib/api/actions/auth";
 import { requireProfile } from "@/lib/api/session";
@@ -50,6 +51,15 @@ export default async function WorkspaceLayout({
           {children}
         </SidebarInset>
       </SidebarProvider>
+
+      {/*
+        The dashboard's one Toaster. There is deliberately no global one — see
+        the root layout — so the route that raises toasts is the route that
+        pays sonner's ~10 KB, and the guest menu never does. Every save in the
+        editor is its own request, so saying which one landed is the only way an
+        owner can tell a saved change from an unsaved one.
+      */}
+      <Toaster />
     </AppearanceScope>
   );
 }

@@ -11,12 +11,30 @@ import type { Money, PriceModel } from "./types";
  */
 
 /**
- * Menu prices are whole units. Showing `189,00 Kč` on a menu is noise, and
- * fractional koruna prices do not exist. EUR menus do use cents, so decimals
- * are kept when the amount actually has them.
+ * Decimals appear only when the price has them. Most menu prices are whole —
+ * printing `189,00 Kč` beside `245,00 Kč` is noise — but a price of 56,50 is a
+ * real price an owner can enter, and rounding it on the menu would be wrong.
  */
 function fractionDigits(amount: number): number {
   return Number.isInteger(amount) ? 0 : 2;
+}
+
+/**
+ * A stored price, written the way this locale's owner would type it.
+ *
+ * For a text input, so no currency and no grouping — a thousands separator is
+ * not something anyone types into a price field, and the field's own rule would
+ * reject it. Whole prices stay whole (`89`); a price with hellers gets both
+ * decimals and the locale's separator (`56,50` in Czech), so re-opening a dish
+ * shows back what was entered rather than a dot and a dropped zero.
+ */
+export function formatPriceInput(locale: string, amount: number): string {
+  const digits = Number.isInteger(amount) ? 0 : 2;
+  return new Intl.NumberFormat(locale, {
+    useGrouping: false,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
 }
 
 export function formatMoney(locale: string, money: Money): string {

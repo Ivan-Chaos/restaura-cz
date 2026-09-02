@@ -1,34 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import {
-  AsYouType,
-  getCountryCallingCode,
-  parsePhoneNumberFromString,
-  type CountryCode,
-} from "libphonenumber-js";
-import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import { getCountryCallingCode, type CountryCode } from "libphonenumber-js";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { composePhone, detectCountry, formatNational, splitPhone } from "@/lib/phone/country";
+import { countryOptions, regionFlag, type CountryOption } from "@/lib/phone/countries";
 import { cn } from "@/lib/utils";
-
-/**
- * The countries a Czech restaurant plausibly publishes a number in, with the
- * home country first. Deliberately short: a list of every country on earth is a
- * scrolling exercise for a field that is nearly always +420.
- */
-export const PHONE_COUNTRIES = ["CZ", "SK", "AT", "DE", "PL"] as const satisfies readonly CountryCode[];
-
-export type PhoneCountry = (typeof PHONE_COUNTRIES)[number];
-
-export const DEFAULT_PHONE_COUNTRY: PhoneCountry = "CZ";
 
 export interface PhoneInputProps {
   /** The stored value, e.g. `+420 601 234 567`. */
@@ -51,12 +40,14 @@ export interface PhoneInputProps {
  * text field that owns the rest. They are kept together rather than split into
  * two form fields because the stored value is one string — the number as it
  * will be printed on a menu — and splitting it would mean reassembling it in
- * every caller.
+ * every caller. Visually they are one control, because that is what they are.
  *
- * Formatting uses libphonenumber's `AsYouType`, so the grouping matches the
- * selected country's own convention instead of a fixed mask that would be wrong
- * everywhere but Czechia. Digits are all the owner types; the spaces appear
- * under them.
+ * **Typing a dialling code moves the picker.** Paste `+49 30 123456` into a
+ * field that says Czechia and it becomes a German number: the code is taken off
+ * the front and the picker follows. That is the one thing people reliably try,
+ * and it used to produce `+420 49 301 234 56` — a number that exists nowhere.
+ * `lib/phone/country.ts` is where that reading lives, and where its odd cases
+ * are pinned.
  *
  * The value stays a formatted string rather than becoming E.164. Guests read
  * this number off a printed menu, and `+420601234567` is meaningfully harder to
@@ -73,6 +64,9 @@ export function PhoneInput({
   ...aria
 }: PhoneInputProps) {
   const t = useTranslations("Registration");
+  const locale = useLocale();
+
+  const { pinned, rest } = useMemo(() => countryOptions(locale), [locale]);
 
   /**
    * The two controls are held here rather than re-derived from `value` on every
@@ -84,52 +78,105 @@ export function PhoneInput({
    * component — the stored profile arriving in settings, or a reset — is still
    * picked up.
    */
-  const [state, setState] = useState(() => ({ ...split(value), lastEmitted: value }));
+  const [state, setState] = useState(() => ({ ...splitPhone(value), lastEmitted: value }));
 
   if (value !== state.lastEmitted) {
-    setState({ ...split(value), lastEmitted: value });
+    setState({ ...splitPhone(value), lastEmitted: value });
   }
 
   const { country, national } = state;
 
-  function emit(nextCountry: PhoneCountry, nextNational: string) {
-    const digits = nextNational.replace(/[^\d]/g, "");
+  function emit(nextCountry: CountryCode, typed: string) {
+    const detected = detectCountry(typed, nextCountry);
 
-    if (digits === "") {
-      // An empty row is an unused input, not a number with a country code.
-      setState({ country: nextCountry, national: "", lastEmitted: "" });
-      onChange("");
+    if (detected.kind === "partial") {
+      // A `+` with nothing conclusive after it. Showing exactly what was typed
+      // is the only honest thing to do: guessing a country from `+4` would move
+      // the picker under the owner's hands and reformat mid-word.
+      setState({ country: nextCountry, national: detected.raw, lastEmitted: detected.raw });
+      onChange(detected.raw);
       return;
     }
 
-    // Formatted from the digits alone, so deleting a separator deletes the
-    // digit beside it rather than being silently re-added.
-    const formatted = new AsYouType(nextCountry).input(digits);
-    const emitted = `+${getCountryCallingCode(nextCountry)} ${formatted}`.trim();
+    const resolved = detected.kind === "international" ? detected.country : nextCountry;
+    write(resolved, detected.digits);
+  }
 
-    setState({ country: nextCountry, national: formatted, lastEmitted: emitted });
+  /**
+   * The picker, used directly.
+   *
+   * A choice made here wins outright, which the typing path cannot guarantee:
+   * with a half-typed code still in the field, re-reading the text would answer
+   * `+1` with the United States however the owner had just answered it. The
+   * stray prefix goes, because the picker is now the thing saying `+1`.
+   */
+  function chooseCountry(nextCountry: CountryCode) {
+    const detected = detectCountry(national, country);
+    write(nextCountry, detected.kind === "partial" ? "" : detected.digits);
+  }
+
+  /** Both paths end here: one country, one set of digits, one stored string. */
+  function write(nextCountry: CountryCode, digits: string) {
+    const emitted = composePhone(nextCountry, digits);
+
+    setState({
+      country: nextCountry,
+      national: formatNational(nextCountry, digits),
+      lastEmitted: emitted,
+    });
     onChange(emitted);
   }
 
+  const option = (entry: CountryOption) => (
+    <SelectItem key={entry.code} value={entry.code} label={entry.name}>
+      <span aria-hidden="true">{regionFlag(entry.code)}</span>
+      <span className="flex-1">{entry.name}</span>
+      <span className="text-muted-foreground">+{entry.callingCode}</span>
+    </SelectItem>
+  );
+
   return (
-    <div className={cn("flex items-start gap-2", className)}>
+    <div
+      className={cn(
+        // One bordered control holding both halves, so the dialling code reads
+        // as part of the number rather than as a separate question.
+        "border-input focus-within:border-ring focus-within:ring-ring/50 flex items-stretch rounded-lg border transition-colors focus-within:ring-3",
+        className,
+      )}
+    >
       <Select
         value={country}
-        onValueChange={(next) => emit(next as PhoneCountry, national)}
+        onValueChange={(next) => chooseCountry(next as CountryCode)}
       >
         <SelectTrigger
-          className="h-9 shrink-0"
+          className="border-input h-auto shrink-0 rounded-none rounded-l-lg border-0 border-r focus-visible:ring-0"
           aria-label={t("phoneCountryLabel")}
         >
-          <SelectValue />
+          {/*
+            The flag and the code only. The country's name is left to the popup:
+            it comes from ICU, whose data can differ between the server and the
+            browser, and a name rendered here would be a hydration mismatch
+            waiting for a version bump.
+          */}
+          <SelectValue>
+            {(selected) => (
+              <>
+                <span aria-hidden="true">{regionFlag(selected as CountryCode)}</span>
+                <span>+{getCountryCallingCode(selected as CountryCode)}</span>
+              </>
+            )}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {PHONE_COUNTRIES.map((code) => (
-            <SelectItem key={code} value={code}>
-              {t(`phoneCountries.${code}` as "phoneCountries.CZ")} +
-              {getCountryCallingCode(code)}
-            </SelectItem>
-          ))}
+          <SelectGroup>
+            <SelectLabel>{t("phoneCountriesNearby")}</SelectLabel>
+            {pinned.map(option)}
+          </SelectGroup>
+          <SelectSeparator />
+          <SelectGroup>
+            <SelectLabel>{t("phoneCountriesAll")}</SelectLabel>
+            {rest.map(option)}
+          </SelectGroup>
         </SelectContent>
       </Select>
 
@@ -143,32 +190,9 @@ export function PhoneInput({
         onChange={(event) => emit(country, event.target.value)}
         onBlur={onBlur}
         placeholder={t("phonePlaceholder")}
-        className="flex-1"
+        className="flex-1 rounded-none rounded-r-lg border-0 shadow-none focus-visible:ring-0"
         {...aria}
       />
     </div>
   );
-}
-
-/**
- * Splits a stored number back into the two controls.
- *
- * Falls back to the default country and the raw text for anything unparseable,
- * so a value typed before this component existed — or pasted in an unexpected
- * shape — is still editable rather than silently dropped.
- */
-function split(value: string): { country: PhoneCountry; national: string } {
-  if (value.trim() === "") return { country: DEFAULT_PHONE_COUNTRY, national: "" };
-
-  const parsed = parsePhoneNumberFromString(value, DEFAULT_PHONE_COUNTRY);
-  const country = parsed?.country;
-
-  if (parsed && country && (PHONE_COUNTRIES as readonly string[]).includes(country)) {
-    return {
-      country: country as PhoneCountry,
-      national: new AsYouType(country as PhoneCountry).input(parsed.nationalNumber),
-    };
-  }
-
-  return { country: DEFAULT_PHONE_COUNTRY, national: value };
 }

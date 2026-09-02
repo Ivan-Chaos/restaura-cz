@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { formatMoney, formatPriceLabel, lowestAmount } from "@/lib/design-system/price";
+import {
+  formatMoney,
+  formatPriceInput,
+  formatPriceLabel,
+  lowestAmount,
+} from "@/lib/design-system/price";
 import type { Money, PriceModel } from "@/lib/design-system/types";
 
 const czk = (amount: number): Money => ({ amount, currency: "CZK" });
@@ -92,5 +97,37 @@ describe("formatPriceLabel", () => {
       ),
     );
     expect(label).toBe("0,3 l 45 Kč · 0,5 l 59 Kč");
+  });
+});
+
+/**
+ * What goes back into a price *field*, as opposed to onto a menu.
+ *
+ * The two differ in three ways and each one matters: no currency, no thousands
+ * separator, and the decimals only when the price has them — because whatever
+ * this produces has to be something the price rule would accept if the owner
+ * retyped it by hand.
+ */
+describe("formatPriceInput", () => {
+  it("uses the locale's decimal separator", () => {
+    expect(formatPriceInput("cs", 56.5)).toBe("56,50");
+    expect(formatPriceInput("de", 56.5)).toBe("56,50");
+    expect(formatPriceInput("en", 56.5)).toBe("56.50");
+  });
+
+  it("leaves a whole price whole", () => {
+    // `89,00` in a field the owner is about to edit is noise they have to read
+    // past.
+    expect(formatPriceInput("cs", 89)).toBe("89");
+    expect(formatPriceInput("cs", 0)).toBe("0");
+  });
+
+  it("gives both decimals, so a trailing zero is not dropped", () => {
+    expect(formatPriceInput("cs", 56.5)).not.toBe("56,5");
+  });
+
+  it("never groups thousands, which no price field accepts", () => {
+    expect(formatPriceInput("cs", 1250)).toBe("1250");
+    expect(formatPriceInput("en", 1250.5)).toBe("1250.50");
   });
 });
