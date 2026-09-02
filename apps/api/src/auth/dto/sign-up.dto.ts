@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
-import { EMAIL_LOCALES } from '../../mail/mail.service.js';
+import { EMAIL_LOCALES } from '../../mail/email-locale.js';
 import { ProfileDto } from './profile.dto.js';
 
 /**

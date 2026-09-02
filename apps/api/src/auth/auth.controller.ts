@@ -105,7 +105,7 @@ export class AuthController {
     const { account } = request as AuthenticatedRequest;
     if (!account) throw AppError.unauthenticated();
 
-    await this.auth.verifyEmail(account.id, dto.code);
+    await this.auth.verifyEmail(account.id, dto.code, dto.locale);
 
     // Re-stated rather than reusing the guard's copy: that one was resolved
     // before the address was confirmed, and answering with `emailVerified:

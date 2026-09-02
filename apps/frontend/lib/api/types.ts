@@ -101,6 +101,16 @@ export interface AccountResponse {
   profile: RestaurantProfile | null;
 }
 
+/**
+ * `POST /auth/verify-email`. The locale is optional on the wire and defaults
+ * to `cs`; it chooses the language of the welcome email the API sends on
+ * success.
+ */
+export interface VerifyEmailRequest {
+  code: string;
+  locale?: "cs" | "en" | "de";
+}
+
 export interface ProfileResponse {
   profile: RestaurantProfile;
 }

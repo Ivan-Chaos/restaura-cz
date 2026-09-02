@@ -1,5 +1,5 @@
 import { IsIn, IsOptional } from 'class-validator';
-import { EMAIL_LOCALES } from '../../mail/mail.service.js';
+import { EMAIL_LOCALES } from '../../mail/email-locale.js';
 
 /**
  * Which language to write the email in.

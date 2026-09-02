@@ -11,6 +11,7 @@ import type {
   PublicMenuResponse,
   PublishResponse,
   UnpublishResponse,
+  VerifyEmailRequest,
 } from "@/lib/api/types";
 
 /**
@@ -146,6 +147,16 @@ describe("response shapes match the contract", () => {
     };
     expectTypeOf(payload).toExtend<PublicMenuResponse>();
     expect(JSON.stringify(payload)).not.toContain('"id"');
+  });
+});
+
+describe("request shapes match the contract", () => {
+  it("sends the documented verify-email request, locale included", () => {
+    const body = { code: "123456", locale: "cs" as const };
+    expectTypeOf(body).toExtend<VerifyEmailRequest>();
+    // The locale is optional on the wire; the API defaults it to `cs`.
+    expectTypeOf({ code: "123456" }).toExtend<VerifyEmailRequest>();
+    expect(body.locale).toBe("cs");
   });
 });
 

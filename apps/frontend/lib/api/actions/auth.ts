@@ -14,7 +14,7 @@ import { IDLE, SAVED, toFormState, type FormState } from "../form-state";
 import { toLocale } from "../locale";
 import { toDestination } from "../next-path";
 import { nextStep } from "../next-step";
-import type { AccountResponse, ProfileResponse } from "../types";
+import type { AccountResponse, ProfileResponse, VerifyEmailRequest } from "../types";
 
 /**
  * Cookie policy for this origin, declared once. The API sets its own cookie on
@@ -95,7 +95,8 @@ export async function verifyEmailAction(
 
   const { result } = await apiRequest<AccountResponse>("/auth/verify-email", {
     method: "POST",
-    body: { code: submitted.values.code },
+    // `locale` steers the language of the welcome email sent on success.
+    body: { code: submitted.values.code, locale } satisfies VerifyEmailRequest,
   });
 
   if (!result.ok) return toFormState(result.error);

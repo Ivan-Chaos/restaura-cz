@@ -6,7 +6,8 @@ import { AppError } from '../common/app-error.js';
 import { isUniqueViolation } from '../common/pg-errors.js';
 import { DRIZZLE, type DrizzleDb } from '../db/client.js';
 import { emailConfirmation, ownerAccount, restaurantProfile, session } from '../db/schema.js';
-import { MailService, type EmailLocale } from '../mail/mail.service.js';
+import { type EmailLocale } from '../mail/email-locale.js';
+import { MailService } from '../mail/mail.service.js';
 import {
   CODE_TTL_MS,
   codeMatches,
@@ -162,9 +163,13 @@ export class AuthService {
    * Idempotent for an already-verified account: an owner who submits the form
    * twice, or returns to a stale tab, has done nothing wrong and gets success.
    */
-  async verifyEmail(accountId: string, code: string): Promise<void> {
+  async verifyEmail(
+    accountId: string,
+    code: string,
+    locale: EmailLocale = 'cs',
+  ): Promise<void> {
     const [account] = await this.db
-      .select({ emailVerifiedAt: ownerAccount.emailVerifiedAt })
+      .select({ email: ownerAccount.email, emailVerifiedAt: ownerAccount.emailVerifiedAt })
       .from(ownerAccount)
       .where(eq(ownerAccount.id, accountId))
       .limit(1);
@@ -219,6 +224,19 @@ export class AuthService {
         .where(eq(ownerAccount.id, accountId));
       await tx.delete(emailConfirmation).where(eq(emailConfirmation.accountId, accountId));
     });
+
+    // Deliberately after the transaction and deliberately not in the caller's
+    // failure path: the address is confirmed whether or not the welcome
+    // arrives, and a Resend outage must not turn a successful confirmation
+    // into a 500. The early return above is what makes this fire once.
+    const profile = await this.getProfile(accountId);
+    await this.mail
+      .sendWelcome(account.email, { restaurantName: profile?.restaurantName ?? null }, locale)
+      .catch((error: unknown) => {
+        this.logger.error(
+          `Email confirmed but the welcome email failed for ${accountId}: ${String(error)}`,
+        );
+      });
   }
 
   /**

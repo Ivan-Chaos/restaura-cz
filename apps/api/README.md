@@ -35,6 +35,7 @@ src/
 │   └── migrations/      Generated SQL, committed, never edited after applying
 ├── common/              Error shape, session guard, shared validators
 ├── auth/                Sign-up, sign-in, sign-out, session lifecycle
+├── mail/                Resend transport and the hand-written email templates
 └── menus/               Owner CRUD, publishing, and the public read
 ```
 

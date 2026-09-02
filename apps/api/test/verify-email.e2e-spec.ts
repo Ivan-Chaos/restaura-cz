@@ -105,6 +105,34 @@ describe('email confirmation', () => {
       expect(me.body.account.emailVerified).toBe(true);
     });
 
+    it('accepts the locale that steers the welcome email', async () => {
+      const owner = await signUpUnverified(testApp);
+      await setConfirmationCode(owner.accountId, KNOWN_CODE);
+
+      const response = await request(testApp.server)
+        .post('/auth/verify-email')
+        .set('Cookie', owner.cookie)
+        .send({ code: KNOWN_CODE, locale: 'en' })
+        .expect(200);
+
+      expect(response.body.account.emailVerified).toBe(true);
+    });
+
+    it('rejects a locale it has no template for, without charging an attempt', async () => {
+      const owner = await signUpUnverified(testApp);
+      await setConfirmationCode(owner.accountId, KNOWN_CODE);
+
+      const response = await request(testApp.server)
+        .post('/auth/verify-email')
+        .set('Cookie', owner.cookie)
+        .send({ code: KNOWN_CODE, locale: 'fr' })
+        .expect(400);
+
+      expect(response.body.error.code).toBe('VALIDATION_FAILED');
+      // Validation runs before the service, so the code is still untouched.
+      expect(await confirmationAttempts(owner.accountId)).toBe(0);
+    });
+
     it('rejects a wrong code and charges an attempt', async () => {
       const owner = await signUpUnverified(testApp);
       await setConfirmationCode(owner.accountId, KNOWN_CODE);

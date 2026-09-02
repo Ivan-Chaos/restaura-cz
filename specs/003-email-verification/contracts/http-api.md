@@ -1,6 +1,6 @@
 # HTTP API Contract Delta: Sign-Up Validation & Email Confirmation
 
-**Date**: 2026-09-01
+**Date**: 2026-09-01, amended 2026-09-02 (`locale` on verify-email; welcome email)
 
 This document amends [specs/001-menu-creation-publishing/contracts/http-api.md](../../001-menu-creation-publishing/contracts/http-api.md) as already amended by [specs/002-signup-dashboard-revamp/contracts/http-api.md](../../002-signup-dashboard-revamp/contracts/http-api.md). Conventions (base URL, cookie auth, error shape, 🔒 marker) are unchanged and not repeated. Per the root constitution this contract is test-covered on **both sides** in the same change set: `apps/api/test/verify-email.e2e-spec.ts` proves the shapes are served; `apps/frontend/tests/unit/api-contract.test.ts` proves they are expected.
 
@@ -60,10 +60,11 @@ Confirms the caller's own address. Session-guarded, which is what keeps it off t
 Request:
 
 ```json
-{ "code": "123456" }
+{ "code": "123456", "locale": "cs" }
 ```
 
 - `code`: exactly six digits (`^\d{6}$`). Malformed → `400 VALIDATION_FAILED` (`details[].code = MATCHES`, which the frontend degrades to its generic `INVALID` message — a value users normally never see, because the form validates the shape before submitting).
+- `locale`: optional, `cs` | `en` | `de`, default `cs`. Chooses the language of the welcome email sent on success. An unsupported value → `400 VALIDATION_FAILED` (`details[].code = IS_IN`), and no attempt is charged, because validation runs before the code is looked at.
 
 Responses:
 
@@ -74,6 +75,8 @@ Responses:
 - `401 UNAUTHENTICATED` — no session.
 
 **Idempotent**: submitting against an already-confirmed account is `200`, not an error. A stale tab or a double submit is not a mistake worth punishing.
+
+**Welcome email**: on the first successful confirmation the API sends a welcome email to the confirmed address, in the requested `locale`. It is best-effort in the same way sign-up's confirmation send is: a provider failure is logged and the response is still `200`. An already-confirmed account gets no second welcome, because the idempotent early return happens before the send.
 
 ## New: POST /auth/verify-email/resend 🔒
 
@@ -114,7 +117,7 @@ Storage: only `sha256("<accountId>.<code>")` is persisted, following the `sessio
 | `POST /auth/sign-out` | cookie (lenient) | unchanged |
 | `GET /auth/me` | 🔒 | **changed** (`emailVerified` in response) |
 | `PUT /auth/profile` | 🔒 | unchanged |
-| `POST /auth/verify-email` | 🔒 | **new** |
+| `POST /auth/verify-email` | 🔒 | **new** (optional `locale`; sends the welcome email on success) |
 | `POST /auth/verify-email/resend` | 🔒 | **new** |
 
 Menu endpoints: unchanged in shape, but now gated on confirmation. Public endpoints: unchanged.

@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 import { loadEnv } from '../config/env.js';
+import type { EmailLocale } from './email-locale.js';
+import { renderConfirmationCode } from './templates/confirmation-code.js';
+import type { EmailMessage } from './templates/layout.js';
+import { renderWelcome } from './templates/welcome.js';
 
-/**
- * The locales the frontend can ask for, as a value so DTOs can validate
- * against the same list the templates implement. Must stay in step with
- * `apps/frontend/i18n/routing.ts`.
- */
-export const EMAIL_LOCALES = ['cs', 'en', 'de'] as const;
-
-export type EmailLocale = (typeof EMAIL_LOCALES)[number];
+// Re-exported so existing importers of the locale list keep one path.
+export { EMAIL_LOCALES, type EmailLocale } from './email-locale.js';
 
 /**
  * Outbound email.
@@ -17,6 +15,13 @@ export type EmailLocale = (typeof EMAIL_LOCALES)[number];
  * Wrapped in a service of our own rather than calling Resend from the auth
  * service, so that the one decision worth isolating — send or log — lives in a
  * single place, and so a provider change touches one file.
+ *
+ * Every message goes out as multipart text and HTML. The HTML is hand-written
+ * tables in `./templates`, rendered by string concatenation: no template
+ * engine, no build step, and nothing new in package.json. The text part is
+ * kept as the fallback for text-only clients and as the honest signal spam
+ * filters look for; the HTML carries no images, fonts or remote resources, so
+ * there is nothing for a client to block.
  *
  * Without RESEND_API_KEY the code is written to the log instead of sent. That
  * is not a silent degradation: local development has no verified sending
@@ -37,8 +42,6 @@ export class MailService {
    * endpoint deliberately does not.
    */
   async sendConfirmationCode(to: string, code: string, locale: EmailLocale): Promise<void> {
-    const { subject, body } = confirmationMessage(code, locale);
-
     if (!this.resend) {
       // Written at log level, not debug: in local development this line *is*
       // the delivery mechanism, and a developer must be able to find it.
@@ -46,65 +49,56 @@ export class MailService {
       return;
     }
 
+    const message = renderConfirmationCode(
+      { recipient: to, code, appUrl: this.env.appUrl },
+      locale,
+    );
+    await this.deliver('confirmation', to, message);
+  }
+
+  /**
+   * Sent once, after the address is confirmed. Throws on provider rejection
+   * like the confirmation email; the caller decides whether that matters.
+   */
+  async sendWelcome(
+    to: string,
+    params: { restaurantName: string | null },
+    locale: EmailLocale,
+  ): Promise<void> {
+    if (!this.resend) {
+      // Logged so a developer walking the flow can see that the trigger fired.
+      this.logger.log(`Welcome email for ${to} (${locale}) not sent: RESEND_API_KEY is unset`);
+      return;
+    }
+
+    const message = renderWelcome(
+      { recipient: to, restaurantName: params.restaurantName, appUrl: this.env.appUrl },
+      locale,
+    );
+    await this.deliver('welcome', to, message);
+  }
+
+  private async deliver(
+    kind: 'confirmation' | 'welcome',
+    to: string,
+    message: EmailMessage,
+  ): Promise<void> {
+    // Guarded by both callers; restated so this method is safe on its own.
+    if (!this.resend) return;
+
     const { error } = await this.resend.emails.send({
       from: this.env.emailFrom,
       to,
-      subject,
-      text: body,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
     });
 
     // The SDK reports failure as a value rather than throwing, so an
     // unchecked call looks successful while delivering nothing.
     if (error) {
-      this.logger.error(`Resend rejected the confirmation email: ${error.message}`);
+      this.logger.error(`Resend rejected the ${kind} email: ${error.message}`);
       throw new Error(error.message);
     }
-  }
-}
-
-/**
- * Plain text, not HTML. The entire message is one code and one deadline; an
- * HTML template would add a rendering dependency and a spam-filter liability
- * to something with nothing to lay out.
- */
-function confirmationMessage(
-  code: string,
-  locale: EmailLocale,
-): { subject: string; body: string } {
-  switch (locale) {
-    case 'en':
-      return {
-        subject: `Your Restaura confirmation code: ${code}`,
-        body: [
-          `Your confirmation code is ${code}.`,
-          '',
-          'Enter it in Restaura to finish setting up your account. The code expires in 15 minutes.',
-          '',
-          'If you did not create a Restaura account, you can ignore this email.',
-        ].join('\n'),
-      };
-    case 'de':
-      return {
-        subject: `Ihr Restaura-Bestätigungscode: ${code}`,
-        body: [
-          `Ihr Bestätigungscode lautet ${code}.`,
-          '',
-          'Geben Sie ihn in Restaura ein, um die Einrichtung Ihres Kontos abzuschließen. Der Code läuft in 15 Minuten ab.',
-          '',
-          'Wenn Sie kein Restaura-Konto erstellt haben, können Sie diese E-Mail ignorieren.',
-        ].join('\n'),
-      };
-    case 'cs':
-    default:
-      return {
-        subject: `Váš potvrzovací kód Restaura: ${code}`,
-        body: [
-          `Váš potvrzovací kód je ${code}.`,
-          '',
-          'Zadejte jej v Restaura a dokončete nastavení účtu. Kód platí 15 minut.',
-          '',
-          'Pokud jste si účet Restaura nezakládali, tento e-mail můžete ignorovat.',
-        ].join('\n'),
-      };
   }
 }

@@ -1,4 +1,5 @@
-import { IsString, Matches } from 'class-validator';
+import { IsIn, IsOptional, IsString, Matches } from 'class-validator';
+import { EMAIL_LOCALES } from '../../mail/email-locale.js';
 import { CODE_LENGTH } from '../email-confirmation.js';
 
 /**
@@ -14,4 +15,13 @@ export class VerifyEmailDto {
     message: `must be ${CODE_LENGTH} digits`,
   })
   code!: string;
+
+  /**
+   * Which language to write the welcome email in. Declared even though it is
+   * optional for the same reason as on ResendConfirmationDto: the global
+   * ValidationPipe rejects undeclared properties.
+   */
+  @IsOptional()
+  @IsIn(EMAIL_LOCALES)
+  locale?: (typeof EMAIL_LOCALES)[number];
 }

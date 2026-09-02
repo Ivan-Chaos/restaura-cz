@@ -2,6 +2,7 @@
  * Environment access, read at boot so a misconfigured process fails with a
  * readable message instead of at the first request with a connection error.
  */
+import { DEFAULT_EMAIL_FROM } from '../mail/addresses.js';
 
 /**
  * Loads apps/api/.env when present. Deployed environments supply real
@@ -64,8 +65,18 @@ export interface Env {
    * registration path undevelopable offline.
    */
   resendApiKey: string | undefined;
-  /** The From address on confirmation emails. Must be a domain Resend has verified. */
+  /**
+   * The From header on every email. Defaults to `Restaura <noreply@restaura.cz>`
+   * (see `mail/addresses.ts`); whatever it is set to must be a domain Resend
+   * has verified.
+   */
   emailFrom: string;
+  /**
+   * Public origin of the frontend, without a trailing slash. Used only to
+   * build the links inside emails; nothing else in the API knows where the
+   * frontend lives.
+   */
+  appUrl: string;
 }
 
 export function loadEnv(): Env {
@@ -75,6 +86,7 @@ export function loadEnv(): Env {
     port: port('PORT', 3001),
     cookieSecure: boolean('COOKIE_SECURE', false),
     resendApiKey: optional('RESEND_API_KEY'),
-    emailFrom: optional('EMAIL_FROM') ?? 'Restaura <onboarding@resend.dev>',
+    emailFrom: optional('EMAIL_FROM') ?? DEFAULT_EMAIL_FROM,
+    appUrl: (optional('APP_URL') ?? 'http://localhost:3000').replace(/\/+$/, ''),
   };
 }
