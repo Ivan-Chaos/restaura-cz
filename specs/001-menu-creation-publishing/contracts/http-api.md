@@ -99,7 +99,7 @@ Sections and items sorted by `(position, id)`.
 
 Request (all optional, at least one): `{ "name": "…", "visualVariant": "default" }`
 
-- `visualVariant` allowlist for this feature: `["default"]` — any other value → `400 VALIDATION_FAILED` (FR-010 stub).
+- `visualVariant` allowlist (feature 005): `["default", "plain-white", "liquid-glass", "green-bar", "modern", "refined"]` — any other value → `400 VALIDATION_FAILED` with the field error on `visualVariant`. `default` is the Classic look every menu starts with. Consumers MUST treat a stored value they do not recognise as `default`; the API does not re-validate stored values on read.
 - `200` → full menu detail.
 
 ### DELETE /menus/:menuId

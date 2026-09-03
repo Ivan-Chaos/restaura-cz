@@ -13,8 +13,15 @@
  *   olive, herb              — positive / available / vegetarian
  *   honey                    — highlight, warning, "chef's pick"
  *
- * Cool families (only used by the `slate` example theme):
+ * Cool families (the `slate` example theme; cobalt also accents `liquid-glass`):
  *   graphite, cobalt
+ *
+ * Variant families (feature 005, one look each):
+ *   ink                      — plain-white, modern (true neutral)
+ *   bottle, brass            — green-bar
+ *   ivory                    — refined
+ *   aurora, glass            — liquid-glass (ambient field, translucent panels)
+ *   signal                   — modern accent
  */
 
 :root {
@@ -175,4 +182,100 @@
   --palette-cobalt-800: oklch(0.37 0.125 258);
   --palette-cobalt-900: oklch(0.29 0.1 258);
   --palette-cobalt-950: oklch(0.21 0.075 258);
+
+  /* ------------------------------------------------------------------ ink */
+  /* True neutral (zero chroma) — `plain-white` and `modern` themes. */
+  --palette-ink-50: oklch(0.995 0 0);
+  --palette-ink-100: oklch(0.975 0 0);
+  --palette-ink-200: oklch(0.93 0 0);
+  --palette-ink-300: oklch(0.87 0 0);
+  --palette-ink-400: oklch(0.78 0 0);
+  --palette-ink-500: oklch(0.65 0 0);
+  --palette-ink-600: oklch(0.55 0 0);
+  --palette-ink-700: oklch(0.46 0 0);
+  --palette-ink-800: oklch(0.35 0 0);
+  --palette-ink-900: oklch(0.24 0 0);
+  --palette-ink-950: oklch(0.15 0 0);
+
+  /* --------------------------------------------------------------- bottle */
+  /* Deep bottle green — `green-bar` surfaces. */
+  --palette-bottle-50: oklch(0.97 0.02 155);
+  --palette-bottle-100: oklch(0.94 0.035 155);
+  --palette-bottle-200: oklch(0.88 0.06 155);
+  --palette-bottle-300: oklch(0.8 0.09 155);
+  --palette-bottle-400: oklch(0.7 0.11 155);
+  --palette-bottle-500: oklch(0.6 0.12 155);
+  --palette-bottle-600: oklch(0.5 0.11 155);
+  --palette-bottle-700: oklch(0.42 0.095 155);
+  --palette-bottle-800: oklch(0.34 0.08 155);
+  --palette-bottle-900: oklch(0.27 0.065 155);
+  --palette-bottle-950: oklch(0.2 0.05 155);
+
+  /* ---------------------------------------------------------------- brass */
+  /* Brass / amber — `green-bar` accent and prices. */
+  --palette-brass-50: oklch(0.98 0.02 75);
+  --palette-brass-100: oklch(0.95 0.045 75);
+  --palette-brass-200: oklch(0.9 0.08 75);
+  --palette-brass-300: oklch(0.85 0.11 75);
+  --palette-brass-400: oklch(0.8 0.13 75);
+  --palette-brass-500: oklch(0.74 0.14 75);
+  --palette-brass-600: oklch(0.66 0.135 75);
+  --palette-brass-700: oklch(0.56 0.12 75);
+  --palette-brass-800: oklch(0.46 0.1 75);
+  --palette-brass-900: oklch(0.36 0.08 75);
+  --palette-brass-950: oklch(0.26 0.06 75);
+
+  /* ---------------------------------------------------------------- ivory */
+  /* Warm off-white paper — `refined` surfaces. Never clinical white. */
+  --palette-ivory-50: oklch(0.995 0.006 90);
+  --palette-ivory-100: oklch(0.985 0.01 90);
+  --palette-ivory-200: oklch(0.965 0.014 90);
+  --palette-ivory-300: oklch(0.94 0.018 90);
+  --palette-ivory-400: oklch(0.9 0.02 90);
+  --palette-ivory-500: oklch(0.82 0.022 90);
+  --palette-ivory-600: oklch(0.72 0.022 90);
+  --palette-ivory-700: oklch(0.62 0.02 90);
+  --palette-ivory-800: oklch(0.5 0.018 90);
+  --palette-ivory-900: oklch(0.38 0.015 90);
+  --palette-ivory-950: oklch(0.26 0.012 90);
+
+  /* --------------------------------------------------------------- aurora */
+  /* Soft lavender — the `liquid-glass` ambient field. The 50–200 steps stay
+     at L ≥ 0.93 and the 900–950 steps at L ≤ 0.30 on purpose: they are what
+     translucent panels composite over, and the glass contrast test bounds
+     readability against them. */
+  --palette-aurora-50: oklch(0.985 0.01 290);
+  --palette-aurora-100: oklch(0.96 0.025 290);
+  --palette-aurora-200: oklch(0.93 0.045 290);
+  --palette-aurora-300: oklch(0.88 0.07 290);
+  --palette-aurora-400: oklch(0.8 0.1 290);
+  --palette-aurora-500: oklch(0.7 0.13 290);
+  --palette-aurora-600: oklch(0.6 0.15 290);
+  --palette-aurora-700: oklch(0.5 0.14 290);
+  --palette-aurora-800: oklch(0.4 0.12 290);
+  --palette-aurora-900: oklch(0.3 0.09 290);
+  --palette-aurora-950: oklch(0.2 0.06 290);
+
+  /* --------------------------------------------------------------- signal */
+  /* One saturated accent — `modern` theme. */
+  --palette-signal-50: oklch(0.975 0.015 30);
+  --palette-signal-100: oklch(0.94 0.035 30);
+  --palette-signal-200: oklch(0.89 0.07 30);
+  --palette-signal-300: oklch(0.81 0.11 30);
+  --palette-signal-400: oklch(0.72 0.16 30);
+  --palette-signal-500: oklch(0.64 0.2 30);
+  --palette-signal-600: oklch(0.56 0.2 30);
+  --palette-signal-700: oklch(0.48 0.17 30);
+  --palette-signal-800: oklch(0.4 0.14 30);
+  --palette-signal-900: oklch(0.32 0.11 30);
+  --palette-signal-950: oklch(0.24 0.08 30);
+
+  /* ---------------------------------------------------------------- glass */
+  /* The only steps that carry alpha. A translucent panel and its edge, for
+     each appearance. `lib/design-system/contrast.ts#composite` and
+     `tests/unit/glass-contrast.test.ts` are what make these safe to use. */
+  --palette-glass-light: oklch(0.995 0.004 290 / 0.72);
+  --palette-glass-dark: oklch(0.22 0.02 290 / 0.62);
+  --palette-glass-edge-light: oklch(1 0 0 / 0.6);
+  --palette-glass-edge-dark: oklch(1 0 0 / 0.14);
 }

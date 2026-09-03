@@ -7,6 +7,7 @@ import { SampleMenu } from "@/components/menu/SampleMenu";
 import { ThemeScope } from "@/components/theme/ThemeScope";
 import { getSampleMenu } from "@/lib/design-system/fixtures/sample-menu";
 import { DEFAULT_THEME, THEME_IDS, isThemeId } from "@/lib/design-system/themes";
+import { presentationForTheme } from "@/lib/menu-display/presentation";
 import { routing } from "@/i18n/routing";
 
 /**
@@ -71,8 +72,14 @@ export default async function SampleMenuPage({
   const menu = getSampleMenu(t);
 
   return (
-    <ThemeScope theme={themeId}>
-      <SampleMenu menu={menu} />
+    // A real box rather than `display: contents`, painted in the theme's own
+    // ground: a dark style must not sit on the warm `<body>` colour, and the
+    // ambient field (`none` for most themes) needs a full-height surface.
+    <ThemeScope
+      theme={themeId}
+      className="ambient bg-background text-foreground flex min-h-svh flex-1 flex-col"
+    >
+      <SampleMenu menu={menu} presentation={presentationForTheme(themeId)} />
     </ThemeScope>
   );
 }

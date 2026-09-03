@@ -1,0 +1,169 @@
+/**
+ * Plain White — stark, quiet, near-monochrome.
+ *
+ * One neutral ramp (`ink`), one family (Inter), square-ish corners, hairline
+ * dividers, no card lift and no shadows. The price is plain body text: the
+ * whole style is "the food speaks for itself". Dark appearance is the mirror,
+ * a plain near-black, so the identity is monochrome restraint rather than the
+ * literal colour white.
+ *
+ * Scoped only — no `:root` here. Contract:
+ * `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="plain-white"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ink-50);
+  --foreground: var(--palette-ink-950);
+  --card: var(--palette-ink-50);
+  --card-foreground: var(--palette-ink-950);
+  --popover: var(--palette-ink-50);
+  --popover-foreground: var(--palette-ink-950);
+  --surface-raised: var(--palette-ink-50);
+  --surface-raised-foreground: var(--palette-ink-950);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-ink-900);
+  --primary-foreground: var(--palette-ink-50);
+  --secondary: var(--palette-ink-100);
+  --secondary-foreground: var(--palette-ink-900);
+  --muted: var(--palette-ink-100);
+  --muted-foreground: var(--palette-ink-700);
+  --accent: var(--palette-ink-200);
+  --accent-foreground: var(--palette-ink-950);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-ink-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-ink-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-ink-50);
+  --info: var(--palette-ink-700);
+  --info-foreground: var(--palette-ink-50);
+  --highlight: var(--palette-ink-200);
+  --highlight-foreground: var(--palette-ink-950);
+
+  /* Menu semantics — the price is body text, deliberately unemphasised. --- */
+  --price: var(--palette-ink-950);
+
+  /* Media ---------------------------------------------------------------- */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-ink-400);
+  --input: var(--palette-ink-600);
+  --ring: var(--palette-ink-900);
+
+  /* Shape and rhythm ----------------------------------------------------- */
+  --radius: 0.25rem;
+  --density: 1;
+
+  /* Typography — one family ---------------------------------------------- */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — none. Hairlines do the separating. ----------------------- */
+  --shadow-card: none;
+  --shadow-overlay: 0 8px 30px oklch(0 0 0 / 0.12);
+
+  /* Motion --------------------------------------------------------------- */
+  --motion-fast: 100ms;
+  --motion-base: 160ms;
+  --motion-slow: 260ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-ink-900);
+  --chart-2: var(--palette-ink-600);
+  --chart-3: var(--palette-ink-400);
+  --chart-4: var(--palette-herb-600);
+  --chart-5: var(--palette-paprika-600);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ink-100);
+  --sidebar-foreground: var(--palette-ink-950);
+  --sidebar-primary: var(--palette-ink-900);
+  --sidebar-primary-foreground: var(--palette-ink-50);
+  --sidebar-accent: var(--palette-ink-200);
+  --sidebar-accent-foreground: var(--palette-ink-950);
+  --sidebar-border: var(--palette-ink-400);
+  --sidebar-ring: var(--palette-ink-900);
+
+  /* Panel and ambient — none. -------------------------------------------- */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
+}
+
+.dark [data-theme="plain-white"],
+[data-theme="plain-white"].dark {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ink-950);
+  --foreground: var(--palette-ink-50);
+  --card: var(--palette-ink-950);
+  --card-foreground: var(--palette-ink-50);
+  --popover: var(--palette-ink-900);
+  --popover-foreground: var(--palette-ink-50);
+  --surface-raised: var(--palette-ink-950);
+  --surface-raised-foreground: var(--palette-ink-50);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-ink-100);
+  --primary-foreground: var(--palette-ink-950);
+  --secondary: var(--palette-ink-800);
+  --secondary-foreground: var(--palette-ink-50);
+  --muted: var(--palette-ink-900);
+  --muted-foreground: var(--palette-ink-300);
+  --accent: var(--palette-ink-800);
+  --accent-foreground: var(--palette-ink-50);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-ink-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-ink-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-ink-950);
+  --info: var(--palette-ink-300);
+  --info-foreground: var(--palette-ink-950);
+  --highlight: var(--palette-ink-200);
+  --highlight-foreground: var(--palette-ink-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-ink-50);
+
+  /* Media — unchanged on purpose. */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-ink-700);
+  --input: var(--palette-ink-600);
+  --ring: var(--palette-ink-100);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: none;
+  --shadow-overlay: 0 8px 30px oklch(0 0 0 / 0.6);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-ink-100);
+  --chart-2: var(--palette-ink-400);
+  --chart-3: var(--palette-ink-600);
+  --chart-4: var(--palette-herb-400);
+  --chart-5: var(--palette-paprika-400);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ink-900);
+  --sidebar-foreground: var(--palette-ink-50);
+  --sidebar-primary: var(--palette-ink-100);
+  --sidebar-primary-foreground: var(--palette-ink-950);
+  --sidebar-accent: var(--palette-ink-800);
+  --sidebar-accent-foreground: var(--palette-ink-50);
+  --sidebar-border: var(--palette-ink-700);
+  --sidebar-ring: var(--palette-ink-100);
+}

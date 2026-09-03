@@ -35,6 +35,50 @@ The visual layer is token-driven so a restaurant's menu can be re-skinned withou
 
 Any theme × any appearance is valid. Never couple them.
 
+## Variants vs themes (feature 005)
+
+- **A theme is design-system vocabulary; a variant is what an owner picks.** The API stores
+  `visualVariant` (`default`, `plain-white`, `liquid-glass`, `green-bar`, `modern`, `refined`);
+  `lib/menu-display/variants.ts` maps it onto a theme id — `default → warm`, the rest by the
+  same name — and `themeForVariant()` never throws: anything unknown renders as Classic. The id
+  list is pinned on both sides (`apps/api/src/menus/visual-variants.ts`,
+  `tests/unit/variants.test.ts`); change one, the other's test fails.
+- **`slate` is a theme with no variant.** It exists to break hard-coded styling in the second
+  story pass. Do not add it to the catalogue.
+- **The picker (`components/workspace/VariantSwitcher.tsx`) submits on change** through
+  `setVisualVariantAction`, which calls `readVisualVariant` before the API like every other
+  action. Swatches are `<ThemeScope as="span">` boxes built from tokens — there is no image to
+  keep in sync.
+- **Preview lives at `/[locale]/preview/[menuId]/[variant]`, outside `/workspace` on purpose.**
+  It has to be full-bleed and honour dark appearance, which the light-locked shell cannot, so it
+  calls `requireProfile` itself — the one page that repeats the gate, because it is the one page
+  not under the layout. It renders `GuestMenu` through the same adapter, so it cannot drift from
+  what guests see.
+- **Panel and ambient tokens** (`--panel`, `--panel-border`, `--panel-blur`, `--panel-inset`,
+  `--ambient`, `--ambient-motion`) are how Liquid Glass gets translucency without a theme ever
+  naming a component. `components/menu/MenuPanel.tsx` is their one consumer and wraps each
+  category, so blur is paid once per section, never per dish. Under the neutral defaults it is an
+  invisible box. `tests/unit/glass-contrast.test.ts` composites a translucent panel over the
+  background and every ambient stop before measuring text — `wcagContrast` ignores alpha.
+- **Theme files stay flat.** No `@media`/`@supports` in `styles/themes/*.css`: the test parser
+  is flat and would read a nested override as the real value. Reduced-transparency and no-blur
+  fallbacks live in `app/globals.css` on `[data-theme]`, which wins by order.
+- **Non-default faces load with `preload: false`** in the root layout, so a Classic menu
+  downloads nothing new and a Refined one fetches Cormorant and DM Sans only when text uses them.
+  A theme may only name a face in `FONT_VARIABLES`; the unit test checks.
+- **Structure comes from a presentation recipe, not from the theme.** A theme changes colour,
+  type, radius and rhythm; it cannot make dishes into glass cards or put roman numerals on a
+  section. `lib/menu-display/presentation.ts` holds one recipe per style (header layout, nav
+  shape, section style, dish layout for rows and cards, price treatment, panel or not), and
+  `GuestMenu`/`SampleMenu` read it. Every axis is a prop on an existing component
+  (`MenuHeader.layout`, `CategoryNav.shape`, `CategoryHeading.style`, `DishRow.layout`,
+  `DishCard.surface`, `DishPrice.treatment`); `presentationForTheme()` maps a theme to its recipe
+  and `warm`/`slate` stay `classic`, so the fixture theme remains a pure re-colouring. Do not
+  reach for `[data-theme] [data-slot=…]` CSS to change structure — add a variant.
+- **Glass cards are translucent, not blurred.** `DishCard surface="glass"` is
+  `bg-surface-raised/55` plus the theme's specular inset in `--shadow-card`; the backdrop blur is
+  paid once by the `MenuPanel`, header and nav bars, never per card.
+
 ## Rules (all enforced by `pnpm lint` / `pnpm test`)
 
 - **No literal visual values in `components/` or `app/`** — no hex, no `rgb()/oklch()`, no Tailwind arbitrary values (`p-[13px]`, `bg-[#fff]`). `scripts/check-design-tokens.mjs` fails the build with file:line. Escape hatch: `// design-tokens-ignore-next-line -- <reason>`.

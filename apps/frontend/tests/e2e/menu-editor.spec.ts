@@ -276,20 +276,27 @@ test.describe("menu creation and filling", () => {
     await expect(page.getByText("V této sekci zatím nejsou žádná jídla")).toBeVisible();
   });
 
-  test("shows the variant switcher locked to the one available style", async ({ page }) => {
+  test("picks and keeps a visual style", async ({ page }) => {
     await signUp(page);
     await createMenu(page, "Polední menu");
 
     await expect(page.getByText("Vizuální styl")).toBeVisible();
-    await expect(page.getByRole("radio", { checked: true })).toBeVisible();
 
-    // The other styles are visible but cannot be chosen yet.
-    const comingSoon = page.getByText("Připravujeme");
-    await expect(comingSoon.first()).toBeVisible();
-    for (const radio of await page.getByRole("radio").all()) {
-      const checked = await radio.isChecked();
-      if (!checked) await expect(radio).toBeDisabled();
-    }
+    // Six styles, all selectable, none "coming soon"; Classic is the default.
+    const radios = page.getByRole("radio");
+    await expect(radios).toHaveCount(6);
+    await expect(page.getByText("Připravujeme")).toHaveCount(0);
+    for (const radio of await radios.all()) await expect(radio).toBeEnabled();
+    await expect(page.getByRole("radio", { name: /Klasický/ })).toBeChecked();
+
+    // Choosing a card saves it.
+    await page.getByRole("radio", { name: /Zelený bar/ }).check();
+    await expect(page.getByText("Vizuální styl uložen.")).toBeVisible();
+
+    // And it survives a reload.
+    await page.reload();
+    await expect(page.getByRole("radio", { name: /Zelený bar/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /Klasický/ })).not.toBeChecked();
   });
 
   test("hides another owner's menu", async ({ page }) => {

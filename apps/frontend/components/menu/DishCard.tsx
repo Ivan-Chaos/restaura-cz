@@ -2,13 +2,25 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@/lib/design-system/types";
+import type { PriceTreatment } from "@/lib/menu-display/presentation";
 
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { DietaryMarkerList } from "./DietaryMarkerList";
 import { DishImage } from "./DishImage";
+import { DishPrice } from "./DishPrice";
 import { HighlightBadge } from "./HighlightBadge";
-import { Price } from "./Price";
 import { SpiceLevel } from "./SpiceLevel";
+
+/**
+ * The card's surface (feature 005).
+ *
+ * - `raised`: the classic lifted card on `surface-raised`.
+ * - `glass`: translucent over the ambient field, with the theme's specular
+ *   edge from `--shadow-card`. No backdrop blur here on purpose — the blur is
+ *   paid once by the `MenuPanel` behind the grid, never per card (PR-003).
+ * - `flat`: an editorial tile, no border, no shadow, just a tinted block.
+ */
+export type CardSurface = "raised" | "glass" | "flat";
 
 /**
  * A dish, as a card.
@@ -32,6 +44,8 @@ export interface DishCardProps extends Omit<ComponentProps<"article">, "children
   priority?: boolean;
   /** Slot for an action (used by the future ordering variant). */
   action?: ReactNode;
+  surface?: CardSurface;
+  priceTreatment?: PriceTreatment;
 }
 
 export function DishCard({
@@ -39,19 +53,29 @@ export function DishCard({
   layout = "vertical",
   priority,
   action,
+  surface = "raised",
+  priceTreatment,
   className,
   ...props
 }: DishCardProps) {
   const availability = item.availability ?? "available";
   const isSoldOut = availability === "soldOut";
   const horizontal = layout === "horizontal";
+  const treatment: PriceTreatment =
+    priceTreatment ?? (surface === "glass" ? "chip" : surface === "flat" ? "bold" : "leader");
 
   return (
     <article
       data-slot="dish-card"
+      data-surface={surface}
       data-sold-out={isSoldOut || undefined}
       className={cn(
-        "bg-surface-raised text-surface-raised-foreground border-border shadow-card flex overflow-hidden rounded-lg border",
+        "flex overflow-hidden",
+        surface === "raised" &&
+          "bg-surface-raised text-surface-raised-foreground border-border shadow-card rounded-lg border",
+        surface === "glass" &&
+          "bg-surface-raised/55 text-surface-raised-foreground border-panel-border shadow-card rounded-xl border",
+        surface === "flat" && "bg-surface-raised text-surface-raised-foreground rounded-lg",
         horizontal ? "flex-row items-stretch" : "flex-col",
         // A sold-out dish recedes, but NOT by dimming the card: an opacity on
         // the whole card multiplies through to the text and dropped
@@ -83,10 +107,20 @@ export function DishCard({
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-display flex-1 text-base leading-snug font-medium">
+          <h3
+            className={cn(
+              "font-display flex-1 leading-snug",
+              surface === "flat" ? "text-lg font-bold tracking-tight" : "text-base font-medium",
+              surface === "glass" && "font-semibold",
+            )}
+          >
             {item.name}
           </h3>
-          <Price price={item.price} size="md" emphasis className="shrink-0" />
+          {treatment === "leader" ? (
+            <DishPrice price={item.price} treatment="bold" className="shrink-0 text-base" />
+          ) : (
+            <DishPrice price={item.price} treatment={treatment} className="shrink-0" />
+          )}
         </div>
 
         {item.description ? (

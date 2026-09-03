@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { redirect } from "@/i18n/navigation";
-import { readInlineText, readItem } from "@/lib/validation/form-data";
+import { readInlineText, readItem, readVisualVariant } from "@/lib/validation/form-data";
 import { apiGet, apiRequest } from "../client";
 import { SAVED, toFormState, type FormState } from "../form-state";
 import { toLocale } from "../locale";
@@ -78,6 +78,35 @@ export async function renameMenuAction(
   if (!result.ok) return toFormState(result.error);
 
   revalidateEditor(locale, menuId);
+  return SAVED;
+}
+
+/**
+ * The visual style (feature 005). Validated against the catalogue first, so an
+ * id the frontend does not know never costs a request; revalidates the public
+ * address too, so a guest's next load carries the new look even if the page
+ * ever stops being force-dynamic.
+ */
+export async function setVisualVariantAction(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const locale = toLocale(formData.get("locale"));
+  const menuId = String(formData.get("menuId") ?? "");
+
+  const parsed = readVisualVariant(formData);
+  if (!parsed.ok) return parsed.state;
+
+  const { result } = await apiRequest<MenuDetailResponse>(`/menus/${menuId}`, {
+    method: "PATCH",
+    body: { visualVariant: parsed.values.visualVariant },
+  });
+
+  if (!result.ok) return toFormState(result.error);
+
+  revalidateEditor(locale, menuId);
+  const slug = result.data.menu.publicSlug;
+  if (slug) revalidatePath(`/${locale}/m/${slug}`);
   return SAVED;
 }
 

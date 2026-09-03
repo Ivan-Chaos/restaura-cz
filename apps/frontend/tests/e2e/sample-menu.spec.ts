@@ -1,6 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { THEME_IDS } from "../../lib/design-system/themes";
+import { VISUAL_VARIANTS } from "../../lib/menu-display/variants";
+
 /**
  * The guest experience, measured on a real production build.
  *
@@ -145,7 +148,9 @@ test.describe("@us2 theming", () => {
     expect(slate.density).not.toBe(warm.density);
   });
 
-  for (const theme of ["warm", "slate"] as const) {
+  // Every registered theme, not a hand-picked pair: the owner-selectable styles
+  // (feature 005) each have to hold up in German at 320px in both appearances.
+  for (const theme of THEME_IDS) {
     for (const colorScheme of ["light", "dark"] as const) {
       test(`${theme} / ${colorScheme} stays accessible and fits 320px`, async ({
         page,
@@ -154,11 +159,78 @@ test.describe("@us2 theming", () => {
         await page.setViewportSize({ width: 320, height: 720 });
         await page.goto(path("de", theme));
 
+        await expect(page.locator(`[data-theme="${theme}"]`)).toHaveCount(1);
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         await expectNoHorizontalScroll(page);
         await expectNoAxeViolations(page, `${theme} / ${colorScheme} / de @320`);
       });
     }
   }
+
+  test("every owner-selectable style is prerendered at a stable address", async ({ page }) => {
+    // Spec 005 FR-018 / US4. `default` lives at the bare route; the rest at
+    // their theme id. Slate is a fixture and is not asserted here.
+    for (const { id, themeId } of VISUAL_VARIANTS) {
+      const response = await page.goto(id === "default" ? path("cs") : path("cs", themeId));
+      expect(response?.status(), `${id} → ${themeId}`).toBe(200);
+      await expect(page.locator(`[data-theme="${themeId}"]`)).toHaveCount(1);
+    }
+  });
+
+  test("liquid glass keeps its ambient still under reduced motion", async ({ page }) => {
+    // Spec 005 FR-014. The global reduced-motion rule collapses every animation
+    // to a single 0.01ms frame, so the field is painted but never drifts.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(path("cs", "liquid-glass"));
+
+    const motion = await page.evaluate(() => {
+      const scope = document.querySelector('[data-theme="liquid-glass"]');
+      if (!scope) return null;
+      const styles = getComputedStyle(scope);
+      return {
+        name: styles.animationName,
+        duration: styles.animationDuration,
+        hasAmbient: styles.backgroundImage !== "none",
+      };
+    });
+
+    expect(motion).not.toBeNull();
+    expect(motion?.hasAmbient, "the ambient field itself should still paint").toBe(true);
+
+    // Chrome reports the collapsed duration as "1e-05s", Firefox as "0.01ms";
+    // compare in seconds rather than on the string.
+    const seconds = (value: string) =>
+      value.endsWith("ms") ? Number.parseFloat(value) / 1000 : Number.parseFloat(value);
+    expect(
+      motion?.name === "none" || seconds(motion?.duration ?? "1s") <= 0.001,
+      `expected no drift, got ${motion?.name} over ${motion?.duration}`,
+    ).toBe(true);
+  });
+
+  test("liquid glass panels are translucent and blurred, once per category", async ({ page }) => {
+    // Spec 005 PR-003: blur is bounded to panels, never applied per dish.
+    await page.goto(path("cs", "liquid-glass"));
+
+    const stats = await page.evaluate(() => {
+      const panels = [...document.querySelectorAll('[data-slot="menu-panel"]')];
+      const blurred = panels.filter((el) => {
+        const s = getComputedStyle(el);
+        return /blur/.test(s.backdropFilter || s.getPropertyValue("-webkit-backdrop-filter"));
+      });
+      const blurredRows = [
+        ...document.querySelectorAll('[data-slot="dish-row"], [data-slot="dish-card"]'),
+      ].filter((el) => {
+        const s = getComputedStyle(el);
+        return /blur/.test(s.backdropFilter || s.getPropertyValue("-webkit-backdrop-filter"));
+      });
+      const sections = document.querySelectorAll("section[aria-labelledby]").length;
+      return { panels: panels.length, blurred: blurred.length, blurredRows: blurredRows.length, sections };
+    });
+
+    expect(stats.blurred).toBeGreaterThan(0);
+    expect(stats.blurred).toBeLessThanOrEqual(stats.sections);
+    expect(stats.blurredRows).toBe(0);
+  });
 });
 
 test.describe("@us5 ordering boundary", () => {

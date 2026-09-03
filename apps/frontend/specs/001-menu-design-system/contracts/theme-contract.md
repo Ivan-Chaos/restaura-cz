@@ -71,6 +71,34 @@ into the Foundations page.
 `--chart-1..5`, `--sidebar*`, `--motion-fast`, `--motion-base`, `--motion-slow`,
 `--motion-ease`
 
+### Panel and ambient treatment (added by feature 005)
+
+```css
+--panel            /* colour, may carry alpha; `transparent` when the theme has no panels */
+--panel-border     /* colour */
+--panel-blur       /* length; `0px` for none */
+--panel-inset      /* length; `0px` so layout does not shift when there is no panel */
+--ambient          /* <image> | none — painted behind the whole menu */
+--ambient-motion   /* <'animation'> | none — the ambient drift */
+```
+
+- Every theme SHOULD declare all six in its light rule (all shipped themes do), so
+  behaviour never depends on inheriting them from `:root`.
+- Exposed as `bg-panel`, `border-panel-border`, `backdrop-blur-panel`, `p-panel` and the
+  `ambient` utility in `app/globals.css`. `components/menu/MenuPanel.tsx` is the one
+  consumer of the panel tokens; blur is paid once per category, never per dish.
+- A theme MUST NOT define keyframes; `ambient-drift` is defined once in `globals.css`.
+- **A theme file MUST stay flat** — no `@media`, no `@supports`. The test parser in
+  `tests/unit/theme-css.ts` is flat and would read a nested override as the theme's real
+  value. Fallbacks for missing `backdrop-filter` and `prefers-reduced-transparency` live in
+  `app/globals.css` on `[data-theme]`, which wins over `[data-theme="<id>"]` by order.
+- If `--panel` resolves to a colour with alpha < 1, the theme MUST pass
+  `tests/unit/glass-contrast.test.ts`: `--foreground`, `--muted-foreground` and `--price`
+  at ≥ 4.5:1 against the panel composited over `--background` and over every
+  `--palette-*` step referenced by `--ambient`, in both appearances. `wcagContrast`
+  ignores alpha; compositing is what makes the check honest.
+- `--palette-glass-*` are the only palette steps that carry alpha.
+
 ## Accessibility guarantees (MUST, both appearances)
 
 The machine-readable version is `CONTRAST_PAIRS` in
@@ -118,10 +146,24 @@ perceptibility floor, not an accessibility claim.
 export const THEMES = [
   { id: "warm",  isDefault: true,  fonts: { display: "fraunces",   body: "nunitoSans" } },
   { id: "slate", isDefault: false, fonts: { display: "nunitoSans", body: "nunitoSans" } },
+  // feature 005 — owner-selectable styles
+  { id: "plain-white",  isDefault: false, fonts: { display: "inter",     body: "inter" } },
+  { id: "liquid-glass", isDefault: false, fonts: { display: "inter",     body: "inter" } },
+  { id: "green-bar",    isDefault: false, fonts: { display: "oswald",    body: "nunitoSans" } },
+  { id: "modern",       isDefault: false, fonts: { display: "manrope",   body: "inter" } },
+  { id: "refined",      isDefault: false, fonts: { display: "cormorant", body: "dmSans" } },
 ] as const satisfies readonly Theme[];
 ```
 
 Display names live in `messages/{cs,en,de}.json` under `Themes`.
+
+Themes are the design system's vocabulary; the *product* vocabulary an owner picks from is
+the variant catalogue in `lib/menu-display/variants.ts`, which maps the API's stored
+`visualVariant` (`default` → `warm`, others by the same name) onto a theme id. `slate` is a
+theme with no variant: it exists to break hard-coded styling, not to be sold.
+
+Non-default faces are loaded with `preload: false` so a page only downloads the faces its
+theme's CSS actually uses.
 
 ## Authoring checklist
 

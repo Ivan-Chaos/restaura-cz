@@ -6,6 +6,7 @@ import {
   signInSchema,
   signUpSchema,
   verifyCodeSchema,
+  visualVariantSchema,
   type InlineTextField,
 } from "./schemas";
 import { zodToFields } from "./zod-fields";
@@ -103,4 +104,11 @@ export function readItem(formData: FormData) {
 /** A menu name or a section title, whichever the caller is posting. */
 export function readInlineText(formData: FormData, field: InlineTextField) {
   return parsed(inlineTextSchema(field).safeParse({ [field]: text(formData, field) }));
+}
+
+/** The visual style an owner picked. Only catalogue ids get as far as the API. */
+export function readVisualVariant(formData: FormData) {
+  return parsed(
+    visualVariantSchema.safeParse({ visualVariant: text(formData, "visualVariant") }),
+  );
 }

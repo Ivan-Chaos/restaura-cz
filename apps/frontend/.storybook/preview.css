@@ -11,6 +11,11 @@
 :root {
   --font-fraunces: "Fraunces";
   --font-nunito-sans: "Nunito Sans";
+  --font-inter: "Inter";
+  --font-oswald: "Oswald";
+  --font-manrope: "Manrope";
+  --font-cormorant: "Cormorant Garamond";
+  --font-dm-sans: "DM Sans";
 }
 
 /* Stories are rendered on the theme's own page colour rather than Storybook's

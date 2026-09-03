@@ -3,7 +3,7 @@ import { expect, userEvent, within } from "storybook/test";
 
 import { Section } from "@/components/layout/Section";
 
-import { CategoryNav } from "./CategoryNav";
+import { CategoryNav, type CategoryNavProps } from "./CategoryNav";
 
 const meta = {
   title: "Menu/CategoryNav",
@@ -46,6 +46,31 @@ export const ActiveInTheMiddle: Story = {
     await expect(current).toHaveTextContent("Hlavní jídla");
   },
 };
+
+/** The five other shapes (feature 005); behaviour and roles are identical. */
+const shaped = (shape: NonNullable<CategoryNavProps["shape"]>): Story => ({
+  args: { categories: CATEGORIES, activeId: "mains", shape, "aria-label": "Kategorie" },
+  decorators: [
+    (Story) => (
+      <div className="ambient bg-background py-4">
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByRole("link")).toHaveLength(CATEGORIES.length);
+    await expect(canvasElement.querySelector('[aria-current="true"]')).toHaveTextContent(
+      "Hlavní jídla",
+    );
+  },
+});
+
+export const ShapeUnderline: Story = shaped("underline");
+export const ShapeGlass: Story = shaped("glass");
+export const ShapeSquares: Story = shaped("squares");
+export const ShapeHeavy: Story = shaped("heavy");
+export const ShapeText: Story = shaped("text");
 
 /** A single category still renders sensibly rather than looking broken. */
 export const SingleCategory: Story = {

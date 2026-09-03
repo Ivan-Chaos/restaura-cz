@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { VISUAL_VARIANTS } from '../src/menus/visual-variants.js';
 import { createTestApp, type TestApp } from './app.factory.js';
 import { addItem, addSection, createMenu, signUp, type SignedUpOwner } from './helpers.js';
 
@@ -396,17 +397,54 @@ describe('menus (US2)', () => {
     });
   });
 
-  describe('visual variant (FR-010)', () => {
-    it('accepts the default variant', async () => {
+  describe('visual variant (FR-010; feature 005 FR-001, FR-005, FR-006)', () => {
+    it.each(VISUAL_VARIANTS)('accepts the "%s" variant and echoes it', async (variant) => {
       const menuId = await createMenu(testApp, owner.cookie);
 
       const response = await request(testApp.server)
         .patch(`/menus/${menuId}`)
         .set('Cookie', owner.cookie)
-        .send({ visualVariant: 'default' })
+        .send({ visualVariant: variant })
         .expect(200);
 
-      expect(response.body.menu.visualVariant).toBe('default');
+      expect(response.body.menu.visualVariant).toBe(variant);
+
+      // And it is what the owner reads back, not just what the PATCH echoed.
+      const detail = await request(testApp.server)
+        .get(`/menus/${menuId}`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+      expect(detail.body.menu.visualVariant).toBe(variant);
+    });
+
+    it('offers exactly the six styles the frontend catalogue pins', () => {
+      // The frontend copies this literal into tests/unit/variants.test.ts; the
+      // two must agree or one side is lying to its users.
+      expect([...VISUAL_VARIANTS]).toEqual([
+        'default',
+        'plain-white',
+        'liquid-glass',
+        'green-bar',
+        'modern',
+        'refined',
+      ]);
+    });
+
+    it('refuses a change from anyone but the owner', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const intruder = await signUp(testApp, 'intruder@example.com');
+
+      await request(testApp.server)
+        .patch(`/menus/${menuId}`)
+        .set('Cookie', intruder.cookie)
+        .send({ visualVariant: 'refined' })
+        .expect(404);
+
+      const detail = await request(testApp.server)
+        .get(`/menus/${menuId}`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+      expect(detail.body.menu.visualVariant).toBe('default');
     });
 
     it('rejects a variant that does not exist yet', async () => {

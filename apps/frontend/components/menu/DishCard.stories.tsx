@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { Grid } from "@/components/layout/Grid";
+import { ThemeScope } from "@/components/theme/ThemeScope";
 import type { MenuItem } from "@/lib/design-system/types";
 
 import { DishCard } from "./DishCard";
@@ -163,6 +164,69 @@ export const UnbreakableName: Story = {
 /** Horizontal layout: a thumbnail beside the text, for denser sections. */
 export const Horizontal: Story = {
   args: { item: base, layout: "horizontal" },
+};
+
+/**
+ * The glass surface (feature 005): translucent over the ambient, with the
+ * theme's specular edge. No blur on the card itself — that is the panel's job.
+ */
+export const GlassSurface: Story = {
+  args: { item: base, surface: "glass" },
+  decorators: [
+    (Story) => (
+      <ThemeScope theme="liquid-glass" className="ambient bg-background block w-80 max-w-full rounded-xl p-4">
+        <Story />
+      </ThemeScope>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const card = canvasElement.querySelector<HTMLElement>('[data-slot="dish-card"]');
+    await expect(card).toHaveAttribute("data-surface", "glass");
+    const styles = getComputedStyle(card as HTMLElement);
+    await expect(styles.backdropFilter || "none").toBe("none");
+  },
+};
+
+/** The flat editorial tile: no border, no shadow, a heavy title and price. */
+export const FlatSurface: Story = {
+  args: { item: base, surface: "flat" },
+};
+
+/** The row layouts (feature 005): ledger, board, editorial, centred, glass. */
+export const RowLayouts: Story = {
+  args: { item: base },
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="bg-background flex w-full max-w-2xl flex-col gap-8 p-4">
+      {(["ledger", "board", "editorial", "centered", "glass"] as const).map((layout) => (
+        <div key={layout} data-layout-sample={layout}>
+          <DishRow item={{ ...base, image: undefined }} layout={layout} />
+          <DishRow
+            item={{
+              ...base,
+              id: `${layout}-variants`,
+              image: undefined,
+              name: "Pilsner Urquell",
+              description: undefined,
+              price: {
+                kind: "variants",
+                variants: [
+                  { label: "0,3 l", amount: { amount: 45, currency: "CZK" } },
+                  { label: "0,5 l", amount: { amount: 59, currency: "CZK" } },
+                ],
+              },
+            }}
+            layout={layout}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    // Every layout still names the dish and states the price.
+    await expect(canvasElement.querySelectorAll('[data-slot="dish-row"]')).toHaveLength(10);
+    await expect(canvasElement.querySelectorAll('[data-slot="price"]')).toHaveLength(10);
+  },
 };
 
 /** How a real category looks — mixed shapes side by side. */

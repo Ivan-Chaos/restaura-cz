@@ -24,6 +24,7 @@ import {
   moveSectionAction,
   renameMenuAction,
   renameSectionAction,
+  setVisualVariantAction,
   updateItemAction,
 } from "@/lib/api/actions/menus";
 import { publishAction, unpublishAction } from "@/lib/api/actions/publish";
@@ -91,7 +92,13 @@ export default async function MenuEditorPage({
           unpublishAction={unpublishAction}
         />
 
-        <VariantSwitcher selected={menu.visualVariant} />
+        <VariantSwitcher
+          selected={menu.visualVariant}
+          locale={locale}
+          menuId={menu.id}
+          action={setVisualVariantAction}
+          previewBasePath={`/preview/${menu.id}`}
+        />
 
         <section
           aria-labelledby="sections-heading"

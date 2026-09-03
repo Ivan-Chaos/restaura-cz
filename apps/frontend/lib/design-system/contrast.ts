@@ -1,4 +1,4 @@
-import { parse, wcagContrast } from "culori";
+import { formatRgb, parse, rgb, wcagContrast } from "culori";
 
 import type { ColorToken, ContrastPair } from "./tokens";
 
@@ -79,6 +79,45 @@ export function resolveToken(token: ColorToken, vars: CssVars): string {
     throw new Error(`Theme does not declare --${token}`);
   }
   return resolveVar(raw, vars);
+}
+
+/**
+ * Source-over composite of a (possibly translucent) colour on an opaque one,
+ * returned as an opaque `rgb()` string that `wcagContrast` measures correctly.
+ *
+ * `wcagContrast` ignores alpha, so a frosted panel measured directly would
+ * pass as if it were solid. Compositing over what the panel actually sits on
+ * is what makes the glass contrast test honest.
+ */
+export function composite(top: string, bottom: string): string {
+  const over = rgb(parse(top));
+  const under = rgb(parse(bottom));
+  if (!over) throw new Error(`Cannot parse colour "${top}"`);
+  if (!under) throw new Error(`Cannot parse colour "${bottom}"`);
+
+  const alpha = over.alpha ?? 1;
+  const underAlpha = under.alpha ?? 1;
+  if (underAlpha < 1) {
+    throw new Error(`composite(): the bottom colour must be opaque, got "${bottom}"`);
+  }
+
+  return formatRgb({
+    mode: "rgb",
+    r: over.r * alpha + under.r * (1 - alpha),
+    g: over.g * alpha + under.g * (1 - alpha),
+    b: over.b * alpha + under.b * (1 - alpha),
+  });
+}
+
+/** Alpha of a colour string, 1 when opaque or unparseable-as-translucent. */
+export function alphaOf(value: string): number {
+  const parsed = parse(value);
+  return parsed?.alpha ?? 1;
+}
+
+/** Every `--palette-*` custom property a token value references. */
+export function paletteRefs(value: string): string[] {
+  return [...value.matchAll(/var\((--palette-[\w-]+)/g)].map((m) => m[1]);
 }
 
 export interface ContrastResult extends ContrastPair {

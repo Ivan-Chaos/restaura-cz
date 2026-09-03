@@ -48,6 +48,22 @@ export const WithoutOpeningHours: Story = {
   args: { establishment: withLogo },
 };
 
+/** The five structural layouts (feature 005). Colour comes from the toolbar theme. */
+export const LayoutMinimal: Story = { args: { establishment: withHours, layout: "minimal" } };
+export const LayoutGlass: Story = {
+  args: { establishment: withHours, layout: "glass" },
+  decorators: [
+    (Story) => (
+      <div className="ambient bg-background pb-6">
+        <Story />
+      </div>
+    ),
+  ],
+};
+export const LayoutBand: Story = { args: { establishment: withHours, layout: "band" } };
+export const LayoutEditorial: Story = { args: { establishment: withHours, layout: "editorial" } };
+export const LayoutCentered: Story = { args: { establishment: withHours, layout: "centered" } };
+
 // `LanguageSwitcher` also belongs here in the real app (see the sample route),
 // but it calls `useRouter`/`usePathname` from `@/i18n/navigation`, which
 // currently crashes under Storybook's `next/navigation` mock ("invariant

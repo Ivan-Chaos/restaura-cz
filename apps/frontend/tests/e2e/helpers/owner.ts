@@ -218,6 +218,27 @@ export async function addItem(
   await expect(card.getByText(item.name, { exact: true })).toBeVisible();
 }
 
+/**
+ * Picks a visual style in the open editor by its localised name and waits for
+ * the save to be announced. The picker submits on change, so checking the
+ * radio is the whole interaction.
+ */
+export async function chooseStyle(page: Page, name: RegExp): Promise<void> {
+  // Wait on the Server Action's own round trip, not on the toast: a toast from
+  // an earlier save can still be on screen, and matching it would let a test
+  // read the guest page before the new style is stored.
+  const saved = page.waitForResponse(
+    (response) => response.request().method() === "POST" && response.ok(),
+  );
+  await page.getByRole("radio", { name }).check();
+  await saved;
+
+  await expect(page.getByRole("radio", { name })).toBeChecked();
+  await expect(
+    page.getByText(/vizuální styl uložen|visual style saved|visueller stil gespeichert/i).first(),
+  ).toBeVisible();
+}
+
 /** Publishes the open menu and returns the public address it reports. */
 export async function publish(page: Page): Promise<string> {
   await page.getByRole("button", { name: /^(zveřejnit|publish|veröffentlichen)$/i }).click();

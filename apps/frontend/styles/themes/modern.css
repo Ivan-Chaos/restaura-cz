@@ -1,0 +1,168 @@
+/**
+ * Modern — confident, editorial, high-contrast.
+ *
+ * A bright neutral ground, heavyweight geometric headings (Manrope), Inter for
+ * everything else, one saturated accent (`signal`) used sparingly, a slightly
+ * more generous rhythm than warm, and a single crisp shadow. Prices are set in
+ * the foreground colour and let weight, not colour, carry the emphasis.
+ *
+ * Scoped only — no `:root` here. Contract:
+ * `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="modern"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ink-50);
+  --foreground: var(--palette-ink-950);
+  --card: var(--palette-ink-50);
+  --card-foreground: var(--palette-ink-950);
+  --popover: var(--palette-ink-50);
+  --popover-foreground: var(--palette-ink-950);
+  --surface-raised: var(--palette-ink-100);
+  --surface-raised-foreground: var(--palette-ink-950);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-signal-700);
+  --primary-foreground: var(--palette-ink-50);
+  --secondary: var(--palette-ink-100);
+  --secondary-foreground: var(--palette-ink-900);
+  --muted: var(--palette-ink-100);
+  --muted-foreground: var(--palette-ink-700);
+  --accent: var(--palette-ink-200);
+  --accent-foreground: var(--palette-ink-950);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-ink-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-ink-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-ink-50);
+  --info: var(--palette-ink-700);
+  --info-foreground: var(--palette-ink-50);
+  --highlight: var(--palette-signal-200);
+  --highlight-foreground: var(--palette-signal-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-ink-950);
+
+  /* Media ---------------------------------------------------------------- */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-ink-400);
+  --input: var(--palette-ink-600);
+  --ring: var(--palette-signal-700);
+
+  /* Shape and rhythm — a little more air than warm ----------------------- */
+  --radius: 0.5rem;
+  --density: 1.05;
+
+  /* Typography — heavyweight geometric display, neutral body ------------- */
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — one crisp layer ------------------------------------------ */
+  --shadow-card: 0 2px 8px oklch(0 0 0 / 0.08);
+  --shadow-overlay: 0 12px 40px oklch(0 0 0 / 0.18);
+
+  /* Motion — snappy -------------------------------------------------------- */
+  --motion-fast: 90ms;
+  --motion-base: 160ms;
+  --motion-slow: 260ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-signal-600);
+  --chart-2: var(--palette-ink-800);
+  --chart-3: var(--palette-ink-500);
+  --chart-4: var(--palette-herb-600);
+  --chart-5: var(--palette-honey-600);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ink-100);
+  --sidebar-foreground: var(--palette-ink-950);
+  --sidebar-primary: var(--palette-signal-700);
+  --sidebar-primary-foreground: var(--palette-ink-50);
+  --sidebar-accent: var(--palette-ink-200);
+  --sidebar-accent-foreground: var(--palette-ink-950);
+  --sidebar-border: var(--palette-ink-400);
+  --sidebar-ring: var(--palette-signal-700);
+
+  /* Panel and ambient — none. -------------------------------------------- */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
+}
+
+.dark [data-theme="modern"],
+[data-theme="modern"].dark {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ink-950);
+  --foreground: var(--palette-ink-100);
+  --card: var(--palette-ink-900);
+  --card-foreground: var(--palette-ink-100);
+  --popover: var(--palette-ink-900);
+  --popover-foreground: var(--palette-ink-100);
+  --surface-raised: var(--palette-ink-900);
+  --surface-raised-foreground: var(--palette-ink-100);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-signal-400);
+  --primary-foreground: var(--palette-ink-950);
+  --secondary: var(--palette-ink-800);
+  --secondary-foreground: var(--palette-ink-100);
+  --muted: var(--palette-ink-800);
+  --muted-foreground: var(--palette-ink-300);
+  --accent: var(--palette-ink-800);
+  --accent-foreground: var(--palette-ink-100);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-ink-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-ink-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-ink-950);
+  --info: var(--palette-ink-300);
+  --info-foreground: var(--palette-ink-950);
+  --highlight: var(--palette-signal-900);
+  --highlight-foreground: var(--palette-signal-100);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-signal-300);
+
+  /* Media — unchanged on purpose. */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-ink-700);
+  --input: var(--palette-ink-600);
+  --ring: var(--palette-signal-400);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: 0 2px 8px oklch(0 0 0 / 0.45);
+  --shadow-overlay: 0 12px 40px oklch(0 0 0 / 0.6);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-signal-400);
+  --chart-2: var(--palette-ink-300);
+  --chart-3: var(--palette-ink-500);
+  --chart-4: var(--palette-herb-400);
+  --chart-5: var(--palette-honey-400);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ink-900);
+  --sidebar-foreground: var(--palette-ink-100);
+  --sidebar-primary: var(--palette-signal-400);
+  --sidebar-primary-foreground: var(--palette-ink-950);
+  --sidebar-accent: var(--palette-ink-800);
+  --sidebar-accent-foreground: var(--palette-ink-100);
+  --sidebar-border: var(--palette-ink-700);
+  --sidebar-ring: var(--palette-signal-400);
+}

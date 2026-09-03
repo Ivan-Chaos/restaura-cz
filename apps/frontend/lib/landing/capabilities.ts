@@ -1,3 +1,5 @@
+import { VISUAL_VARIANTS, type VisualVariantId } from "@/lib/menu-display/variants";
+
 import type { MediaAssetId } from "./assets";
 
 /**
@@ -38,7 +40,24 @@ export interface Capability {
    */
   demoHref?: string;
   demoLabelKey?: "capabilities.digitalMenu.demo";
+  /**
+   * The sample menu in each owner-selectable style (feature 005). Derived from
+   * the variant catalogue so the page can never advertise a style owners
+   * cannot pick — or miss one they can.
+   */
+  styleDemos?: readonly StyleDemo[];
 }
+
+export interface StyleDemo {
+  id: VisualVariantId;
+  /** Locale-relative path; `default` is the bare sample route. */
+  href: string;
+}
+
+export const STYLE_DEMOS: readonly StyleDemo[] = VISUAL_VARIANTS.map(({ id, themeId }) => ({
+  id,
+  href: id === "default" ? "/sample-menu" : `/sample-menu/${themeId}`,
+}));
 
 export const CAPABILITIES: readonly Capability[] = [
   {
@@ -49,6 +68,7 @@ export const CAPABILITIES: readonly Capability[] = [
     align: "mediaRight",
     demoHref: "/sample-menu",
     demoLabelKey: "capabilities.digitalMenu.demo",
+    styleDemos: STYLE_DEMOS,
   },
   {
     id: "pdf",

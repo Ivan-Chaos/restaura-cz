@@ -98,6 +98,15 @@
   --sidebar-accent-foreground: var(--palette-cocoa-900);
   --sidebar-border: var(--palette-linen-500);
   --sidebar-ring: var(--palette-terracotta-600);
+
+  /* Panel and ambient — warm has neither; the tokens exist so `MenuPanel`
+     and the `ambient` utility are inert here. */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
 }
 
 /**

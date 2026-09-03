@@ -1,0 +1,169 @@
+/**
+ * Refined — fine-dining restraint.
+ *
+ * Ivory paper (never clinical white), a high-contrast serif for names
+ * (Cormorant Garamond), a quiet sans for descriptions (DM Sans), wide margins,
+ * hairline rules as the only decoration, no elevation. Prices are set in the
+ * text colour: the style de-emphasises the number the way a good printed menu
+ * does. The accent is a deep wine, used only where an action needs it.
+ *
+ * Scoped only — no `:root` here. Contract:
+ * `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="refined"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ivory-100);
+  --foreground: var(--palette-cocoa-900);
+  --card: var(--palette-ivory-50);
+  --card-foreground: var(--palette-cocoa-900);
+  --popover: var(--palette-ivory-50);
+  --popover-foreground: var(--palette-cocoa-900);
+  --surface-raised: var(--palette-ivory-200);
+  --surface-raised-foreground: var(--palette-cocoa-900);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-wine-700);
+  --primary-foreground: var(--palette-ivory-50);
+  --secondary: var(--palette-ivory-300);
+  --secondary-foreground: var(--palette-cocoa-800);
+  --muted: var(--palette-ivory-200);
+  --muted-foreground: var(--palette-cocoa-700);
+  --accent: var(--palette-ivory-300);
+  --accent-foreground: var(--palette-cocoa-900);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-ivory-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-ivory-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-ivory-50);
+  --info: var(--palette-cocoa-700);
+  --info-foreground: var(--palette-ivory-50);
+  --highlight: var(--palette-ivory-400);
+  --highlight-foreground: var(--palette-cocoa-950);
+
+  /* Menu semantics — the price is text, quietly. ------------------------- */
+  --price: var(--palette-cocoa-900);
+
+  /* Media ---------------------------------------------------------------- */
+  --overlay: var(--palette-cocoa-950);
+  --overlay-foreground: var(--palette-ivory-50);
+
+  /* Structure — a single hairline is the only ornament ------------------- */
+  --border: var(--palette-ivory-500);
+  --input: var(--palette-ivory-700);
+  --ring: var(--palette-wine-700);
+
+  /* Shape and rhythm — almost square, generous air ----------------------- */
+  --radius: 0.125rem;
+  --density: 1.1;
+
+  /* Typography — two faces, one elegant, one quiet ----------------------- */
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-body: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — none; paper does not float ------------------------------- */
+  --shadow-card: none;
+  --shadow-overlay: 0 6px 24px oklch(0.26 0.022 55 / 0.14);
+
+  /* Motion — measured ------------------------------------------------------ */
+  --motion-fast: 140ms;
+  --motion-base: 240ms;
+  --motion-slow: 380ms;
+  --motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-wine-600);
+  --chart-2: var(--palette-cocoa-500);
+  --chart-3: var(--palette-ivory-700);
+  --chart-4: var(--palette-herb-600);
+  --chart-5: var(--palette-honey-600);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ivory-200);
+  --sidebar-foreground: var(--palette-cocoa-900);
+  --sidebar-primary: var(--palette-wine-700);
+  --sidebar-primary-foreground: var(--palette-ivory-50);
+  --sidebar-accent: var(--palette-ivory-300);
+  --sidebar-accent-foreground: var(--palette-cocoa-900);
+  --sidebar-border: var(--palette-ivory-500);
+  --sidebar-ring: var(--palette-wine-700);
+
+  /* Panel and ambient — none. -------------------------------------------- */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
+}
+
+.dark [data-theme="refined"],
+[data-theme="refined"].dark {
+  /* Surfaces — warm charcoal, still paper-like --------------------------- */
+  --background: var(--palette-cocoa-950);
+  --foreground: var(--palette-ivory-100);
+  --card: var(--palette-cocoa-900);
+  --card-foreground: var(--palette-ivory-100);
+  --popover: var(--palette-cocoa-900);
+  --popover-foreground: var(--palette-ivory-100);
+  --surface-raised: var(--palette-cocoa-900);
+  --surface-raised-foreground: var(--palette-ivory-100);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-wine-400);
+  --primary-foreground: var(--palette-cocoa-950);
+  --secondary: var(--palette-cocoa-800);
+  --secondary-foreground: var(--palette-ivory-100);
+  --muted: var(--palette-cocoa-800);
+  --muted-foreground: var(--palette-ivory-400);
+  --accent: var(--palette-cocoa-800);
+  --accent-foreground: var(--palette-ivory-100);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-cocoa-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-cocoa-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-cocoa-950);
+  --info: var(--palette-cocoa-300);
+  --info-foreground: var(--palette-cocoa-950);
+  --highlight: var(--palette-ivory-500);
+  --highlight-foreground: var(--palette-cocoa-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-ivory-200);
+
+  /* Media — unchanged on purpose. */
+  --overlay: var(--palette-cocoa-950);
+  --overlay-foreground: var(--palette-ivory-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-cocoa-700);
+  --input: var(--palette-cocoa-600);
+  --ring: var(--palette-wine-400);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: none;
+  --shadow-overlay: 0 6px 24px oklch(0 0 0 / 0.55);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-wine-400);
+  --chart-2: var(--palette-cocoa-300);
+  --chart-3: var(--palette-ivory-600);
+  --chart-4: var(--palette-herb-400);
+  --chart-5: var(--palette-honey-400);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-cocoa-900);
+  --sidebar-foreground: var(--palette-ivory-100);
+  --sidebar-primary: var(--palette-wine-400);
+  --sidebar-primary-foreground: var(--palette-cocoa-950);
+  --sidebar-accent: var(--palette-cocoa-800);
+  --sidebar-accent-foreground: var(--palette-ivory-100);
+  --sidebar-border: var(--palette-cocoa-700);
+  --sidebar-ring: var(--palette-wine-400);
+}

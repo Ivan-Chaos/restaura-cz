@@ -55,6 +55,37 @@ rather than rendering an unstyled page.
 on every axis — cool, sharp, tighter, one type family — so that any value a
 component hard-codes instead of tokenising is obvious the moment you switch.
 
+The five that follow — `plain-white`, `liquid-glass`, `green-bar`, `modern`,
+`refined` — are the **owner-selectable styles** (feature 005). An owner picks a
+*variant* in the menu editor; `lib/menu-display/variants.ts` maps the stored id
+onto a theme (`default → warm`, the rest by the same name) and the public page
+scopes the menu with it. `slate` has no variant on purpose: it is a fixture, not
+a look we sell. Each style is also prerendered at `/sample-menu/<id>`.
+
+## Panels and the ambient field
+
+Liquid Glass needs three things the original catalogue could not say:
+"translucent", "blurred" and "there is an image behind the page". Rather than
+let a theme reach into components, the catalogue grew an **optional** group —
+`--panel`, `--panel-border`, `--panel-blur`, `--panel-inset`, `--ambient`,
+`--ambient-motion` — exposed as `bg-panel`, `border-panel-border`,
+`backdrop-blur-panel`, `p-panel` and the `ambient` utility.
+
+`MenuPanel` is the one consumer. Under the neutral defaults (`transparent`,
+`0px`, `none`) it is an invisible box; under Liquid Glass the same markup is a
+frosted card. Blur is paid once per category, never per dish.
+
+Two rules follow from this:
+
+- **Theme files stay flat.** No `@media`/`@supports` inside `styles/themes/*.css`
+  — the test parser is flat and would take a nested override for the real value.
+  The reduced-transparency and no-`backdrop-filter` fallbacks live in
+  `app/globals.css` on `[data-theme]`.
+- **A translucent panel is measured composited.** `wcagContrast` ignores alpha,
+  so `tests/unit/glass-contrast.test.ts` composites `--panel` over the background
+  and over every palette step the ambient gradient references before checking
+  `--foreground`, `--muted-foreground` and `--price` at 4.5:1.
+
 ## Adding a theme
 
 1. Copy `styles/themes/warm.css` to `styles/themes/<id>.css` and change the
@@ -94,7 +125,9 @@ gets the full 3:1.
 - **Fonts must be loaded by the root layout.** A theme's `--font-display` points
   at a variable `next/font` publishes in `app/[locale]/layout.tsx`. Naming a face
   nobody loads silently falls through to the generic family —
-  `tests/unit/themes.test.ts` catches exactly this.
+  `tests/unit/themes.test.ts` catches exactly this. Every face except the two
+  warm uses is declared with `preload: false`, so a page only downloads the faces
+  its theme's CSS actually applies.
 - **A theme may not invent tokens.** New tokens are a foundations change that
   must land in every theme at once (spec FR-026), otherwise a menu in one theme
   renders a component the others cannot style.

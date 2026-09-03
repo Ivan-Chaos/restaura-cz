@@ -2,8 +2,9 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@/lib/design-system/types";
+import type { PriceTreatment } from "@/lib/menu-display/presentation";
 
-import { DishCard } from "./DishCard";
+import { DishCard, type CardSurface } from "./DishCard";
 
 /**
  * Today's specials, as a horizontally scrolling strip.
@@ -19,12 +20,17 @@ export interface SpecialsStripProps extends Omit<ComponentProps<"section">, "tit
   title: string;
   items: MenuItem[];
   id?: string;
+  /** Card surface and price placement, so the strip follows the page's recipe. */
+  surface?: CardSurface;
+  priceTreatment?: PriceTreatment;
 }
 
 export function SpecialsStrip({
   title,
   items,
   id,
+  surface,
+  priceTreatment,
   className,
   ...props
 }: SpecialsStripProps) {
@@ -69,7 +75,12 @@ export function SpecialsStrip({
             // next one peek in, which is what invites the guest to scroll.
             className="w-64 shrink-0 snap-start"
           >
-            <DishCard item={item} className="h-full" />
+            <DishCard
+              item={item}
+              surface={surface}
+              priceTreatment={priceTreatment}
+              className="h-full"
+            />
           </li>
         ))}
       </ul>

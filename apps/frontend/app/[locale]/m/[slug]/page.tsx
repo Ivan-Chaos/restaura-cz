@@ -8,8 +8,9 @@ import { ThemeScope } from "@/components/theme/ThemeScope";
 import { routing } from "@/i18n/routing";
 import { apiGet } from "@/lib/api/client";
 import type { PublicMenuResponse } from "@/lib/api/types";
-import { DEFAULT_THEME } from "@/lib/design-system/themes";
 import { toDisplayMenu } from "@/lib/menu-display/adapter";
+import { presentationForTheme } from "@/lib/menu-display/presentation";
+import { themeForVariant } from "@/lib/menu-display/variants";
 
 /**
  * A published menu, for a guest with no account.
@@ -61,9 +62,18 @@ export default async function PublicMenuPage({ params }: PageProps<"/[locale]/m/
   // the page cannot be used to discover which menus exist.
   if (!menu) notFound();
 
+  const themeId = themeForVariant(menu.visualVariant);
+
   return (
-    <ThemeScope theme={DEFAULT_THEME.id}>
-      <GuestMenu menu={toDisplayMenu(menu)} />
+    // The owner's chosen style. A value the catalogue does not know — a retired
+    // style, a row from before styles existed — renders as Classic rather than
+    // unstyled (spec 005 FR-007). The scope is a real box so a theme's ambient
+    // field has the whole page to paint.
+    <ThemeScope
+      theme={themeId}
+      className="ambient bg-background text-foreground flex min-h-svh flex-1 flex-col"
+    >
+      <GuestMenu menu={toDisplayMenu(menu)} presentation={presentationForTheme(themeId)} />
     </ThemeScope>
   );
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { VISUAL_VARIANT_IDS } from "@/lib/menu-display/variants";
 import {
   readInlineText,
   readItem,
@@ -7,6 +8,7 @@ import {
   readSignIn,
   readSignUp,
   readVerifyCode,
+  readVisualVariant,
   type Parsed,
 } from "@/lib/validation/form-data";
 import {
@@ -475,6 +477,32 @@ describe("readInlineText", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.values.title).toBe("Polévky");
+  });
+});
+
+/**
+ * The visual-style picker (feature 005 FR-006). Mirrors the API's
+ * `@IsIn(VISUAL_VARIANTS)`; the id list itself is pinned in `variants.test.ts`.
+ */
+describe("readVisualVariant", () => {
+  it.each(VISUAL_VARIANT_IDS)("accepts %s", (id) => {
+    const result = readVisualVariant(form({ visualVariant: id }));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values.visualVariant).toBe(id);
+  });
+
+  it("rejects an id outside the catalogue without reaching the API", () => {
+    expect(fieldsOf(readVisualVariant(form({ visualVariant: "elegant" })))).toEqual({
+      visualVariant: "INVALID",
+    });
+    expect(fieldsOf(readVisualVariant(form({ visualVariant: "slate" })))).toEqual({
+      visualVariant: "INVALID",
+    });
+  });
+
+  it("rejects a missing field", () => {
+    expect(fieldsOf(readVisualVariant(form({})))).toEqual({ visualVariant: "INVALID" });
   });
 });
 

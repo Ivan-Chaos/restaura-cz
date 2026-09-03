@@ -1,0 +1,194 @@
+/**
+ * Liquid Glass — frosted panels over a slowly drifting colour field.
+ *
+ * The text and surface tokens are ordinary opaque colours and pass the same
+ * contrast contract as every theme. What makes this glass is the optional
+ * panel group: `--panel` is a translucent palette step, `--panel-blur` turns on
+ * the backdrop blur, and `--ambient` paints the lavender field the panels
+ * float over. `tests/unit/glass-contrast.test.ts` composites the panel over
+ * every colour it can sit on and proves the text still reads.
+ *
+ * This file is flat on purpose: no @media, no @supports. The reduced-
+ * transparency and no-blur fallbacks live in `app/globals.css`, because the
+ * theme test parser would otherwise read a nested override as the real value.
+ *
+ * Scoped only — no `:root` here. Contract:
+ * `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="liquid-glass"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-aurora-50);
+  --foreground: var(--palette-ink-950);
+  --card: var(--palette-ink-50);
+  --card-foreground: var(--palette-ink-950);
+  --popover: var(--palette-ink-50);
+  --popover-foreground: var(--palette-ink-950);
+  --surface-raised: var(--palette-ink-50);
+  --surface-raised-foreground: var(--palette-ink-950);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-cobalt-600);
+  --primary-foreground: var(--palette-ink-50);
+  --secondary: var(--palette-aurora-100);
+  --secondary-foreground: var(--palette-ink-900);
+  --muted: var(--palette-aurora-100);
+  --muted-foreground: var(--palette-ink-700);
+  --accent: var(--palette-aurora-200);
+  --accent-foreground: var(--palette-ink-950);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-600);
+  --destructive-foreground: var(--palette-ink-50);
+  --success: var(--palette-herb-700);
+  --success-foreground: var(--palette-ink-50);
+  --warning: var(--palette-honey-800);
+  --warning-foreground: var(--palette-ink-50);
+  --info: var(--palette-ink-700);
+  --info-foreground: var(--palette-ink-50);
+  --highlight: var(--palette-aurora-200);
+  --highlight-foreground: var(--palette-aurora-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-ink-950);
+
+  /* Media ---------------------------------------------------------------- */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-aurora-400);
+  --input: var(--palette-aurora-600);
+  --ring: var(--palette-cobalt-600);
+
+  /* Shape and rhythm — large, soft radii ---------------------------------- */
+  --radius: 1.25rem;
+  --density: 1;
+
+  /* Typography ----------------------------------------------------------- */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — a specular line along the top edge (the inset), then a soft
+     cool drop. This is what makes a translucent card read as glass rather
+     than as a faded box. */
+  --shadow-card: inset 0 1px 0 oklch(1 0 0 / 0.75), 0 1px 2px oklch(0.3 0.04 290 / 0.06),
+    0 16px 40px oklch(0.3 0.04 290 / 0.14);
+  --shadow-overlay: inset 0 1px 0 oklch(1 0 0 / 0.75), 0 24px 64px oklch(0.3 0.04 290 / 0.28);
+
+  /* Motion — unhurried ----------------------------------------------------- */
+  --motion-fast: 140ms;
+  --motion-base: 240ms;
+  --motion-slow: 400ms;
+  --motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-cobalt-500);
+  --chart-2: var(--palette-aurora-500);
+  --chart-3: var(--palette-herb-600);
+  --chart-4: var(--palette-honey-600);
+  --chart-5: var(--palette-ink-500);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-aurora-100);
+  --sidebar-foreground: var(--palette-ink-950);
+  --sidebar-primary: var(--palette-cobalt-600);
+  --sidebar-primary-foreground: var(--palette-ink-50);
+  --sidebar-accent: var(--palette-aurora-200);
+  --sidebar-accent-foreground: var(--palette-ink-950);
+  --sidebar-border: var(--palette-aurora-400);
+  --sidebar-ring: var(--palette-cobalt-600);
+
+  /* Panel and ambient — the glass itself --------------------------------- */
+  --panel: var(--palette-glass-light);
+  --panel-border: var(--palette-glass-edge-light);
+  --panel-blur: 18px;
+  --panel-inset: calc(var(--spacing) * 4);
+  /* Three soft colour blobs rather than a flat wash: the blur has something
+     to refract, and the drift moves them past the panels. Every stop is a
+     palette step, so the composite contrast test can enumerate them. */
+  --ambient:
+    radial-gradient(60% 50% at 15% 10%, var(--palette-aurora-300), transparent 70%),
+    radial-gradient(50% 45% at 85% 20%, var(--palette-cobalt-200), transparent 70%),
+    radial-gradient(60% 55% at 50% 95%, var(--palette-terracotta-200), transparent 70%),
+    linear-gradient(180deg, var(--palette-aurora-100), var(--palette-aurora-50));
+  --ambient-motion: ambient-drift 32s ease-in-out infinite alternate;
+}
+
+.dark [data-theme="liquid-glass"],
+[data-theme="liquid-glass"].dark {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-ink-950);
+  --foreground: var(--palette-ink-50);
+  --card: var(--palette-ink-900);
+  --card-foreground: var(--palette-ink-50);
+  --popover: var(--palette-ink-900);
+  --popover-foreground: var(--palette-ink-50);
+  --surface-raised: var(--palette-ink-900);
+  --surface-raised-foreground: var(--palette-ink-50);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-cobalt-400);
+  --primary-foreground: var(--palette-ink-950);
+  --secondary: var(--palette-ink-800);
+  --secondary-foreground: var(--palette-ink-50);
+  --muted: var(--palette-ink-800);
+  --muted-foreground: var(--palette-ink-300);
+  --accent: var(--palette-ink-800);
+  --accent-foreground: var(--palette-ink-50);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-400);
+  --destructive-foreground: var(--palette-ink-950);
+  --success: var(--palette-herb-400);
+  --success-foreground: var(--palette-ink-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-ink-950);
+  --info: var(--palette-ink-300);
+  --info-foreground: var(--palette-ink-950);
+  --highlight: var(--palette-aurora-300);
+  --highlight-foreground: var(--palette-aurora-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-aurora-200);
+
+  /* Media — unchanged on purpose. */
+  --overlay: var(--palette-ink-950);
+  --overlay-foreground: var(--palette-ink-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-ink-700);
+  --input: var(--palette-ink-600);
+  --ring: var(--palette-cobalt-400);
+
+  /* Elevation — a faint specular edge, then depth ------------------------- */
+  --shadow-card: inset 0 1px 0 oklch(1 0 0 / 0.16), 0 1px 2px oklch(0 0 0 / 0.4),
+    0 16px 40px oklch(0 0 0 / 0.5);
+  --shadow-overlay: inset 0 1px 0 oklch(1 0 0 / 0.16), 0 24px 64px oklch(0 0 0 / 0.65);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-cobalt-400);
+  --chart-2: var(--palette-aurora-400);
+  --chart-3: var(--palette-herb-400);
+  --chart-4: var(--palette-honey-400);
+  --chart-5: var(--palette-ink-400);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-ink-900);
+  --sidebar-foreground: var(--palette-ink-50);
+  --sidebar-primary: var(--palette-cobalt-400);
+  --sidebar-primary-foreground: var(--palette-ink-950);
+  --sidebar-accent: var(--palette-ink-800);
+  --sidebar-accent-foreground: var(--palette-ink-50);
+  --sidebar-border: var(--palette-ink-700);
+  --sidebar-ring: var(--palette-cobalt-400);
+
+  /* Panel and ambient ---------------------------------------------------- */
+  --panel: var(--palette-glass-dark);
+  --panel-border: var(--palette-glass-edge-dark);
+  --ambient:
+    radial-gradient(60% 50% at 15% 10%, var(--palette-aurora-800), transparent 70%),
+    radial-gradient(50% 45% at 85% 20%, var(--palette-cobalt-900), transparent 70%),
+    radial-gradient(60% 55% at 50% 95%, var(--palette-wine-900), transparent 70%),
+    linear-gradient(180deg, var(--palette-aurora-950), var(--palette-ink-950));
+}

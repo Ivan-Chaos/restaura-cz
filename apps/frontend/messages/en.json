@@ -24,7 +24,8 @@
         "eyebrow": "Digital menu",
         "title": "A menu that reads beautifully on every phone",
         "body": "Your dishes, prices and allergens in a page that opens instantly — no app to install, no pinching to zoom. Change a price once and every guest sees it.",
-        "demo": "See a live menu"
+        "demo": "See a live menu",
+        "styles": "Browse the styles"
       },
       "pdf": {
         "eyebrow": "PDF export",
@@ -421,7 +422,46 @@
   },
   "Themes": {
     "warm": "Warm",
-    "slate": "Slate"
+    "slate": "Slate",
+    "plain-white": "Plain White",
+    "liquid-glass": "Liquid Glass",
+    "green-bar": "Green Bar",
+    "modern": "Modern",
+    "refined": "Refined"
+  },
+  "VisualVariants": {
+    "default": {
+      "name": "Classic",
+      "description": "Warm parchment, serif headings, terracotta accents. The classic restaurant look."
+    },
+    "plain-white": {
+      "name": "Plain White",
+      "description": "Black on white, one typeface, hairline dividers. Quiet and fast."
+    },
+    "liquid-glass": {
+      "name": "Liquid Glass",
+      "description": "Frosted panels over a soft, drifting colour field. Modern and airy."
+    },
+    "green-bar": {
+      "name": "Green Bar",
+      "description": "Deep bottle green, cream text, brass prices. Made for dim rooms."
+    },
+    "modern": {
+      "name": "Modern",
+      "description": "Bright neutrals, heavyweight headings, one bold accent. Confident and clear."
+    },
+    "refined": {
+      "name": "Refined",
+      "description": "Ivory paper, an elegant serif, wide margins. Fine-dining restraint."
+    }
+  },
+  "Preview": {
+    "metaTitle": "Style preview",
+    "previewing": "Previewing: {style}",
+    "current": "Current style",
+    "back": "Back to editor",
+    "useStyle": "Use this style",
+    "applied": "Style applied."
   },
   "Menu": {
     "viewMenu": "View the menu",
@@ -766,9 +806,10 @@
     "deleteItemBody": "“{name}” will be removed from the menu.",
     "confirmDelete": "Delete",
     "variantTitle": "Visual style",
-    "variantDescription": "How your menu looks to guests. More styles are on the way.",
-    "variantDefault": "Classic",
-    "variantComingSoon": "Coming soon",
+    "variantDescription": "How your menu looks to guests. Pick a style; it applies the moment it is saved.",
+    "variantApply": "Apply style",
+    "variantSaved": "Visual style saved.",
+    "variantPreview": "Preview",
     "renameMenu": "Rename menu",
     "renameSectionButton": "Rename",
     "duplicateItem": "Duplicate dish",

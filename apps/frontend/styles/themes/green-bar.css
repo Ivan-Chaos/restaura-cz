@@ -1,0 +1,149 @@
+/**
+ * Green Bar — the pub menu: deep bottle green, cream text, brass accents.
+ *
+ * Built for dim rooms. Both appearances are dark by design — the "dark"
+ * appearance deepens the green rather than switching to grey — and both still
+ * have to pass every contrast pair. Oswald gives the bold, condensed headings
+ * of the bar-menu template family; rows are 10% tighter than warm so a long
+ * tap list stays on one screen.
+ *
+ * Scoped only — no `:root` here. Contract:
+ * `specs/001-menu-design-system/contracts/theme-contract.md`.
+ */
+
+[data-theme="green-bar"] {
+  /* Surfaces ------------------------------------------------------------- */
+  --background: var(--palette-bottle-900);
+  --foreground: var(--palette-cream-100);
+  --card: var(--palette-bottle-800);
+  --card-foreground: var(--palette-cream-100);
+  --popover: var(--palette-bottle-800);
+  --popover-foreground: var(--palette-cream-100);
+  --surface-raised: var(--palette-bottle-800);
+  --surface-raised-foreground: var(--palette-cream-100);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-brass-500);
+  --primary-foreground: var(--palette-bottle-950);
+  --secondary: var(--palette-bottle-700);
+  --secondary-foreground: var(--palette-cream-100);
+  --muted: var(--palette-bottle-800);
+  --muted-foreground: var(--palette-bottle-200);
+  --accent: var(--palette-bottle-700);
+  --accent-foreground: var(--palette-cream-100);
+
+  /* Status --------------------------------------------------------------- */
+  --destructive: var(--palette-paprika-300);
+  --destructive-foreground: var(--palette-bottle-950);
+  --success: var(--palette-herb-300);
+  --success-foreground: var(--palette-bottle-950);
+  --warning: var(--palette-honey-400);
+  --warning-foreground: var(--palette-bottle-950);
+  --info: var(--palette-bottle-200);
+  --info-foreground: var(--palette-bottle-950);
+  --highlight: var(--palette-brass-300);
+  --highlight-foreground: var(--palette-bottle-950);
+
+  /* Menu semantics — brass prices, the one thing that glints. ------------ */
+  --price: var(--palette-brass-400);
+
+  /* Media ---------------------------------------------------------------- */
+  --overlay: var(--palette-bottle-950);
+  --overlay-foreground: var(--palette-cream-50);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-bottle-600);
+  --input: var(--palette-bottle-400);
+  --ring: var(--palette-brass-500);
+
+  /* Shape and rhythm — compact rows --------------------------------------- */
+  --radius: 0.375rem;
+  --density: 0.9;
+
+  /* Typography — bold condensed display, legible body -------------------- */
+  --font-display: var(--font-oswald), "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-body: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation — deep, green-tinted --------------------------------------- */
+  --shadow-card: 0 1px 2px oklch(0.15 0.04 155 / 0.5), 0 4px 14px oklch(0.15 0.04 155 / 0.45);
+  --shadow-overlay: 0 8px 30px oklch(0.1 0.03 155 / 0.65);
+
+  /* Motion --------------------------------------------------------------- */
+  --motion-fast: 100ms;
+  --motion-base: 180ms;
+  --motion-slow: 280ms;
+  --motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Charts --------------------------------------------------------------- */
+  --chart-1: var(--palette-brass-400);
+  --chart-2: var(--palette-bottle-300);
+  --chart-3: var(--palette-cream-300);
+  --chart-4: var(--palette-honey-400);
+  --chart-5: var(--palette-paprika-300);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-bottle-800);
+  --sidebar-foreground: var(--palette-cream-100);
+  --sidebar-primary: var(--palette-brass-500);
+  --sidebar-primary-foreground: var(--palette-bottle-950);
+  --sidebar-accent: var(--palette-bottle-700);
+  --sidebar-accent-foreground: var(--palette-cream-100);
+  --sidebar-border: var(--palette-bottle-600);
+  --sidebar-ring: var(--palette-brass-500);
+
+  /* Panel and ambient — none. -------------------------------------------- */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
+}
+
+.dark [data-theme="green-bar"],
+[data-theme="green-bar"].dark {
+  /* Surfaces — deeper, not greyer ----------------------------------------- */
+  --background: var(--palette-bottle-950);
+  --foreground: var(--palette-cream-50);
+  --card: var(--palette-bottle-900);
+  --card-foreground: var(--palette-cream-50);
+  --popover: var(--palette-bottle-900);
+  --popover-foreground: var(--palette-cream-50);
+  --surface-raised: var(--palette-bottle-900);
+  --surface-raised-foreground: var(--palette-cream-50);
+
+  /* Emphasis ------------------------------------------------------------- */
+  --primary: var(--palette-brass-400);
+  --primary-foreground: var(--palette-bottle-950);
+  --secondary: var(--palette-bottle-800);
+  --secondary-foreground: var(--palette-cream-50);
+  --muted: var(--palette-bottle-900);
+  --muted-foreground: var(--palette-bottle-200);
+  --accent: var(--palette-bottle-800);
+  --accent-foreground: var(--palette-cream-50);
+
+  /* Status --------------------------------------------------------------- */
+  --highlight: var(--palette-brass-300);
+  --highlight-foreground: var(--palette-bottle-950);
+
+  /* Menu semantics ------------------------------------------------------- */
+  --price: var(--palette-brass-300);
+
+  /* Structure ------------------------------------------------------------ */
+  --border: var(--palette-bottle-700);
+  --input: var(--palette-bottle-500);
+  --ring: var(--palette-brass-400);
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.5), 0 4px 14px oklch(0 0 0 / 0.5);
+  --shadow-overlay: 0 8px 30px oklch(0 0 0 / 0.7);
+
+  /* Sidebar -------------------------------------------------------------- */
+  --sidebar: var(--palette-bottle-900);
+  --sidebar-foreground: var(--palette-cream-50);
+  --sidebar-primary: var(--palette-brass-400);
+  --sidebar-accent: var(--palette-bottle-800);
+  --sidebar-accent-foreground: var(--palette-cream-50);
+  --sidebar-border: var(--palette-bottle-700);
+  --sidebar-ring: var(--palette-brass-400);
+}

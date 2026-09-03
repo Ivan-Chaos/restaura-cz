@@ -148,6 +148,26 @@ describe("response shapes match the contract", () => {
     expectTypeOf(payload).toExtend<PublicMenuResponse>();
     expect(JSON.stringify(payload)).not.toContain('"id"');
   });
+
+  it("carries any allowlisted visual variant, not only the default (feature 005)", () => {
+    const detail = {
+      menu: {
+        id: "8d1c…",
+        name: "Lunch",
+        status: "published" as const,
+        publicSlug: "lunch-x7k2qf",
+        visualVariant: "green-bar",
+        updatedAt: "2026-09-03T10:00:00.000Z",
+        sections: [],
+      },
+    };
+    const publicMenu = {
+      menu: { name: "Lunch", visualVariant: "green-bar", sections: [] },
+    };
+    expectTypeOf(detail).toExtend<MenuDetailResponse>();
+    expectTypeOf(publicMenu).toExtend<PublicMenuResponse>();
+    expect(publicMenu.menu.visualVariant).toBe(detail.menu.visualVariant);
+  });
 });
 
 describe("request shapes match the contract", () => {

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/landing/Reveal";
 import { TableTent } from "@/components/landing/TableTent";
 import { Container } from "@/components/layout/Container";
+import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { assetSrc, getAsset } from "@/lib/landing/assets";
 import type { Capability, CapabilityIconName } from "@/lib/landing/capabilities";
@@ -36,6 +37,7 @@ export function CapabilitySection({
   className,
 }: CapabilitySectionProps) {
   const t = useTranslations("Landing");
+  const tVariants = useTranslations("VisualVariants");
   const Icon = ICONS[capability.icon];
   const headingId = `capability-${capability.id}-heading`;
   const asset = capability.asset ? getAsset(capability.asset) : undefined;
@@ -81,6 +83,33 @@ export function CapabilitySection({
                 {t(capability.demoLabelKey)}
                 <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
+            ) : null}
+
+            {capability.styleDemos ? (
+              // Real anchors with button styling: Base UI's Button expects a
+              // native <button> and would replace the link semantics.
+              <nav
+                aria-label={t("capabilities.digitalMenu.styles")}
+                data-slot="style-demos"
+                className="mt-1 flex flex-col gap-1.5"
+              >
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  {t("capabilities.digitalMenu.styles")}
+                </p>
+                <ul className="-ml-2 flex flex-wrap gap-1">
+                  {capability.styleDemos.map(({ id, href }) => (
+                    <li key={id}>
+                      <Link
+                        href={href}
+                        data-style={id}
+                        className={buttonVariants({ variant: "ghost", size: "sm" })}
+                      >
+                        {tVariants(`${id}.name`)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             ) : null}
           </Reveal>
 

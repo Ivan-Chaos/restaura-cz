@@ -9,6 +9,12 @@
    every other theme redefines the same tokens under [data-theme="…"]. */
 @import "../styles/themes/warm.css";
 @import "../styles/themes/slate.css";
+/* Owner-selectable styles (feature 005). */
+@import "../styles/themes/plain-white.css";
+@import "../styles/themes/liquid-glass.css";
+@import "../styles/themes/green-bar.css";
+@import "../styles/themes/modern.css";
+@import "../styles/themes/refined.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -65,6 +71,25 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Panel treatment (feature 005). `bg-panel`, `border-panel-border`,
+     `backdrop-blur-panel` and `p-panel` resolve to whatever the theme in scope
+     declares; under the neutral defaults they paint nothing and pad nothing. */
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --blur-panel: var(--panel-blur);
+  --spacing-panel: var(--panel-inset);
+
+  /* The ambient drift used by translucent themes. Defined once here; a theme
+     only ever references it through `--ambient-motion`. */
+  @keyframes ambient-drift {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 100% 50%;
+    }
+  }
 
   /* Charts + sidebar (shadcn contract) */
   --color-chart-1: var(--chart-1);
@@ -151,4 +176,37 @@
 /** Bottom padding that clears a phone's home indicator. */
 @utility pb-safe-bottom {
   padding-bottom: max(calc(var(--spacing) * 4), env(safe-area-inset-bottom));
+}
+
+/**
+ * The ambient colour field behind a menu. `none` in every theme but the
+ * translucent ones, so the utility is safe to leave on the page root. The
+ * oversized background is what gives the drift somewhere to go.
+ */
+@utility ambient {
+  background-image: var(--ambient);
+  background-size: 200% 200%;
+  animation: var(--ambient-motion);
+}
+
+/**
+ * Fallbacks for translucent themes. These live here, not in a theme file, for
+ * two reasons: they apply to any theme that ever uses a frosted panel, and the
+ * theme test parser is flat — a nested @media inside `liquid-glass.css` would
+ * be read as the theme's real value. `[data-theme]` matches the same
+ * specificity as `[data-theme="…"]` and is declared later, so it wins by order.
+ */
+@supports not (backdrop-filter: blur(1px)) {
+  [data-theme] {
+    --panel: var(--surface-raised);
+    --panel-blur: 0px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-theme] {
+    --panel: var(--surface-raised);
+    --panel-blur: 0px;
+    --ambient: none;
+  }
 }

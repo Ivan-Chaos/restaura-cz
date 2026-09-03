@@ -93,6 +93,14 @@
   --sidebar-accent-foreground: var(--palette-graphite-900);
   --sidebar-border: var(--palette-graphite-400);
   --sidebar-ring: var(--palette-cobalt-600);
+
+  /* Panel and ambient — none. */
+  --panel: transparent;
+  --panel-border: transparent;
+  --panel-blur: 0px;
+  --panel-inset: 0px;
+  --ambient: none;
+  --ambient-motion: none;
 }
 
 .dark [data-theme="slate"],

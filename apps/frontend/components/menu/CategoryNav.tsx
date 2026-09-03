@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { NavShape } from "@/lib/menu-display/presentation";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,6 +28,12 @@ export interface CategoryNavProps {
   /** Controlled active id. When omitted the component tracks scroll itself. */
   activeId?: string;
   onSelect?: (id: string) => void;
+  /**
+   * The strip's shape (feature 005): filled pills, a text row with an
+   * underline, a floating glass bar, square uppercase tabs, heavy underlined
+   * tabs, or letterspaced small caps. Behaviour is identical in all of them.
+   */
+  shape?: NavShape;
   className?: string;
   "aria-label"?: string;
 }
@@ -35,6 +42,7 @@ export function CategoryNav({
   categories,
   activeId,
   onSelect,
+  shape = "pills",
   className,
   "aria-label": ariaLabel,
 }: CategoryNavProps) {
@@ -125,9 +133,16 @@ export function CategoryNav({
   return (
     <nav
       data-slot="category-nav"
+      data-shape={shape}
       aria-label={ariaLabel}
       className={cn(
-        "bg-background/95 border-border sticky top-0 z-10 border-b backdrop-blur",
+        "sticky z-10",
+        shape === "pills" && "bg-background/95 border-border top-0 border-b backdrop-blur",
+        shape === "underline" && "bg-background border-border top-0 border-b",
+        shape === "glass" && "top-2 px-4 sm:px-6",
+        shape === "squares" && "bg-card text-card-foreground border-primary top-0 border-b-2",
+        shape === "heavy" && "bg-background border-foreground top-0 border-b-2",
+        shape === "text" && "bg-background/95 border-border top-0 border-b backdrop-blur",
         className,
       )}
     >
@@ -137,7 +152,16 @@ export function CategoryNav({
         // `scrollbar-none` is not a Tailwind default; the strip simply scrolls.
         // `relative` keeps absolutely positioned descendants (sr-only labels)
         // inside this scroll container rather than widening the document.
-        className="relative flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 py-2"
+        // The measure matches `Container size="md"` so chips line up with the
+        // content beneath them.
+        className={cn(
+          "relative mx-auto flex w-full max-w-4xl snap-x snap-mandatory overflow-x-auto",
+          shape === "glass"
+            ? "bg-panel border-panel-border backdrop-blur-panel shadow-card gap-1 rounded-full border px-2 py-1.5"
+            : "gap-2 px-4 py-2 sm:px-6",
+          (shape === "underline" || shape === "heavy" || shape === "text") && "gap-4 py-0",
+          shape === "squares" && "gap-0 px-2 py-0 sm:px-4",
+        )}
       >
         {categories.map((category) => {
           const isActive = category.id === active;
@@ -157,10 +181,44 @@ export function CategoryNav({
                   go(category.id);
                 }}
                 className={cn(
-                  "focus-visible:ring-ring inline-flex items-center rounded-full px-3 py-1.5 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-2",
-                  isActive
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground",
+                  "focus-visible:ring-ring inline-flex items-center whitespace-nowrap transition-colors outline-none focus-visible:ring-2",
+                  (shape === "pills" || shape === "glass") && "rounded-full px-3 py-1.5 text-sm",
+                  shape === "pills" &&
+                    (isActive
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"),
+                  shape === "glass" &&
+                    (isActive
+                      ? "bg-primary text-primary-foreground shadow-card font-medium"
+                      : "text-foreground hover:bg-accent/60"),
+                  shape === "underline" &&
+                    cn(
+                      "border-b-2 px-1 py-2.5 text-sm",
+                      isActive
+                        ? "border-foreground text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground border-transparent",
+                    ),
+                  shape === "squares" &&
+                    cn(
+                      "font-display px-3 py-2.5 text-xs tracking-widest uppercase",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-card-foreground hover:bg-secondary",
+                    ),
+                  shape === "heavy" &&
+                    cn(
+                      "font-display border-b-4 px-1 py-2.5 text-base font-bold",
+                      isActive
+                        ? "border-primary text-foreground"
+                        : "text-muted-foreground hover:text-foreground border-transparent",
+                    ),
+                  shape === "text" &&
+                    cn(
+                      "font-display px-2 py-3 text-sm tracking-widest uppercase",
+                      isActive
+                        ? "decoration-primary text-foreground underline decoration-2 underline-offset-8"
+                        : "text-muted-foreground hover:text-foreground",
+                    ),
                 )}
               >
                 {category.name}

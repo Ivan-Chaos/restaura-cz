@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { VISUAL_VARIANT_IDS, type VisualVariantId } from "@/lib/menu-display/variants";
+
 import {
   collectPhones,
   isValidPhone,
@@ -274,3 +276,16 @@ export function inlineTextSchema(
 
 /** What the form holds: the price is still the string that was typed. */
 export type MenuItemFormValues = z.input<typeof menuItemFormSchema>;
+
+/**
+ * The visual-style picker (feature 005). The allowed ids are the catalogue in
+ * `lib/menu-display/variants.ts`, which mirrors the API's `@IsIn` allowlist;
+ * anything else is `INVALID` and never reaches the API.
+ */
+export const visualVariantSchema = z.object({
+  visualVariant: z.enum(VISUAL_VARIANT_IDS as [VisualVariantId, ...VisualVariantId[]], {
+    message: "INVALID",
+  }),
+});
+
+export type VisualVariantValues = z.output<typeof visualVariantSchema>;

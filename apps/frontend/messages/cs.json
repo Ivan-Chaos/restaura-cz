@@ -24,7 +24,8 @@
         "eyebrow": "Digitální menu",
         "title": "Menu, které se dobře čte na každém telefonu",
         "body": "Vaše jídla, ceny a alergeny na stránce, která se otevře okamžitě — bez instalace aplikace a bez přibližování. Cenu změníte jednou a vidí ji každý host.",
-        "demo": "Prohlédnout ukázkové menu"
+        "demo": "Prohlédnout ukázkové menu",
+        "styles": "Prohlédnout styly"
       },
       "pdf": {
         "eyebrow": "Export do PDF",
@@ -421,7 +422,46 @@
   },
   "Themes": {
     "warm": "Teplý",
-    "slate": "Břidlicový"
+    "slate": "Břidlicový",
+    "plain-white": "Čistě bílý",
+    "liquid-glass": "Tekuté sklo",
+    "green-bar": "Zelený bar",
+    "modern": "Moderní",
+    "refined": "Vytříbený"
+  },
+  "VisualVariants": {
+    "default": {
+      "name": "Klasický",
+      "description": "Teplý pergamen, patkové nadpisy, terakotové akcenty. Klasický vzhled restaurace."
+    },
+    "plain-white": {
+      "name": "Čistě bílý",
+      "description": "Černá na bílé, jedno písmo, tenké linky. Tichý a rychlý."
+    },
+    "liquid-glass": {
+      "name": "Tekuté sklo",
+      "description": "Matné skleněné panely nad jemně plynoucím barevným podkladem. Moderní a vzdušný."
+    },
+    "green-bar": {
+      "name": "Zelený bar",
+      "description": "Sytá lahvová zeleň, krémový text, mosazné ceny. Stvořený pro tlumené světlo."
+    },
+    "modern": {
+      "name": "Moderní",
+      "description": "Světlé neutrální tóny, výrazné nadpisy, jeden odvážný akcent. Sebevědomý a přehledný."
+    },
+    "refined": {
+      "name": "Vytříbený",
+      "description": "Slonovinový papír, elegantní patkové písmo, široké okraje. Zdrženlivost fine diningu."
+    }
+  },
+  "Preview": {
+    "metaTitle": "Náhled stylu",
+    "previewing": "Náhled: {style}",
+    "current": "Aktuální styl",
+    "back": "Zpět do editoru",
+    "useStyle": "Použít tento styl",
+    "applied": "Styl použit."
   },
   "Menu": {
     "viewMenu": "Zobrazit jídelní lístek",
@@ -766,9 +806,10 @@
     "deleteItemBody": "Jídlo „{name}“ bude z menu odstraněno.",
     "confirmDelete": "Smazat",
     "variantTitle": "Vizuální styl",
-    "variantDescription": "Jak menu uvidí hosté. Další styly připravujeme.",
-    "variantDefault": "Klasický",
-    "variantComingSoon": "Připravujeme",
+    "variantDescription": "Jak menu uvidí hosté. Vyberte styl; platí hned po uložení.",
+    "variantApply": "Použít styl",
+    "variantSaved": "Vizuální styl uložen.",
+    "variantPreview": "Náhled",
     "renameMenu": "Přejmenovat menu",
     "renameSectionButton": "Přejmenovat",
     "duplicateItem": "Duplikovat jídlo",

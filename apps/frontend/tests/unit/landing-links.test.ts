@@ -1,11 +1,39 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { THEME_IDS } from "@/lib/design-system/themes";
+import { CAPABILITIES, STYLE_DEMOS } from "@/lib/landing/capabilities";
 import {
   isInternalHref,
   LANDING_CONTACT_EMAIL,
   resolveNotifyHref,
   resolveSignupHref,
 } from "@/lib/landing/links";
+import { VISUAL_VARIANT_IDS } from "@/lib/menu-display/variants";
+
+/**
+ * The style gallery links (feature 005 US4). Every owner-selectable style has a
+ * prerendered sample, and nothing else is advertised.
+ */
+describe("style demos", () => {
+  it("lists exactly the owner-selectable styles, in catalogue order", () => {
+    expect(STYLE_DEMOS.map((d) => d.id)).toEqual([...VISUAL_VARIANT_IDS]);
+    expect(STYLE_DEMOS.some((d) => d.href.includes("slate"))).toBe(false);
+  });
+
+  it("points every style at a prerendered sample-menu path", () => {
+    for (const demo of STYLE_DEMOS) {
+      expect(isInternalHref(demo.href), demo.href).toBe(true);
+      if (demo.href === "/sample-menu") continue;
+      const theme = demo.href.replace("/sample-menu/", "");
+      expect(THEME_IDS, `${demo.id} → ${demo.href}`).toContain(theme);
+    }
+  });
+
+  it("hangs the gallery off the digital-menu capability only", () => {
+    const withDemos = CAPABILITIES.filter((c) => c.styleDemos);
+    expect(withDemos.map((c) => c.id)).toEqual(["digitalMenu"]);
+  });
+});
 
 /**
  * The one rule these links must never break: a call to action always leads

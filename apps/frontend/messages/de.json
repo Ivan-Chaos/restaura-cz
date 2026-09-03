@@ -24,7 +24,8 @@
         "eyebrow": "Digitale Speisekarte",
         "title": "Eine Karte, die sich auf jedem Handy gut liest",
         "body": "Ihre Gerichte, Preise und Allergene auf einer Seite, die sofort öffnet — ohne App, ohne Zoomen. Sie ändern einen Preis einmal, und jeder Gast sieht ihn.",
-        "demo": "Beispielkarte ansehen"
+        "demo": "Beispielkarte ansehen",
+        "styles": "Stile ansehen"
       },
       "pdf": {
         "eyebrow": "PDF-Export",
@@ -421,7 +422,46 @@
   },
   "Themes": {
     "warm": "Warm",
-    "slate": "Schiefer"
+    "slate": "Schiefer",
+    "plain-white": "Reinweiß",
+    "liquid-glass": "Flüssiges Glas",
+    "green-bar": "Grüne Bar",
+    "modern": "Modern",
+    "refined": "Edel"
+  },
+  "VisualVariants": {
+    "default": {
+      "name": "Klassisch",
+      "description": "Warmes Pergament, Serifen-Überschriften, Terrakotta-Akzente. Der klassische Restaurant-Look."
+    },
+    "plain-white": {
+      "name": "Reinweiß",
+      "description": "Schwarz auf Weiß, eine Schrift, feine Linien. Ruhig und schnell."
+    },
+    "liquid-glass": {
+      "name": "Flüssiges Glas",
+      "description": "Mattglas-Panels über einem sanft wandernden Farbfeld. Modern und luftig."
+    },
+    "green-bar": {
+      "name": "Grüne Bar",
+      "description": "Tiefes Flaschengrün, cremefarbener Text, Preise in Messing. Gemacht für gedämpftes Licht."
+    },
+    "modern": {
+      "name": "Modern",
+      "description": "Helle Neutraltöne, kräftige Überschriften, ein mutiger Akzent. Selbstbewusst und klar."
+    },
+    "refined": {
+      "name": "Edel",
+      "description": "Elfenbeinpapier, elegante Serife, breite Ränder. Die Zurückhaltung der Spitzenküche."
+    }
+  },
+  "Preview": {
+    "metaTitle": "Stilvorschau",
+    "previewing": "Vorschau: {style}",
+    "current": "Aktueller Stil",
+    "back": "Zurück zum Editor",
+    "useStyle": "Diesen Stil verwenden",
+    "applied": "Stil übernommen."
   },
   "Menu": {
     "viewMenu": "Speisekarte ansehen",
@@ -766,9 +806,10 @@
     "deleteItemBody": "„{name}“ wird von der Speisekarte entfernt.",
     "confirmDelete": "Löschen",
     "variantTitle": "Visueller Stil",
-    "variantDescription": "Wie Ihre Speisekarte für Gäste aussieht. Weitere Stile folgen.",
-    "variantDefault": "Klassisch",
-    "variantComingSoon": "Demnächst",
+    "variantDescription": "Wie Ihre Speisekarte für Gäste aussieht. Wählen Sie einen Stil; er gilt, sobald er gespeichert ist.",
+    "variantApply": "Stil anwenden",
+    "variantSaved": "Visueller Stil gespeichert.",
+    "variantPreview": "Vorschau",
     "renameMenu": "Speisekarte umbenennen",
     "renameSectionButton": "Umbenennen",
     "duplicateItem": "Gericht duplizieren",

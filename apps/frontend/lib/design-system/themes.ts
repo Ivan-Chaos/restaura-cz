@@ -12,7 +12,14 @@
  */
 
 /** Font keys the root layout loads via `next/font`. */
-export type FontKey = "fraunces" | "nunitoSans";
+export type FontKey =
+  | "fraunces"
+  | "nunitoSans"
+  | "inter"
+  | "oswald"
+  | "manrope"
+  | "cormorant"
+  | "dmSans";
 
 /**
  * The CSS variable each loaded font publishes.
@@ -26,6 +33,11 @@ export type FontKey = "fraunces" | "nunitoSans";
 export const FONT_VARIABLES: Record<FontKey, string> = {
   fraunces: "--font-fraunces",
   nunitoSans: "--font-nunito-sans",
+  inter: "--font-inter",
+  oswald: "--font-oswald",
+  manrope: "--font-manrope",
+  cormorant: "--font-cormorant",
+  dmSans: "--font-dm-sans",
 };
 
 export interface Theme {
@@ -51,6 +63,33 @@ export const THEMES = [
     id: "slate",
     isDefault: false,
     fonts: { display: "nunitoSans", body: "nunitoSans" },
+  },
+  // Owner-selectable styles (feature 005). The mapping from the API's variant
+  // ids to these lives in `lib/menu-display/variants.ts`.
+  {
+    id: "plain-white",
+    isDefault: false,
+    fonts: { display: "inter", body: "inter" },
+  },
+  {
+    id: "liquid-glass",
+    isDefault: false,
+    fonts: { display: "inter", body: "inter" },
+  },
+  {
+    id: "green-bar",
+    isDefault: false,
+    fonts: { display: "oswald", body: "nunitoSans" },
+  },
+  {
+    id: "modern",
+    isDefault: false,
+    fonts: { display: "manrope", body: "inter" },
+  },
+  {
+    id: "refined",
+    isDefault: false,
+    fonts: { display: "cormorant", body: "dmSans" },
   },
 ] as const satisfies readonly Theme[];
 

@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { addItem, addSection, createMenu, publish, signUp } from "./helpers/owner";
+import { addItem, addSection, chooseStyle, createMenu, publish, signUp } from "./helpers/owner";
 
 /**
  * User Story 4: the guest experience. No account, no sign-in, on a phone.
@@ -118,6 +118,46 @@ test.describe("public menu", () => {
       "accessibility violations on the guest menu",
     ).toEqual([]);
 
+    await guest.close();
+  });
+
+  test("renders the style the owner chose, with every dish intact", async ({
+    page,
+    browser,
+  }) => {
+    // Spec 005 US2: the picker's choice is what guests see, and the next load
+    // after a change already carries it.
+    const url = await publishSampleMenu(page);
+    await chooseStyle(page, /Zelený bar/);
+
+    const guest = await browser.newContext({ viewport: PHONE });
+    const guestPage = await guest.newPage();
+    await guestPage.goto(url);
+
+    await expect(guestPage.locator('[data-theme="green-bar"]')).toHaveCount(1);
+    await expect(guestPage.getByText("Kulajda")).toBeVisible();
+    await expect(guestPage.getByText("Svíčková na smetaně")).toBeVisible();
+    await expect(guestPage.getByText("245 Kč").first()).toBeVisible();
+    await expect(guestPage.getByText("12,50 Kč").first()).toBeVisible();
+
+    // Switching again is reflected on the very next request.
+    await chooseStyle(page, /Vytříbený/);
+    await guestPage.reload();
+    await expect(guestPage.locator('[data-theme="refined"]')).toHaveCount(1);
+    await expect(guestPage.getByText("Kulajda")).toBeVisible();
+
+    await guest.close();
+  });
+
+  test("renders a menu that never chose a style as Classic", async ({ page, browser }) => {
+    // Spec 005 FR-007: the stored `default` — every pre-existing menu — is warm.
+    const url = await publishSampleMenu(page);
+
+    const guest = await browser.newContext();
+    const guestPage = await guest.newPage();
+    await guestPage.goto(url);
+
+    await expect(guestPage.locator('[data-theme="warm"]')).toHaveCount(1);
     await guest.close();
   });
 

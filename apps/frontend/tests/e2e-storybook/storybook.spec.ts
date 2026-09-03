@@ -63,6 +63,20 @@ test("the theme toolbar changes the rendered theme", async ({ page }) => {
   expect(slate.trim()).not.toBe(warm.trim());
 });
 
+test("the toolbar offers the owner-selectable styles too", async ({ page }) => {
+  // Feature 005: the toolbar is derived from the registry, so a new theme has
+  // to appear there with no Storybook change — and Liquid Glass is the one
+  // theme whose panel is translucent, which is what makes it worth checking.
+  await page.goto(previewUrl(STORY, "theme:liquid-glass"));
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "liquid-glass");
+
+  const panel = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--panel").trim(),
+  );
+  expect(panel).not.toBe("");
+  expect(panel).not.toBe("transparent");
+});
+
 test("theme and appearance are independent axes", async ({ page }) => {
   // Any theme × any appearance must be valid (spec FR-009). The failure this
   // guards against is one decorator resetting the other's global.

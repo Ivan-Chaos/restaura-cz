@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
-import { Fraunces, Nunito_Sans } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  DM_Sans,
+  Fraunces,
+  Inter,
+  Manrope,
+  Nunito_Sans,
+  Oswald,
+} from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -28,6 +36,54 @@ const nunitoSans = Nunito_Sans({
   variable: "--font-nunito-sans",
   subsets: ["latin", "latin-ext"],
   display: "swap",
+});
+
+/**
+ * Faces for the non-default menu styles (feature 005).
+ *
+ * `preload: false` is the whole cost model. `next/font` defaults to injecting a
+ * `<link rel="preload">` per subset, which would fetch every face on every
+ * page; without it only the `@font-face` rule is emitted and a browser fetches
+ * a face the first time text actually uses it. A Classic menu therefore
+ * downloads exactly what it did before, and a Refined menu downloads
+ * Cormorant and DM Sans and nothing else new. See
+ * `node_modules/next/dist/docs/01-app/03-api-reference/02-components/font.md`.
+ */
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+});
+
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: false,
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
 });
 
 export function generateStaticParams() {
@@ -81,7 +137,7 @@ export default async function LocaleLayout({
       // next-themes writes the appearance class before hydration; without this
       // React warns about the server/client mismatch it deliberately creates.
       suppressHydrationWarning
-      className={`${fraunces.variable} ${nunitoSans.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${nunitoSans.variable} ${inter.variable} ${oswald.variable} ${manrope.variable} ${cormorant.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {/*

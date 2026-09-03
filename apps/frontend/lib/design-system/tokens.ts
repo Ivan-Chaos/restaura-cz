@@ -75,7 +75,48 @@ export const OPTIONAL_TOKENS = [
   "motion-base",
   "motion-slow",
   "motion-ease",
+  // Panel and ambient treatment (feature 005). A theme with no panels sets the
+  // colours to `transparent`, the lengths to `0px` and the rest to `none`, and
+  // `MenuPanel` renders as an invisible box. Liquid Glass is the theme that
+  // uses them; `tests/unit/glass-contrast.test.ts` proves a translucent panel
+  // stays readable over everything it can composite onto.
+  "panel",
+  "panel-border",
+  "panel-blur",
+  "panel-inset",
+  "ambient",
+  "ambient-motion",
 ] as const;
+
+export type OptionalToken = (typeof OPTIONAL_TOKENS)[number];
+
+/** Purpose of each optional token, for the Foundations docs and theme authors. */
+export const OPTIONAL_TOKEN_PURPOSE: Record<OptionalToken, string> = {
+  "chart-1": "First data series.",
+  "chart-2": "Second data series.",
+  "chart-3": "Third data series.",
+  "chart-4": "Fourth data series.",
+  "chart-5": "Fifth data series.",
+  sidebar: "Dashboard sidebar surface (shadcn contract).",
+  "sidebar-foreground": "Text on `sidebar`.",
+  "sidebar-primary": "Active item in the sidebar.",
+  "sidebar-primary-foreground": "Text on `sidebar-primary`.",
+  "sidebar-accent": "Hover wash in the sidebar.",
+  "sidebar-accent-foreground": "Text on `sidebar-accent`.",
+  "sidebar-border": "Sidebar hairlines.",
+  "sidebar-ring": "Sidebar focus indicator.",
+  "motion-fast": "Micro-interactions (hover, press).",
+  "motion-base": "Standard transitions.",
+  "motion-slow": "Large reveals and sheets.",
+  "motion-ease": "The easing curve every transition shares.",
+  panel:
+    "Surface of the panel that groups a category's dishes. May carry alpha for a frosted look; `transparent` when the theme has no panels.",
+  "panel-border": "Hairline edge of the panel. `transparent` when there is no panel.",
+  "panel-blur": "Backdrop blur behind the panel (`0px` for none). Applied once per panel, never per dish.",
+  "panel-inset": "Inner padding of the panel (`0px` when there is no visible panel, so layout does not shift).",
+  ambient: "Background image painted behind the whole menu (`none` for a flat ground).",
+  "ambient-motion": "Animation shorthand for the ambient drift (`none` to keep it still).",
+};
 
 /** Every colour token, in catalogue order. */
 export const COLOR_TOKENS = [
