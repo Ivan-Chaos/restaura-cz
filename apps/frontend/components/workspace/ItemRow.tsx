@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronDown, ChevronUp, Copy, Pencil } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { formatMoney, formatPriceInput } from "@/lib/design-system/price";
 import type { ServerAction } from "@/hooks/use-action-form";
 import type { MenuItemView } from "@/lib/api/types";
+import { toImageModel } from "@/lib/menu-display/adapter";
 
 import { ConfirmDialog } from "./ConfirmDialog";
 import { ItemForm } from "./ItemForm";
@@ -58,6 +60,7 @@ export function ItemRow({
           // Back to the read-only row once the save lands, so the owner can see
           // what was stored rather than being left staring at the form.
           onSuccess={() => setEditing(false)}
+          currentImage={toImageModel(item.image, item.name) ?? null}
           defaults={{
             name: item.name,
             description: item.description ?? "",
@@ -72,6 +75,22 @@ export function ItemRow({
 
   return (
     <li className="border-border hover:bg-muted/40 -mx-2 flex flex-wrap items-start gap-x-4 gap-y-2  border-b px-2 py-3 last:border-b-0">
+      {/*
+        A thumbnail only where there is one. A dish without a photograph gets
+        nothing at all — no placeholder box, which would read as something
+        missing rather than as a choice the owner made.
+      */}
+      {item.image ? (
+        <Image
+          src={item.image.url}
+          alt={item.name}
+          width={64}
+          height={48}
+          sizes="64px"
+          className="h-12 w-16 shrink-0 rounded-md object-cover"
+        />
+      ) : null}
+
       <div className="min-w-0 flex-1">
         <p className="font-medium">{item.name}</p>
         {item.description ? (

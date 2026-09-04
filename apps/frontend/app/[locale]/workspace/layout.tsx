@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { signOutAction } from "@/lib/api/actions/auth";
 import { requireProfile } from "@/lib/api/session";
+import { toImageModel } from "@/lib/menu-display/adapter";
 
 /**
  * The dashboard shell, and the gate in front of it.
@@ -41,7 +42,10 @@ export default async function WorkspaceLayout({
   return (
     <AppearanceScope className="flex min-h-svh flex-col">
       <SidebarProvider defaultOpen={!collapsed}>
-        <DashboardSidebar restaurantName={profile.restaurantName} />
+        <DashboardSidebar
+          restaurantName={profile.restaurantName}
+          logo={toImageModel(profile.logo, profile.restaurantName)}
+        />
         <SidebarInset>
           <DashboardHeader
             email={account.email}

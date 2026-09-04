@@ -58,6 +58,23 @@ export class AppError extends HttpException {
     );
   }
 
+  /**
+   * A rejected upload (feature 006).
+   *
+   * Deliberately the same `VALIDATION_FAILED` shape as any other bad field: an
+   * image that is too large, is not an image, or carries an impossible crop is
+   * a field the owner can fix, so the form should mark the image control and
+   * translate the code exactly as it does for a bad price. A bare 413 or 415
+   * would be a second error vocabulary for the same kind of problem.
+   */
+  static fileRejected(
+    field: 'file' | 'crop',
+    code: 'MAX_FILE_SIZE' | 'IS_IMAGE' | 'IS_CROP',
+    message: string,
+  ): AppError {
+    return AppError.validationFailed([{ field, code, message }]);
+  }
+
   static unauthenticated(): AppError {
     return new AppError('UNAUTHENTICATED', HttpStatus.UNAUTHORIZED, 'No valid session.');
   }

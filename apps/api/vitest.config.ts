@@ -9,5 +9,12 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.spec.ts'],
+    /**
+     * The decorator metadata class-validator and class-transformer read is
+     * installed by this import, which `main.ts` performs at boot. A unit test
+     * that instantiates a DTO has no boot, so it goes here — once, rather than
+     * as a line every DTO spec has to remember.
+     */
+    setupFiles: ['reflect-metadata'],
   },
 });

@@ -1,16 +1,18 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { redirect } from "@/i18n/navigation";
 import {
+  readImageUpload,
   readProfileValues,
   readSignIn,
   readSignUp,
   readVerifyCode,
 } from "@/lib/validation/form-data";
 import { apiRequest, parseSessionCookie, SESSION_COOKIE } from "../client";
-import { IDLE, SAVED, toFormState, type FormState } from "../form-state";
+import { IDLE, localValidationError, SAVED, toFormState, type FormState } from "../form-state";
 import { toLocale } from "../locale";
 import { toDestination } from "../next-path";
 import { nextStep } from "../next-step";
@@ -204,4 +206,78 @@ export async function signOutAction(formData: FormData): Promise<void> {
   cookieStore.delete(SESSION_COOKIE);
 
   redirect({ href: "/sign-in", locale });
+}
+
+// ------------------------------------------------------------------ logo
+
+/**
+ * The restaurant's logo (feature 006).
+ *
+ * Its own action rather than part of the profile save, because confirming a
+ * framing *is* the decision — an owner who has just positioned their mark
+ * should not have to find a Save button somewhere else on the page.
+ *
+ * The file is relayed unchanged: it arrives here as part of the action's own
+ * multipart body and leaves in another, so the bytes are never decoded, copied
+ * into a string, or held longer than the request.
+ */
+export async function uploadLogoAction(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const locale = toLocale(formData.get("locale"));
+
+  const submitted = await readImageUpload(formData);
+  if (!submitted.ok) return submitted.state;
+
+  // Only a replacement makes sense here: removal has its own action, and an
+  // empty submission is a bug rather than a no-op worth honouring silently.
+  if (submitted.values.kind !== "replace") {
+    return localValidationError({ image: "IS_IMAGE" });
+  }
+
+  const body = new FormData();
+  body.set("file", submitted.values.file);
+  if (submitted.values.crop) {
+    body.set("cropX", String(submitted.values.crop.x));
+    body.set("cropY", String(submitted.values.crop.y));
+    body.set("cropWidth", String(submitted.values.crop.width));
+    body.set("cropHeight", String(submitted.values.crop.height));
+  }
+
+  const { result } = await apiRequest<ProfileResponse>("/auth/profile/logo", {
+    method: "PUT",
+    body,
+  });
+
+  if (!result.ok) return toFormState(result.error);
+
+  revalidateProfile(locale);
+  return SAVED;
+}
+
+/**
+ * A plain form post, like every other confirm-then-act button in the workspace:
+ * nothing is typed, so there is no state to render back and no reason to make
+ * the caller thread a `FormState` through a dialog.
+ */
+export async function removeLogoAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get("locale"));
+
+  await apiRequest<ProfileResponse>("/auth/profile/logo", { method: "DELETE" });
+
+  revalidateProfile(locale);
+}
+
+/**
+ * The logo appears in the settings page that changed it and in the workspace
+ * shell's header, so both are refreshed.
+ *
+ * Guest menus need no invalidation: the public page is `force-dynamic`, and a
+ * replaced logo is stored under a new key anyway, so there is no address whose
+ * cached contents could be stale.
+ */
+function revalidateProfile(locale: string): void {
+  revalidatePath(`/${locale}/workspace/settings/profile`, "page");
+  revalidatePath(`/${locale}/workspace`, "layout");
 }

@@ -1,6 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: (unratified template) → 1.0.0
+- Version change: 1.0.0 → 1.0.1
+- Clarified: Technology Constraints — object storage for binary blobs keyed from Postgres is
+  not an "alternative datastore". A clarification of an existing rule rather than a change to
+  it, hence PATCH; no app is out of compliance and no migration is needed.
 - Modified principles: n/a (initial ratification — all placeholder principles replaced)
 - Added sections:
   - Core Principles: I. Simplicity First, II. Readability Over Cleverness,
@@ -74,7 +77,10 @@ database guarantee invariants the application cannot.
 ## Technology Constraints
 
 - PostgreSQL is the system of record. Alternative datastores MUST NOT be introduced without a
-  constitution amendment.
+  constitution amendment. Object storage for binary blobs is **not** an alternative datastore
+  for the purposes of this rule, provided every fact the system depends on — which object
+  belongs to what, and its metadata — lives in Postgres and the store holds only bytes
+  addressed by a key Postgres owns. Uploaded images are the case this clarifies (feature 006).
 - Database access MUST go through a single, shared data-access layer; ad-hoc connections
   scattered through feature code are prohibited.
 - Configuration (connection strings, secrets, ports) MUST come from the environment; secrets
@@ -99,4 +105,4 @@ principle, MINOR for adding a principle or materially expanding guidance, PATCH 
 clarifications and wording. Compliance is reviewed at every pull request; any deviation MUST be
 either corrected or explicitly justified in the PR description before merge.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-31 | **Last Amended**: 2026-08-31
+**Version**: 1.0.1 | **Ratified**: 2026-08-31 | **Last Amended**: 2026-09-03

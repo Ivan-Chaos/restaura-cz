@@ -676,7 +676,10 @@
       "IS_PHONE": "Geben Sie eine gültige Telefonnummer ein.",
       "IS_ARRAY": "Dieser Wert ist ungültig.",
       "ARRAY_MIN_SIZE": "Fügen Sie mindestens einen Eintrag hinzu.",
-      "ARRAY_MAX_SIZE": "Das sind mehr Einträge als erlaubt."
+      "ARRAY_MAX_SIZE": "Das sind mehr Einträge als erlaubt.",
+      "MAX_FILE_SIZE": "Wählen Sie ein Bild mit höchstens 10 MB.",
+      "IS_IMAGE": "Verwenden Sie ein JPEG-, PNG- oder WebP-Bild.",
+      "IS_CROP": "Dieser Ausschnitt passt nicht ins Bild. Bitte anpassen."
     }
   },
   "Registration": {
@@ -709,7 +712,10 @@
       "location": "Geben Sie die Adresse Ihres Restaurants ein, höchstens 200 Zeichen.",
       "phone": "Geben Sie eine gültige Telefonnummer ein.",
       "phonesMin": "Fügen Sie mindestens eine Telefonnummer hinzu.",
-      "phonesMax": "Fügen Sie höchstens drei Telefonnummern hinzu."
+      "phonesMax": "Fügen Sie höchstens drei Telefonnummern hinzu.",
+      "MAX_FILE_SIZE": "Wählen Sie ein Bild mit höchstens 10 MB.",
+      "IS_IMAGE": "Verwenden Sie ein JPEG-, PNG- oder WebP-Bild.",
+      "IS_CROP": "Dieser Ausschnitt passt nicht ins Bild. Bitte anpassen."
     }
   },
   "VerifyEmail": {
@@ -748,6 +754,19 @@
       "statusActive": "Aktiv",
       "planDescription": "Alle Funktionen kostenlos, solange sich Restaura im frühen Zugang befindet.",
       "comingSoon": "Bezahltarife und Abrechnung werden hier verwaltet. Im Moment ist nichts zu tun — wir melden uns rechtzeitig, bevor sich etwas ändert."
+    },
+    "logoSection": "Logo",
+    "logoDescription": "Erscheint oben auf Ihren Speisekarten. Ohne Logo sehen Gäste den Namen Ihres Restaurants.",
+    "logoSaved": "Logo gespeichert.",
+    "logoRemoved": "Logo entfernt.",
+    "removeLogoTitle": "Logo entfernen?",
+    "removeLogoBody": "Gäste sehen stattdessen den Namen Ihres Restaurants. Sie können jederzeit ein neues Logo hochladen.",
+    "removeLogoConfirm": "Logo entfernen",
+    "fieldErrors": {
+      "MAX_FILE_SIZE": "Wählen Sie ein Bild mit höchstens 10 MB.",
+      "IS_IMAGE": "Verwenden Sie ein JPEG-, PNG- oder WebP-Bild.",
+      "IS_CROP": "Dieser Ausschnitt passt nicht ins Bild. Bitte anpassen.",
+      "INVALID": "Das ist nicht gültig."
     }
   },
   "Workspace": {
@@ -834,8 +853,13 @@
       "IS_ARRAY": "Dieser Wert ist ungültig.",
       "ARRAY_MIN_SIZE": "Fügen Sie mindestens einen Eintrag hinzu.",
       "ARRAY_MAX_SIZE": "Das sind mehr Einträge als erlaubt.",
-      "INVALID": "Dieser Wert ist ungültig."
-    }
+      "INVALID": "Dieser Wert ist ungültig.",
+      "MAX_FILE_SIZE": "Wählen Sie ein Bild mit höchstens 10 MB.",
+      "IS_IMAGE": "Verwenden Sie ein JPEG-, PNG- oder WebP-Bild.",
+      "IS_CROP": "Dieser Ausschnitt passt nicht ins Bild. Bitte anpassen."
+    },
+    "itemPhoto": "Foto",
+    "itemPhotoOf": "Foto von {name}"
   },
   "Publish": {
     "draft": "Entwurf",
@@ -857,5 +881,29 @@
     "notAvailableTitle": "Diese Speisekarte ist nicht verfügbar",
     "notAvailableBody": "Der Link ist möglicherweise falsch, oder das Restaurant hat die Speisekarte offline genommen.",
     "metaDescription": "Sehen Sie die Speisekarte von {name}."
+  },
+  "ImageField": {
+    "addPhoto": "Foto hinzufügen",
+    "uploadLogo": "Logo hochladen",
+    "changePhoto": "Foto ersetzen",
+    "changeLogo": "Logo ersetzen",
+    "removePhoto": "Foto entfernen",
+    "removeLogo": "Logo entfernen",
+    "hint": "JPEG, PNG oder WebP, bis zu 10 MB.",
+    "pendingPhoto": "Foto bereit — mit dem Speichern des Gerichts übernehmen.",
+    "pendingLogo": "Logo bereit.",
+    "removedPending": "Das Foto wird beim Speichern entfernt.",
+    "currentPhoto": "Aktuelles Foto",
+    "currentLogo": "Aktuelles Logo",
+    "newPhoto": "Gewähltes Foto"
+  },
+  "ImageCrop": {
+    "titlePhoto": "Foto ausrichten",
+    "titleLogo": "Logo ausrichten",
+    "instructions": "Bild ziehen oder mit den Pfeiltasten bewegen. Zoom über den Regler.",
+    "zoom": "Zoom",
+    "confirm": "Diesen Ausschnitt verwenden",
+    "cancel": "Abbrechen",
+    "loading": "Bild wird vorbereitet…"
   }
 }

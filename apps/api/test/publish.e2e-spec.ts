@@ -1,7 +1,14 @@
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp, type TestApp } from './app.factory.js';
-import { addItem, addSection, createMenu, signUp, type SignedUpOwner } from './helpers.js';
+import {
+  addItem,
+  addSection,
+  createMenu,
+  PROFILE,
+  signUp,
+  type SignedUpOwner,
+} from './helpers.js';
 
 describe('publishing and public display (US3, US4)', () => {
   let testApp: TestApp;
@@ -195,11 +202,15 @@ describe('publishing and public display (US3, US4)', () => {
 
       expect(response.body.menu).toEqual({
         name: 'Polední menu',
+        // The restaurant behind the menu, so its logo can be described in
+        // words; null because this owner has not uploaded one (feature 006).
+        restaurantName: PROFILE.restaurantName,
         visualVariant: 'default',
+        logo: null,
         sections: [
           {
             title: 'Polévky',
-            items: [{ name: 'Kulajda', description: 'S vejcem', priceCzk: 89 }],
+            items: [{ name: 'Kulajda', description: 'S vejcem', priceCzk: 89, image: null }],
           },
         ],
       });

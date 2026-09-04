@@ -33,7 +33,9 @@ describe('restaurant profile (002/US1, US4)', () => {
         .set('Cookie', owner.cookie)
         .expect(200);
 
-      expect(response.body.profile).toEqual(PROFILE);
+      // The logo is part of the profile a caller reads, and null is its normal
+      // state (feature 006).
+      expect(response.body.profile).toEqual({ ...PROFILE, logo: null });
     });
 
     it('reports a profile-less account with a null profile, not an error (FR-005)', async () => {
@@ -76,6 +78,7 @@ describe('restaurant profile (002/US1, US4)', () => {
         restaurantName: 'Nová Restaurace',
         phones: ['601 234 567'],
         location: 'Brno',
+        logo: null,
       });
 
       const me = await request(testApp.server)
@@ -107,6 +110,7 @@ describe('restaurant profile (002/US1, US4)', () => {
         restaurantName: 'Přejmenovaná Restaurace',
         phones: ['601 111 222', '601 333 444'],
         location: 'Ostrava',
+        logo: null,
       });
     });
 
@@ -170,7 +174,7 @@ describe('restaurant profile (002/US1, US4)', () => {
         .get('/auth/me')
         .set('Cookie', owner.cookie)
         .expect(200);
-      expect(me.body.profile).toEqual(PROFILE);
+      expect(me.body.profile).toEqual({ ...PROFILE, logo: null });
     });
 
     it('rejects a partial write: the whole profile is the unit', async () => {

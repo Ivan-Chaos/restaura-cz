@@ -30,6 +30,11 @@ function apiUrl(): string {
 
 export interface ApiRequest {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /**
+   * JSON by default. A `FormData` is relayed as multipart instead, which is how
+   * image uploads reach the API (feature 006) — the file arrives at the Server
+   * Action and is forwarded without ever being decoded here.
+   */
   body?: unknown;
   /**
    * Publish state changes at any moment, so nothing served to a guest may be
@@ -56,16 +61,28 @@ export async function apiRequest<T>(
   const cookieStore = await cookies();
   const session = cookieStore.get(SESSION_COOKIE);
 
+  /**
+   * A `FormData` goes out untouched and **without** a Content-Type header:
+   * fetch generates the multipart boundary itself, and setting the header by
+   * hand omits that boundary, which makes the body unparseable at the other
+   * end. Everything else is JSON, as before.
+   */
+  const isMultipart = body instanceof FormData;
+
   let response: Response;
   try {
     response = await fetch(`${apiUrl()}${path}`, {
       method,
       cache,
       headers: {
-        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...(body === undefined || isMultipart
+          ? {}
+          : { "Content-Type": "application/json" }),
         ...(session ? { Cookie: `${SESSION_COOKIE}=${session.value}` } : {}),
       },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      ...(body === undefined
+        ? {}
+        : { body: isMultipart ? (body as FormData) : JSON.stringify(body) }),
     });
   } catch {
     // Unreachable API, DNS failure, connection reset — never a user's fault,

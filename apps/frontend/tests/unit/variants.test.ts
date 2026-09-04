@@ -74,13 +74,15 @@ describe("visual variant catalogue", () => {
     // the adapter must not so much as look at it.
     const base: PublicMenu = {
       name: "Lunch",
+      restaurantName: "U Zlaté Lípy",
       visualVariant: "default",
+      logo: null,
       sections: [
         {
           title: "Starters",
           items: [
-            { name: "Soup", description: "Of the day", priceCzk: 89 },
-            { name: "Bread", description: null, priceCzk: 12.5 },
+            { name: "Soup", description: "Of the day", priceCzk: 89, image: null },
+            { name: "Bread", description: null, priceCzk: 12.5, image: null },
           ],
         },
       ],

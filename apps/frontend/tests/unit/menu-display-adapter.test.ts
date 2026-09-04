@@ -11,16 +11,18 @@ import { toDisplayMenu } from "@/lib/menu-display/adapter";
 
 const menu: PublicMenu = {
   name: "U Modré kachny",
+  restaurantName: "U Modré kachny",
   visualVariant: "default",
+  logo: null,
   sections: [
     {
       title: "Polévky",
       items: [
-        { name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: 89 },
-        { name: "Hovězí vývar", description: null, priceCzk: 79 },
+        { name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: 89, image: null },
+        { name: "Hovězí vývar", description: null, priceCzk: 79, image: null },
       ],
     },
-    { title: "Hlavní jídla", items: [{ name: "Svíčková", description: null, priceCzk: 245 }] },
+    { title: "Hlavní jídla", items: [{ name: "Svíčková", description: null, priceCzk: 245, image: null }] },
   ],
 };
 
@@ -99,12 +101,106 @@ describe("toDisplayMenu", () => {
   it("keeps a price of zero rather than treating it as missing", () => {
     const free = toDisplayMenu({
       ...menu,
-      sections: [{ title: "Doplňky", items: [{ name: "Voda", description: null, priceCzk: 0 }] }],
+      sections: [{ title: "Doplňky", items: [{ name: "Voda", description: null, priceCzk: 0, image: null }] }],
     });
 
     expect(free.categories[0]?.items[0]?.price).toEqual({
       kind: "single",
       amount: { amount: 0, currency: "CZK" },
     });
+  });
+});
+
+/**
+ * Images (feature 006).
+ *
+ * The rule worth pinning is where the alt text comes from: a dish photo is
+ * described by the dish and a logo by the restaurant, both derived rather than
+ * stored, so an owner never types a description of something we already named.
+ */
+describe("toDisplayMenu with images", () => {
+  const LOGO = { url: "https://img.example.com/logos/3f2c.png", width: 512, height: 512 };
+  const PHOTO = { url: "https://img.example.com/dishes/9a1e.jpg", width: 1600, height: 1200 };
+
+  it("describes the logo by the restaurant, not by the menu", () => {
+    const display = toDisplayMenu({
+      ...menu,
+      name: "Polední menu",
+      restaurantName: "U Modré kachny",
+      logo: LOGO,
+    });
+
+    expect(display.establishment.logo).toEqual({
+      src: LOGO.url,
+      alt: "U Modré kachny",
+      width: 512,
+      height: 512,
+    });
+    // The heading still names the menu; only the logo names the restaurant.
+    expect(display.establishment.name).toBe("Polední menu");
+  });
+
+  it("describes a dish photo by the dish", () => {
+    const display = toDisplayMenu({
+      ...menu,
+      sections: [
+        {
+          title: "Polévky",
+          items: [{ name: "Kulajda", description: null, priceCzk: 89, image: PHOTO }],
+        },
+      ],
+    });
+
+    expect(display.categories[0]?.items[0]?.image).toEqual({
+      src: PHOTO.url,
+      alt: "Kulajda",
+      width: 1600,
+      height: 1200,
+    });
+  });
+
+  it("leaves the image out entirely when there is none", () => {
+    const display = toDisplayMenu(menu);
+
+    expect(display.establishment.logo).toBeUndefined();
+    expect(display.categories[0]?.items[0]?.image).toBeUndefined();
+    // Absent, not present-and-null: the design system treats the key as
+    // optional and a null would not satisfy it.
+    expect("logo" in display.establishment).toBe(false);
+  });
+
+  it("treats an absent field from an older API as no image", () => {
+    // A payload built before this feature carries neither key. It must render
+    // as a menu without images rather than crash.
+    const legacy: Record<string, unknown> = { ...menu };
+    delete legacy.logo;
+
+    const display = toDisplayMenu(legacy as unknown as typeof menu);
+    expect(display.establishment.logo).toBeUndefined();
+  });
+
+  it("carries the stored dimensions through, so the page can reserve the box", () => {
+    const display = toDisplayMenu({ ...menu, logo: LOGO });
+
+    expect(display.establishment.logo?.width).toBe(LOGO.width);
+    expect(display.establishment.logo?.height).toBe(LOGO.height);
+  });
+
+  it("mixes photographed and plain dishes in one category", () => {
+    const display = toDisplayMenu({
+      ...menu,
+      sections: [
+        {
+          title: "Polévky",
+          items: [
+            { name: "Kulajda", description: null, priceCzk: 89, image: PHOTO },
+            { name: "Vývar", description: null, priceCzk: 79, image: null },
+          ],
+        },
+      ],
+    });
+
+    expect(display.categories[0]?.items[0]?.image).toBeDefined();
+    expect(display.categories[0]?.items[1]?.image).toBeUndefined();
   });
 });

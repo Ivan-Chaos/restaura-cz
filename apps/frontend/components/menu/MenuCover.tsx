@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { Container } from "@/components/layout/Container";
+import { SafeImage } from "@/components/menu/SafeImage";
 import { Stack } from "@/components/layout/Stack";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -38,8 +38,10 @@ export function MenuCover({ establishment, href, className }: MenuCoverProps) {
       )}
     >
       <Stack gap={2} align="center">
+        {/* A missing object leaves the restaurant name alone, never a broken icon. */}
         {logo ? (
-          <Image
+          <SafeImage
+            fallback={null}
             src={logo.src}
             alt={logo.alt}
             width={logo.width}

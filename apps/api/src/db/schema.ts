@@ -92,6 +92,22 @@ export const restaurantProfile = pgTable(
       .references(() => ownerAccount.id, { onDelete: 'cascade' }),
     restaurantName: text('restaurant_name').notNull(),
     /**
+     * The restaurant's logo, if it has one (feature 006).
+     *
+     * An image is a property of the row it depicts, so there is no asset table:
+     * the key, and the size the rendition was stored at, live here. The key is
+     * a random UUID under `logos/` and is never derived from `accountId` —
+     * a guessable address would let anyone enumerate accounts by their logos.
+     * Dimensions are stored rather than assumed constant so that changing the
+     * rendition size later cannot make the frontend reserve the wrong box for
+     * images already uploaded.
+     *
+     * NULL is the normal state: a restaurant without a logo is shown by name.
+     */
+    logoKey: text('logo_key'),
+    logoWidth: integer('logo_width'),
+    logoHeight: integer('logo_height'),
+    /**
      * One to three numbers, in the order the owner entered them. An array
      * rather than a child table: the list is capped, has no per-entry metadata,
      * and is always read and written whole, so a join would buy nothing. Per
@@ -113,6 +129,17 @@ export const restaurantProfile = pgTable(
     check(
       'restaurant_profile_location_length',
       sql`char_length(${table.location}) between 1 and 200`,
+    ),
+    /**
+     * A logo is all three columns or none of them. Stated here rather than
+     * trusted to the service, because "key without dimensions" is a row the
+     * frontend cannot render and no amount of care in one code path prevents
+     * another from writing it.
+     */
+    check(
+      'restaurant_profile_logo_complete',
+      sql`(${table.logoKey} is null and ${table.logoWidth} is null and ${table.logoHeight} is null)
+          or (${table.logoKey} is not null and ${table.logoWidth} > 0 and ${table.logoHeight} > 0)`,
     ),
   ],
 );
@@ -190,6 +217,20 @@ export const menuItem = pgTable(
      * double, so the whole stack above this row keeps working in korunas.
      */
     priceCzk: numeric('price_czk', { precision: 10, scale: 2, mode: 'number' }).notNull(),
+    /**
+     * The dish's photograph, if it has one (feature 006). Same reasoning as
+     * `restaurantProfile.logoKey`: the image belongs to the row it depicts, the
+     * key is a random UUID under `dishes/` rather than anything derived from
+     * this item, its section or its menu, and the stored dimensions travel with
+     * it so the guest page can reserve the right box before the bytes arrive.
+     *
+     * NULL is the normal state, and duplicating a dish deliberately leaves it
+     * NULL: two rows must never share a key, or deleting one would break the
+     * other.
+     */
+    imageKey: text('image_key'),
+    imageWidth: integer('image_width'),
+    imageHeight: integer('image_height'),
     position: integer('position').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -201,6 +242,12 @@ export const menuItem = pgTable(
       sql`${table.description} is null or char_length(${table.description}) <= 2000`,
     ),
     check('menu_item_price_non_negative', sql`${table.priceCzk} >= 0`),
+    /** All three image columns or none, for the same reason as the logo's. */
+    check(
+      'menu_item_image_complete',
+      sql`(${table.imageKey} is null and ${table.imageWidth} is null and ${table.imageHeight} is null)
+          or (${table.imageKey} is not null and ${table.imageWidth} > 0 and ${table.imageHeight} > 0)`,
+    ),
   ],
 );
 

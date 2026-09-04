@@ -1,3 +1,6 @@
+import { spawn } from "node:child_process";
+import { join } from "node:path";
+
 import { expect, type Locator, type Page } from "@playwright/test";
 
 import cs from "../../../messages/cs.json";
@@ -249,4 +252,61 @@ export async function publish(page: Page): Promise<string> {
   const url = await address.textContent();
   if (!url) throw new Error("Publishing did not report a public address");
   return url.trim();
+}
+
+/**
+ * Chooses a file in an `ImageField` and confirms the framing (feature 006).
+ *
+ * The file input is visually hidden — the button beside it is what an owner
+ * (and the keyboard) operates — so `setInputFiles` targets the input directly
+ * while everything else goes through the visible controls.
+ *
+ * Returns without confirming when `confirm` is false, which is how the tests
+ * that check a refusal or a cancellation get to look at the intermediate state.
+ */
+export async function chooseImage(
+  scope: Page | Locator,
+  fixture: string,
+  { confirm = true }: { confirm?: boolean } = {},
+): Promise<void> {
+  const page = "page" in scope ? scope.page() : scope;
+
+  await scope.locator('input[type="file"]').first().setInputFiles(fixture);
+
+  if (!confirm) return;
+
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  // The framing only exists once the cropper has measured the image, so the
+  // confirm button is disabled until then.
+  const use = dialog.getByRole("button", {
+    name: /použít toto umístění|use this framing|diesen ausschnitt verwenden/i,
+  });
+  await expect(use).toBeEnabled();
+  await use.click();
+  await expect(dialog).toBeHidden();
+}
+
+/** Absolute path of a committed image fixture. */
+export function imageFixture(name: string): string {
+  return join(process.cwd(), "tests", "fixtures", "images", name);
+}
+
+/**
+ * Builds the two large fixtures the size and timing tests need. They are not
+ * committed: an 11 MiB file and a 12-megapixel photo are fully reproducible, so
+ * a script is a better home for them than git.
+ */
+export async function ensureLargeFixtures(): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [join(process.cwd(), "tests", "fixtures", "images", "generate.mjs")],
+      { stdio: "ignore" },
+    );
+    child.on("error", reject);
+    child.on("exit", (code) =>
+      code === 0 ? resolve() : reject(new Error(`fixture generation exited ${String(code)}`)),
+    );
+  });
 }

@@ -25,8 +25,10 @@ import { isVisualVariant, themeForVariant } from "@/lib/menu-display/variants";
  * not under `/workspace`.
  *
  * **Why it renders `GuestMenu`.** The preview reuses the guest composition and
- * the same adapter, so it cannot drift from what guests get. `MenuDetail` has
- * every field `PublicMenu` has, plus ids, so the adapter takes it unchanged.
+ * the same adapter, so it cannot drift from what guests get. `MenuDetail`
+ * carries everything the menu itself has; the restaurant's name and logo come
+ * from the profile this page already loads, which is where the public endpoint
+ * gets them too (feature 006).
  *
  * Dynamic for the same reason the editor is: one owner's draft behind a
  * session. `noindex`: it is nobody's page but the owner's.
@@ -50,7 +52,7 @@ export default async function PreviewPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  await requireProfile(locale);
+  const { profile } = await requireProfile(locale);
 
   // A style the catalogue does not know is an address that does not exist.
   if (!isVisualVariant(variant)) notFound();
@@ -75,7 +77,14 @@ export default async function PreviewPage({
         isCurrent={menu.visualVariant === variant}
         action={setVisualVariantAction}
       />
-      <GuestMenu menu={toDisplayMenu(menu)} presentation={presentationForTheme(themeId)} />
+      <GuestMenu
+        menu={toDisplayMenu({
+          ...menu,
+          restaurantName: profile.restaurantName,
+          logo: profile.logo,
+        })}
+        presentation={presentationForTheme(themeId)}
+      />
     </ThemeScope>
   );
 }

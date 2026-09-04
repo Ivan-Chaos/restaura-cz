@@ -15,6 +15,7 @@ const item: MenuItemView = {
   description: "Se zastřeným vejcem a koprem",
   priceCzk: 89,
   position: 1,
+  image: null,
 };
 
 const meta = {
@@ -72,4 +73,17 @@ export const EditingInPlace: Story = {
 
 export const Narrow: Story = {
   globals: { viewport: { value: "mobile1" } },
+};
+
+/**
+ * A photographed dish (feature 006). The thumbnail is the fastest way for an
+ * owner to see which dishes they have already got round to.
+ */
+export const WithPhotograph: Story = {
+  args: {
+    item: {
+      ...item,
+      image: { url: "/sample-menu/svickova.svg", width: 1600, height: 1200 },
+    },
+  },
 };

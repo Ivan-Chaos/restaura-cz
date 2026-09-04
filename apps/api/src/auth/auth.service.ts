@@ -6,6 +6,10 @@ import { AppError } from '../common/app-error.js';
 import { isUniqueViolation } from '../common/pg-errors.js';
 import { DRIZZLE, type DrizzleDb } from '../db/client.js';
 import { emailConfirmation, ownerAccount, restaurantProfile, session } from '../db/schema.js';
+import { toImageRef, type ImageRef } from '../images/image-ref.js';
+import { newLogoKey } from '../images/keys.js';
+import { processImage, type CropRect } from '../images/image-processor.js';
+import { IMAGE_STORAGE, type ImageStorage } from '../images/storage/image-storage.js';
 import { type EmailLocale } from '../mail/email-locale.js';
 import { MailService } from '../mail/mail.service.js';
 import {
@@ -29,11 +33,23 @@ export interface PublicAccount {
   emailVerified: boolean;
 }
 
-/** The profile as callers see it: no ids, no timestamps. */
-export interface PublicProfile {
+/**
+ * The fields a caller may *write*.
+ *
+ * Separate from what a caller *reads* because the logo is not among them: it
+ * has its own endpoints, so saving the restaurant's details can never disturb
+ * it, and no body needs to carry an image URL back to us.
+ */
+export interface ProfileInput {
   restaurantName: string;
   phones: string[];
   location: string;
+}
+
+/** The profile as callers see it: no ids, no timestamps, no storage keys. */
+export interface PublicProfile extends ProfileInput {
+  /** Null is the normal state: a restaurant without one is shown by name. */
+  logo: ImageRef | null;
 }
 
 export interface IssuedSession {
@@ -61,6 +77,7 @@ export class AuthService {
 
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDb,
+    @Inject(IMAGE_STORAGE) private readonly storage: ImageStorage,
     private readonly mail: MailService,
   ) {}
 
@@ -85,7 +102,7 @@ export class AuthService {
   async signUp(
     email: string,
     password: string,
-    profile: PublicProfile,
+    profile: ProfileInput,
     locale: EmailLocale = 'cs',
   ): Promise<IssuedSession> {
     const passwordHash = await argonHash(password, ARGON_OPTIONS);
@@ -121,7 +138,9 @@ export class AuthService {
       );
     });
 
-    return this.issueSession(account, profile);
+    // A brand-new account has no logo, and saying so explicitly is cheaper and
+    // more honest than reading back the row we just wrote.
+    return this.issueSession(account, { ...profile, logo: null });
   }
 
   /**
@@ -280,43 +299,190 @@ export class AuthService {
     );
   }
 
+  /** Every column a caller reads, including the three the logo occupies. */
+  private static readonly PROFILE_COLUMNS = {
+    restaurantName: restaurantProfile.restaurantName,
+    phones: restaurantProfile.phones,
+    location: restaurantProfile.location,
+    logoKey: restaurantProfile.logoKey,
+    logoWidth: restaurantProfile.logoWidth,
+    logoHeight: restaurantProfile.logoHeight,
+  };
+
+  /** One row, one wire shape. The storage key never leaves this method. */
+  private toPublicProfile(row: {
+    restaurantName: string;
+    phones: string[];
+    location: string;
+    logoKey: string | null;
+    logoWidth: number | null;
+    logoHeight: number | null;
+  }): PublicProfile {
+    return {
+      restaurantName: row.restaurantName,
+      phones: row.phones,
+      location: row.location,
+      logo: toImageRef(this.storage, {
+        key: row.logoKey,
+        width: row.logoWidth,
+        height: row.logoHeight,
+      }),
+    };
+  }
+
   /** Null for an account created before profiles existed. */
   async getProfile(accountId: string): Promise<PublicProfile | null> {
     const [row] = await this.db
-      .select({
-        restaurantName: restaurantProfile.restaurantName,
-        phones: restaurantProfile.phones,
-        location: restaurantProfile.location,
-      })
+      .select(AuthService.PROFILE_COLUMNS)
       .from(restaurantProfile)
       .where(eq(restaurantProfile.accountId, accountId))
       .limit(1);
 
-    return row ?? null;
+    return row ? this.toPublicProfile(row) : null;
   }
 
   /**
    * One statement for both the completion step and the settings form. Which of
    * the two happened is not something the caller has to care about, and making
    * it one write means there is no window where a profile is half-replaced.
+   *
+   * The `set` clause names its three fields rather than spreading the input,
+   * so a logo can never be cleared by someone saving their opening hours.
    */
-  async upsertProfile(accountId: string, profile: PublicProfile): Promise<PublicProfile> {
+  async upsertProfile(accountId: string, profile: ProfileInput): Promise<PublicProfile> {
     const [row] = await this.db
       .insert(restaurantProfile)
       .values({ accountId, ...profile })
       .onConflictDoUpdate({
         target: restaurantProfile.accountId,
-        set: { ...profile, updatedAt: new Date() },
+        set: {
+          restaurantName: profile.restaurantName,
+          phones: profile.phones,
+          location: profile.location,
+          updatedAt: new Date(),
+        },
       })
-      .returning({
-        restaurantName: restaurantProfile.restaurantName,
-        phones: restaurantProfile.phones,
-        location: restaurantProfile.location,
-      });
+      .returning(AuthService.PROFILE_COLUMNS);
 
     // The upsert always returns the stored row; this satisfies the type.
     if (!row) throw AppError.notFound();
-    return row;
+    return this.toPublicProfile(row);
+  }
+
+  // ----------------------------------------------------------------- logo
+
+  /**
+   * Stores a new logo, replacing any existing one (feature 006).
+   *
+   * The order is deliberate and is what keeps storage and the database from
+   * disagreeing:
+   *
+   * 1. Process first. A file that is not an image never reaches storage.
+   * 2. Write the object under a **new** random key. Keys are never reused, so
+   *    a cache anywhere in the world cannot serve the old picture at the new
+   *    address.
+   * 3. Update the row, returning the key it used to hold.
+   * 4. Only then delete the old object.
+   *
+   * If step 3 fails, the object written in step 2 is removed again — otherwise
+   * it would be an orphan nothing references. If step 4 fails, the row is
+   * already correct and the guest sees the right image; the stale object is
+   * logged and swept later. Neither failure can leave a menu pointing at
+   * nothing, which is the outcome that actually matters.
+   */
+  async setLogo(accountId: string, file: Buffer, crop?: CropRect): Promise<PublicProfile> {
+    const rendition = await processImage(file, 'logo', crop);
+    const key = newLogoKey();
+
+    await this.storage.put(key, rendition.buffer, rendition.contentType);
+
+    let row: Awaited<ReturnType<AuthService['updateLogoColumns']>>;
+    try {
+      row = await this.updateLogoColumns(accountId, {
+        logoKey: key,
+        logoWidth: rendition.width,
+        logoHeight: rendition.height,
+      });
+    } catch (error) {
+      await this.forget([key], 'compensating for a failed logo update');
+      throw error;
+    }
+
+    await this.forget(row.previousKey ? [row.previousKey] : [], 'replaced logo');
+    return this.toPublicProfile(row.profile);
+  }
+
+  /**
+   * Removes the logo. Idempotent: an account with none is already in the state
+   * the caller asked for, so this answers with the profile rather than an error.
+   */
+  async removeLogo(accountId: string): Promise<PublicProfile> {
+    const row = await this.updateLogoColumns(accountId, {
+      logoKey: null,
+      logoWidth: null,
+      logoHeight: null,
+    });
+
+    await this.forget(row.previousKey ? [row.previousKey] : [], 'removed logo');
+    return this.toPublicProfile(row.profile);
+  }
+
+  /**
+   * Writes the three logo columns and reports what was there before.
+   *
+   * One statement, so the read of the old key and the write of the new one
+   * cannot interleave with another request doing the same thing: whichever
+   * lands second owns the row, and the key it displaced is the one it deletes.
+   */
+  private async updateLogoColumns(
+    accountId: string,
+    columns: { logoKey: string | null; logoWidth: number | null; logoHeight: number | null },
+  ) {
+    const previous = this.db.$with('previous').as(
+      this.db
+        .select({ logoKey: restaurantProfile.logoKey })
+        .from(restaurantProfile)
+        .where(eq(restaurantProfile.accountId, accountId)),
+    );
+
+    const [row] = await this.db
+      .with(previous)
+      .update(restaurantProfile)
+      .set({ ...columns, updatedAt: new Date() })
+      .where(eq(restaurantProfile.accountId, accountId))
+      .returning({
+        ...AuthService.PROFILE_COLUMNS,
+        previousKey: sql<string | null>`(select ${previous.logoKey} from ${previous})`,
+      });
+
+    // No row means no profile: an account that has not completed the step.
+    // Reported as not found, like every other address that is not theirs.
+    if (!row) throw AppError.notFound();
+
+    const { previousKey, ...profile } = row;
+    return { profile, previousKey: previousKey === columns.logoKey ? null : previousKey };
+  }
+
+  /**
+   * Deletes objects that are no longer referenced, without letting a storage
+   * failure undo a database write that already succeeded.
+   *
+   * The row is the record; an object nothing points at is litter, and litter is
+   * what the sweep command exists to collect. So a failure here is logged with
+   * the key and swallowed rather than turned into an error the owner sees for
+   * an action that worked.
+   */
+  private async forget(keys: string[], reason: string): Promise<void> {
+    if (keys.length === 0) return;
+
+    try {
+      await this.storage.delete(keys);
+    } catch (error) {
+      this.logger.error(
+        `Could not delete ${keys.join(', ')} after ${reason}; the sweep will collect it.`,
+        error instanceof Error ? error.stack : error,
+      );
+    }
   }
 
   async signIn(email: string, password: string): Promise<IssuedSession> {

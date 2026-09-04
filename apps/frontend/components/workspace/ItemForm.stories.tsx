@@ -95,3 +95,22 @@ export const ClearsAfterAdding: Story = {
     await waitFor(() => expect(name).toHaveValue(""));
   },
 };
+
+/**
+ * Editing a dish that already has a photograph (feature 006). Replacing and
+ * removing are both offered; neither does anything until the dish is saved,
+ * which is what makes cancelling free.
+ */
+export const WithPhotograph: Story = {
+  args: {
+    hidden: { locale: "cs", menuId: "menu-1", sectionId: "section-1", itemId: "item-1" },
+    submitLabel: "Uložit",
+    defaults: { name: "Svíčková na smetaně", description: "", priceCzk: "245" },
+    currentImage: {
+      src: "/sample-menu/svickova.svg",
+      alt: "Svíčková na smetaně",
+      width: 1600,
+      height: 1200,
+    },
+  },
+};

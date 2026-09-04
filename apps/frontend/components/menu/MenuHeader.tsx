@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Container } from "@/components/layout/Container";
+import { SafeImage } from "@/components/menu/SafeImage";
 import type { Establishment } from "@/lib/design-system/types";
 import type { HeaderLayout } from "@/lib/menu-display/presentation";
 import { cn } from "@/lib/utils";
@@ -39,12 +39,16 @@ export function MenuHeader({
   const hasHours = Boolean(openingHours && openingHours.length > 0);
   const centered = layout === "band" || layout === "centered";
 
+  // Through SafeImage, so a stored object that has gone missing leaves the
+  // restaurant name standing alone rather than a broken-image icon beside it.
   const logoNode = logo ? (
-    <Image
+    <SafeImage
+      fallback={null}
       src={logo.src}
       alt={logo.alt}
       width={logo.width}
       height={logo.height}
+      sizes="56px"
       className={cn(
         "shrink-0 object-cover",
         layout === "minimal" ? "size-9 rounded-md" : "size-12 rounded-lg",

@@ -24,8 +24,16 @@ const filled: MenuSectionView = {
       description: "Se zastřeným vejcem a koprem",
       priceCzk: 89,
       position: 0,
+      image: null,
     },
-    { id: "item-2", name: "Hovězí vývar", description: null, priceCzk: 79, position: 1 },
+    {
+      id: "item-2",
+      name: "Hovězí vývar",
+      description: null,
+      priceCzk: 79,
+      position: 1,
+      image: null,
+    },
   ],
 };
 

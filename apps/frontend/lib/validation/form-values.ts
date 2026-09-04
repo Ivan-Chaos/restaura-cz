@@ -1,3 +1,4 @@
+import type { CropRect, PendingImage } from "./image";
 import type {
   InlineTextField,
   MenuItemFormValues,
@@ -80,9 +81,35 @@ function withHidden(formData: FormData, hidden: Record<string, string>): FormDat
   return formData;
 }
 
+/**
+ * Adds whatever the image field decided to the body (feature 006).
+ *
+ * `keep` appends nothing at all, which is what makes an ordinary edit an
+ * ordinary edit: the action sees no image parts and leaves the stored photo
+ * alone. The crop travels as four separate integer fields rather than as JSON
+ * because the no-JavaScript path posts a plain form, and a plain form has no
+ * way to send an object.
+ */
+function appendImage(formData: FormData, image: PendingImage | undefined): FormData {
+  if (!image || image.kind === "keep") return formData;
+
+  if (image.kind === "remove") {
+    formData.set("removeImage", "1");
+    return formData;
+  }
+
+  formData.set("image", image.file);
+  formData.set("cropX", String(image.crop.x));
+  formData.set("cropY", String(image.crop.y));
+  formData.set("cropWidth", String(image.crop.width));
+  formData.set("cropHeight", String(image.crop.height));
+  return formData;
+}
+
 export function itemFormData(
   values: MenuItemFormValues,
   hidden: Record<string, string>,
+  image?: PendingImage,
 ): FormData {
   const formData = new FormData();
   formData.set("name", values.name);
@@ -91,7 +118,19 @@ export function itemFormData(
   // same schema, and sending a number here would mean the two paths validated
   // different things.
   formData.set("priceCzk", values.priceCzk);
+  appendImage(formData, image);
   return withHidden(formData, hidden);
+}
+
+/** The logo upload, which is its own request rather than part of a form save. */
+export function logoFormData(
+  file: File,
+  crop: CropRect,
+  context: FormContext,
+): FormData {
+  const formData = new FormData();
+  appendImage(formData, { kind: "replace", file, crop, previewUrl: "" });
+  return withContext(formData, context);
 }
 
 export function inlineTextFormData(

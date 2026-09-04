@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
 
-import { LABELS, PASSWORD, PROFILE, SECOND_PHONE, signUp } from "./helpers/owner";
+import {
+  LABELS,
+  PASSWORD,
+  PROFILE,
+  SECOND_PHONE,
+  signUp,
+} from "./helpers/owner";
 
 /**
  * User Story 4: settings is its own page with addressable tabs, one of which
@@ -132,5 +138,26 @@ test.describe("settings", () => {
 
     await expect(page).toHaveURL(/\/en\/workspace\/settings\/profile$/);
     await expect(page.getByRole("link", { name: "Subscription" })).toBeVisible();
+  });
+
+  /**
+   * The logo lives on the restaurant tab (feature 006).
+   *
+   * Only its presence is asserted here. Uploading, framing, replacing and
+   * removing it are proved in `images.spec.ts`, and that the two saves leave
+   * each other alone is proved directly against the database in the API suite —
+   * both of which are steadier places for it than a page whose two independent
+   * saves would have to be raced here.
+   */
+  test("offers the logo on the restaurant tab (US1)", async ({ page }) => {
+    await signUp(page);
+    await page.goto("/cs/workspace/settings/profile");
+
+    await expect(page.getByRole("heading", { name: "Logo" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /nahrát logo/i })).toBeVisible();
+    // Says what it accepts before anyone picks wrongly.
+    await expect(page.getByText(/10 MB/)).toBeVisible();
+    // The details form is still its own, separate save.
+    await expect(page.getByRole("button", { name: "Uložit změny" })).toBeVisible();
   });
 });

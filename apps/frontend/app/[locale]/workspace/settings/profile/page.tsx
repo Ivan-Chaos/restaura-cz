@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { LogoField } from "@/components/settings/LogoField";
 import { ProfileSettingsForm } from "@/components/settings/ProfileSettingsForm";
 import { routing } from "@/i18n/routing";
-import { saveProfileAction } from "@/lib/api/actions/auth";
+import { removeLogoAction, saveProfileAction, uploadLogoAction } from "@/lib/api/actions/auth";
 import { requireProfile } from "@/lib/api/session";
 
 export async function generateMetadata({
@@ -29,5 +30,22 @@ export default async function ProfileSettingsPage({
   // the values to prefill, at no extra request.
   const { profile } = await requireProfile(locale);
 
-  return <ProfileSettingsForm profile={profile} action={saveProfileAction} locale={locale} />;
+  return (
+    <div className="flex flex-col gap-10">
+      {/*
+        Above the details form, because the logo is the first thing an owner
+        looks for when they open their restaurant's settings — and because it
+        saves on its own, so it must not read as part of the form below it.
+      */}
+      <LogoField
+        logo={profile.logo}
+        restaurantName={profile.restaurantName}
+        uploadAction={uploadLogoAction}
+        removeAction={removeLogoAction}
+        locale={locale}
+      />
+
+      <ProfileSettingsForm profile={profile} action={saveProfileAction} locale={locale} />
+    </div>
+  );
 }

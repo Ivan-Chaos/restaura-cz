@@ -50,7 +50,13 @@ export type FieldErrorCode =
   /** Fewer phone numbers than the minimum of one. */
   | "ARRAY_MIN_SIZE"
   /** More phone numbers than the maximum of three. */
-  | "ARRAY_MAX_SIZE";
+  | "ARRAY_MAX_SIZE"
+  /** An upload over the 10 MB limit. Noticed by the browser or by the API. */
+  | "MAX_FILE_SIZE"
+  /** Bytes that are not a JPEG, PNG or WebP, whatever the filename claimed. */
+  | "IS_IMAGE"
+  /** A crop rectangle that is incomplete, or does not fit inside the image. */
+  | "IS_CROP";
 
 export interface ApiFieldError {
   field: string;
@@ -86,6 +92,19 @@ export interface Account {
 }
 
 /**
+ * A stored image, ready to display (feature 006).
+ *
+ * The dimensions are the rendition's own, so `next/image` can reserve the right
+ * box before the bytes arrive and the page never shifts. Storage keys are never
+ * exposed — only the URL a browser fetches.
+ */
+export interface ImageRef {
+  url: string;
+  width: number;
+  height: number;
+}
+
+/**
  * The business identity behind an account. Its absence — `profile: null` on
  * `/auth/me` — is what marks an account as incomplete and sends its owner to
  * the profile-completion step instead of the dashboard.
@@ -96,6 +115,12 @@ export interface RestaurantProfile {
   phones: string[];
   /** Free-form address text. */
   location: string;
+  /**
+   * The restaurant's logo, or `null` — which is the normal state, and means
+   * guests see the name in text. Set through its own endpoints, never as part
+   * of a profile save.
+   */
+  logo: ImageRef | null;
 }
 
 export interface AccountResponse {
@@ -136,6 +161,12 @@ export interface MenuItemView {
   /** Whole korunas. */
   priceCzk: number;
   position: number;
+  /**
+   * The dish's photograph, or `null`. Absent is the normal state and renders
+   * exactly as a dish did before photos existed. Duplicating a dish leaves the
+   * copy without one.
+   */
+  image: ImageRef | null;
 }
 
 export interface MenuSectionView {
@@ -185,6 +216,7 @@ export interface PublicMenuItem {
   name: string;
   description: string | null;
   priceCzk: number;
+  image: ImageRef | null;
 }
 
 export interface PublicMenuSection {
@@ -194,7 +226,14 @@ export interface PublicMenuSection {
 
 export interface PublicMenu {
   name: string;
+  /**
+   * The restaurant behind the menu. Carried so the logo has a text alternative
+   * that names the restaurant rather than the menu — a menu called "Lunch" is
+   * not what a logo depicts.
+   */
+  restaurantName: string;
   visualVariant: string;
+  logo: ImageRef | null;
   sections: PublicMenuSection[];
 }
 

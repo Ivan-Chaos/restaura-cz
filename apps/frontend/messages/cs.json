@@ -676,7 +676,10 @@
       "IS_PHONE": "Zadejte platné telefonní číslo.",
       "IS_ARRAY": "Tato hodnota není platná.",
       "ARRAY_MIN_SIZE": "Přidejte alespoň jednu položku.",
-      "ARRAY_MAX_SIZE": "To je více položek, než je povoleno."
+      "ARRAY_MAX_SIZE": "To je více položek, než je povoleno.",
+      "MAX_FILE_SIZE": "Vyberte obrázek do 10 MB.",
+      "IS_IMAGE": "Použijte obrázek ve formátu JPEG, PNG nebo WebP.",
+      "IS_CROP": "Toto umístění se do obrázku nevejde. Upravte ho a zkuste to znovu."
     }
   },
   "Registration": {
@@ -709,7 +712,10 @@
       "location": "Zadejte adresu restaurace, nejvýše 200 znaků.",
       "phone": "Zadejte platné telefonní číslo.",
       "phonesMin": "Přidejte alespoň jedno telefonní číslo.",
-      "phonesMax": "Přidejte nejvýše tři telefonní čísla."
+      "phonesMax": "Přidejte nejvýše tři telefonní čísla.",
+      "MAX_FILE_SIZE": "Vyberte obrázek do 10 MB.",
+      "IS_IMAGE": "Použijte obrázek ve formátu JPEG, PNG nebo WebP.",
+      "IS_CROP": "Toto umístění se do obrázku nevejde. Upravte ho a zkuste to znovu."
     }
   },
   "VerifyEmail": {
@@ -748,6 +754,19 @@
       "statusActive": "Aktivní",
       "planDescription": "Všechny funkce zdarma po dobu předběžného přístupu k Restauře.",
       "comingSoon": "Placené tarify a fakturaci budete spravovat zde. Zatím není co dělat — dáme vám vědět s dostatečným předstihem, než se něco změní."
+    },
+    "logoSection": "Logo",
+    "logoDescription": "Zobrazuje se v záhlaví vašich menu. Bez loga uvidí hosté název restaurace.",
+    "logoSaved": "Logo uloženo.",
+    "logoRemoved": "Logo odebráno.",
+    "removeLogoTitle": "Odebrat logo?",
+    "removeLogoBody": "Hosté místo něj uvidí název vaší restaurace. Nové logo můžete nahrát kdykoli.",
+    "removeLogoConfirm": "Odebrat logo",
+    "fieldErrors": {
+      "MAX_FILE_SIZE": "Vyberte obrázek do 10 MB.",
+      "IS_IMAGE": "Použijte obrázek ve formátu JPEG, PNG nebo WebP.",
+      "IS_CROP": "Toto umístění se do obrázku nevejde. Upravte ho a zkuste to znovu.",
+      "INVALID": "Tato hodnota není platná."
     }
   },
   "Workspace": {
@@ -834,8 +853,13 @@
       "IS_ARRAY": "Tato hodnota není platná.",
       "ARRAY_MIN_SIZE": "Přidejte alespoň jednu položku.",
       "ARRAY_MAX_SIZE": "To je více položek, než je povoleno.",
-      "INVALID": "Tato hodnota není platná."
-    }
+      "INVALID": "Tato hodnota není platná.",
+      "MAX_FILE_SIZE": "Vyberte obrázek do 10 MB.",
+      "IS_IMAGE": "Použijte obrázek ve formátu JPEG, PNG nebo WebP.",
+      "IS_CROP": "Toto umístění se do obrázku nevejde. Upravte ho a zkuste to znovu."
+    },
+    "itemPhoto": "Fotka",
+    "itemPhotoOf": "Fotka jídla {name}"
   },
   "Publish": {
     "draft": "Koncept",
@@ -857,5 +881,29 @@
     "notAvailableTitle": "Toto menu není dostupné",
     "notAvailableBody": "Odkaz může být chybný, nebo restaurace menu stáhla.",
     "metaDescription": "Prohlédněte si menu podniku {name}."
+  },
+  "ImageField": {
+    "addPhoto": "Přidat fotku",
+    "uploadLogo": "Nahrát logo",
+    "changePhoto": "Nahradit fotku",
+    "changeLogo": "Nahradit logo",
+    "removePhoto": "Odebrat fotku",
+    "removeLogo": "Odebrat logo",
+    "hint": "JPEG, PNG nebo WebP, do 10 MB.",
+    "pendingPhoto": "Fotka je připravená — uložením jídla ji potvrdíte.",
+    "pendingLogo": "Logo je připravené.",
+    "removedPending": "Fotka se odebere po uložení.",
+    "currentPhoto": "Současná fotka",
+    "currentLogo": "Současné logo",
+    "newPhoto": "Vybraná fotka"
+  },
+  "ImageCrop": {
+    "titlePhoto": "Umístěte fotku",
+    "titleLogo": "Umístěte logo",
+    "instructions": "Obrázek přesunete tažením nebo šipkami. Přiblížení nastavíte posuvníkem.",
+    "zoom": "Přiblížení",
+    "confirm": "Použít toto umístění",
+    "cancel": "Zrušit",
+    "loading": "Připravujeme obrázek…"
   }
 }

@@ -676,7 +676,10 @@
       "IS_PHONE": "Enter a valid phone number.",
       "IS_ARRAY": "This value is not valid.",
       "ARRAY_MIN_SIZE": "Add at least one entry.",
-      "ARRAY_MAX_SIZE": "That is more entries than allowed."
+      "ARRAY_MAX_SIZE": "That is more entries than allowed.",
+      "MAX_FILE_SIZE": "Choose an image no larger than 10 MB.",
+      "IS_IMAGE": "Use a JPEG, PNG or WebP image.",
+      "IS_CROP": "That framing does not fit the image. Adjust it and try again."
     }
   },
   "Registration": {
@@ -709,7 +712,10 @@
       "location": "Enter your restaurant’s address, up to 200 characters.",
       "phone": "Enter a valid phone number.",
       "phonesMin": "Add at least one phone number.",
-      "phonesMax": "Add at most three phone numbers."
+      "phonesMax": "Add at most three phone numbers.",
+      "MAX_FILE_SIZE": "Choose an image no larger than 10 MB.",
+      "IS_IMAGE": "Use a JPEG, PNG or WebP image.",
+      "IS_CROP": "That framing does not fit the image. Adjust it and try again."
     }
   },
   "VerifyEmail": {
@@ -748,6 +754,19 @@
       "statusActive": "Active",
       "planDescription": "Every feature, at no cost, while Restaura is in early access.",
       "comingSoon": "Paid plans and billing will be managed here. Nothing to do for now — we will let you know well before anything changes."
+    },
+    "logoSection": "Logo",
+    "logoDescription": "Shown at the top of your menus. Without one, guests see your restaurant’s name.",
+    "logoSaved": "Logo saved.",
+    "logoRemoved": "Logo removed.",
+    "removeLogoTitle": "Remove the logo?",
+    "removeLogoBody": "Guests will see your restaurant’s name instead. You can upload a new logo at any time.",
+    "removeLogoConfirm": "Remove logo",
+    "fieldErrors": {
+      "MAX_FILE_SIZE": "Choose an image no larger than 10 MB.",
+      "IS_IMAGE": "Use a JPEG, PNG or WebP image.",
+      "IS_CROP": "That framing does not fit the image. Adjust it and try again.",
+      "INVALID": "That is not valid."
     }
   },
   "Workspace": {
@@ -834,8 +853,13 @@
       "IS_ARRAY": "This value is not valid.",
       "ARRAY_MIN_SIZE": "Add at least one entry.",
       "ARRAY_MAX_SIZE": "That is more entries than allowed.",
-      "INVALID": "This value is not valid."
-    }
+      "INVALID": "This value is not valid.",
+      "MAX_FILE_SIZE": "Choose an image no larger than 10 MB.",
+      "IS_IMAGE": "Use a JPEG, PNG or WebP image.",
+      "IS_CROP": "That framing does not fit the image. Adjust it and try again."
+    },
+    "itemPhoto": "Photo",
+    "itemPhotoOf": "Photo of {name}"
   },
   "Publish": {
     "draft": "Draft",
@@ -857,5 +881,29 @@
     "notAvailableTitle": "This menu is not available",
     "notAvailableBody": "The link may be wrong, or the restaurant has taken the menu offline.",
     "metaDescription": "See the menu of {name}."
+  },
+  "ImageField": {
+    "addPhoto": "Add photo",
+    "uploadLogo": "Upload logo",
+    "changePhoto": "Replace photo",
+    "changeLogo": "Replace logo",
+    "removePhoto": "Remove photo",
+    "removeLogo": "Remove logo",
+    "hint": "JPEG, PNG or WebP, up to 10 MB.",
+    "pendingPhoto": "Photo ready — save the dish to keep it.",
+    "pendingLogo": "Logo ready.",
+    "removedPending": "Photo will be removed when you save.",
+    "currentPhoto": "Current photo",
+    "currentLogo": "Current logo",
+    "newPhoto": "Chosen photo"
+  },
+  "ImageCrop": {
+    "titlePhoto": "Position the photo",
+    "titleLogo": "Position the logo",
+    "instructions": "Drag the image to move it, or use the arrow keys. Use the slider to zoom.",
+    "zoom": "Zoom",
+    "confirm": "Use this framing",
+    "cancel": "Cancel",
+    "loading": "Preparing the image…"
   }
 }

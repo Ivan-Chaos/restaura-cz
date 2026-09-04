@@ -9,6 +9,7 @@ import {
   visualVariantSchema,
   type InlineTextField,
 } from "./schemas";
+import { isCropRect, validateImageFile, type CropRect } from "./image";
 import { zodToFields } from "./zod-fields";
 
 /**
@@ -111,4 +112,60 @@ export function readVisualVariant(formData: FormData) {
   return parsed(
     visualVariantSchema.safeParse({ visualVariant: text(formData, "visualVariant") }),
   );
+}
+
+/**
+ * What a submitted form says to do with its image (feature 006).
+ *
+ * Three outcomes, because "leave it alone" and "remove it" are different
+ * instructions and neither is an upload. The file is validated here — size, and
+ * type by its leading bytes — so a Server Action never spends a request
+ * relaying something the API is certain to refuse, and so the no-JavaScript
+ * path gets the same check the browser would have done.
+ */
+export type ImageUpload =
+  | { kind: "none" }
+  | { kind: "remove" }
+  | { kind: "replace"; file: File; crop?: CropRect };
+
+function cropFrom(formData: FormData): Parsed<CropRect | undefined> {
+  const names = ["cropX", "cropY", "cropWidth", "cropHeight"] as const;
+  const raw = names.map((name) => formData.get(name)).filter((value) => value !== null);
+
+  // All four or none. Three coordinates describe nothing, and quietly ignoring
+  // them would store a centre-crop while the owner believed they had chosen a
+  // framing.
+  if (raw.length === 0) return { ok: true, values: undefined };
+  if (raw.length !== names.length) {
+    return { ok: false, state: localValidationError({ image: "IS_CROP" }) };
+  }
+
+  const [x, y, width, height] = names.map((name) => Number(text(formData, name)));
+  const rect = { x: x!, y: y!, width: width!, height: height! };
+
+  return isCropRect(rect)
+    ? { ok: true, values: rect }
+    : { ok: false, state: localValidationError({ image: "IS_CROP" }) };
+}
+
+export async function readImageUpload(formData: FormData): Promise<Parsed<ImageUpload>> {
+  const file = formData.get("image");
+
+  // A file wins over a removal flag: an owner who picked a new image after
+  // pressing Remove means the new image.
+  if (file instanceof File && file.size > 0) {
+    const problem = await validateImageFile(file);
+    if (problem) return { ok: false, state: localValidationError({ image: problem }) };
+
+    const crop = cropFrom(formData);
+    if (!crop.ok) return crop;
+
+    return { ok: true, values: { kind: "replace", file, crop: crop.values } };
+  }
+
+  if (text(formData, "removeImage") === "1") {
+    return { ok: true, values: { kind: "remove" } };
+  }
+
+  return { ok: true, values: { kind: "none" } };
 }

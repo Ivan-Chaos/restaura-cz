@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isPhoneNumber } from './validators.js';
+import { plainToInstance } from 'class-transformer';
+import { IsEmpty, IsOptional, validateSync } from 'class-validator';
+import { AllOrNoneOf, isPhoneNumber } from './validators.js';
 
 /**
  * The rule is deliberately permissive about *shape* and strict about *content*:
@@ -41,5 +43,45 @@ describe('isPhoneNumber', () => {
     ['an array', ['601234567']],
   ])('rejects %s, which is not a string', (_label, value) => {
     expect(isPhoneNumber(value)).toBe(false);
+  });
+});
+
+/**
+ * The all-or-none rule exists because a partial group is worse than an absent
+ * one: ignoring three of four crop coordinates would store a centre-crop while
+ * the owner believed they had chosen a framing.
+ */
+describe('AllOrNoneOf', () => {
+  class Group {
+    @IsOptional()
+    a?: number;
+
+    @IsOptional()
+    b?: number;
+
+    @IsEmpty()
+    @AllOrNoneOf(['a', 'b'])
+    readonly both?: never;
+  }
+
+  function codesFor(body: Record<string, unknown>): string[] {
+    return validateSync(plainToInstance(Group, body)).flatMap((error) =>
+      Object.keys(error.constraints ?? {}).map((name) => `${error.property}:${name}`),
+    );
+  }
+
+  it('accepts the whole group', () => {
+    expect(codesFor({ a: 1, b: 2 })).toEqual([]);
+  });
+
+  it('accepts none of the group', () => {
+    expect(codesFor({})).toEqual([]);
+  });
+
+  it.each([
+    ['only the first', { a: 1 }],
+    ['only the second', { b: 2 }],
+  ])('rejects %s, reporting against the declaring property', (_label, body) => {
+    expect(codesFor(body)).toContain('both:isCrop');
   });
 });

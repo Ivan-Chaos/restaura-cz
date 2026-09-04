@@ -41,6 +41,9 @@ const KNOWN_FIELD_CODES: readonly FieldErrorCode[] = [
   "IS_ARRAY",
   "ARRAY_MIN_SIZE",
   "ARRAY_MAX_SIZE",
+  "MAX_FILE_SIZE",
+  "IS_IMAGE",
+  "IS_CROP",
 ];
 
 /**
@@ -62,6 +65,12 @@ export function toFieldCode(code: string): FieldErrorCode | "INVALID" {
  * explains nothing. Type problems therefore outrank range problems.
  */
 const CODE_PRIORITY: readonly (FieldErrorCode | "INVALID")[] = [
+  // "this is not an image" and "this is too large" outrank everything: they
+  // describe the file itself, and no advice about its framing helps until the
+  // owner has picked a different one.
+  "IS_IMAGE",
+  "MAX_FILE_SIZE",
+  "IS_CROP",
   "IS_STRING",
   "IS_ARRAY",
   "IS_INT",

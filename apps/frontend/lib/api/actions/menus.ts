@@ -3,9 +3,15 @@
 import { revalidatePath } from "next/cache";
 
 import { redirect } from "@/i18n/navigation";
-import { readInlineText, readItem, readVisualVariant } from "@/lib/validation/form-data";
+import {
+  readImageUpload,
+  readInlineText,
+  readItem,
+  readVisualVariant,
+  type ImageUpload,
+} from "@/lib/validation/form-data";
 import { apiGet, apiRequest } from "../client";
-import { SAVED, toFormState, type FormState } from "../form-state";
+import { localValidationError, SAVED, toFormState, type FormState } from "../form-state";
 import { toLocale } from "../locale";
 import type {
   ItemResponse,
@@ -191,6 +197,49 @@ export async function deleteSectionAction(formData: FormData): Promise<void> {
 
 // ----------------------------------------------------------------- items
 
+/**
+ * Applies whatever the image field decided, after the dish itself is saved
+ * (feature 006).
+ *
+ * Deliberately a second request rather than a field on the item body: folding a
+ * file into the dish PATCH would make every price change a multipart upload and
+ * would mix two failure domains in one call.
+ *
+ * A failure here is reported against the image field alone, because by this
+ * point the dish exists and its text is stored. Telling the owner the whole
+ * save failed would be untrue, and would invite them to type it all again.
+ */
+async function applyItemImage(
+  upload: ImageUpload,
+  path: string,
+): Promise<FormState | null> {
+  if (upload.kind === "none") return null;
+
+  if (upload.kind === "remove") {
+    const { result } = await apiRequest<ItemResponse>(path, { method: "DELETE" });
+    return result.ok ? null : imageFailure(result.error);
+  }
+
+  const body = new FormData();
+  body.set("file", upload.file);
+  if (upload.crop) {
+    body.set("cropX", String(upload.crop.x));
+    body.set("cropY", String(upload.crop.y));
+    body.set("cropWidth", String(upload.crop.width));
+    body.set("cropHeight", String(upload.crop.height));
+  }
+
+  const { result } = await apiRequest<ItemResponse>(path, { method: "PUT", body });
+  return result.ok ? null : imageFailure(result.error);
+}
+
+/** Puts an API rejection under the image field, whatever it was about. */
+function imageFailure(error: Parameters<typeof toFormState>[0]): FormState {
+  const state = toFormState(error);
+  const code = state.status === "error" ? (state.fields?.file ?? state.fields?.crop) : undefined;
+  return localValidationError({ image: code ?? "INVALID" });
+}
+
 export async function addItemAction(
   _previous: FormState,
   formData: FormData,
@@ -202,6 +251,11 @@ export async function addItemAction(
   const parsed = readItem(formData);
   if (!parsed.ok) return parsed.state;
   const { name, description, priceCzk } = parsed.values;
+
+  // Checked before the dish is created, so an unusable file costs no request
+  // and never leaves a dish behind that the owner did not mean to keep.
+  const image = await readImageUpload(formData);
+  if (!image.ok) return image.state;
 
   const { result } = await apiRequest<ItemResponse>(
     `/menus/${menuId}/sections/${sectionId}/items`,
@@ -219,8 +273,14 @@ export async function addItemAction(
 
   if (!result.ok) return toFormState(result.error);
 
+  const failed = await applyItemImage(
+    image.values,
+    `/menus/${menuId}/sections/${sectionId}/items/${result.data.item.id}/image`,
+  );
+
   revalidateEditor(locale, menuId);
-  return SAVED;
+  // The dish is saved either way; only the photograph is in question.
+  return failed ?? SAVED;
 }
 
 export async function updateItemAction(
@@ -236,6 +296,9 @@ export async function updateItemAction(
   if (!parsed.ok) return parsed.state;
   const { name, description, priceCzk } = parsed.values;
 
+  const image = await readImageUpload(formData);
+  if (!image.ok) return image.state;
+
   const { result } = await apiRequest<ItemResponse>(
     `/menus/${menuId}/sections/${sectionId}/items/${itemId}`,
     {
@@ -250,6 +313,15 @@ export async function updateItemAction(
   );
 
   if (!result.ok) return toFormState(result.error);
+
+  const failed = await applyItemImage(
+    image.values,
+    `/menus/${menuId}/sections/${sectionId}/items/${itemId}/image`,
+  );
+  if (failed) {
+    revalidateEditor(locale, menuId);
+    return failed;
+  }
 
   revalidateEditor(locale, menuId);
   return SAVED;

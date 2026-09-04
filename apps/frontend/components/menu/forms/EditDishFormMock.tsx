@@ -8,10 +8,10 @@ import type { AllergenNumber, DietaryMarkerId } from "@/lib/design-system/dietar
 import type { Availability, PriceModel } from "@/lib/design-system/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel, FieldTitle } from "@/components/ui/field";
+import { ImageField } from "@/components/workspace/ImageField";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { AvailabilitySwitch } from "./AvailabilitySwitch";
 import { DietaryPicker } from "./DietaryPicker";
@@ -154,11 +154,20 @@ export function EditDishFormMock({ simulateFailure = false, className }: EditDis
         </Field>
 
         <Field>
-          {/* FieldTitle, not FieldLabel: the skeleton below is a static
-              placeholder, not a focusable control, so there's nothing for a
-              native <label for> to associate with. */}
-          <FieldTitle>{t("image")}</FieldTitle>
-          <Skeleton className="h-32 w-full" role="img" aria-label={t("image")} />
+          {/*
+            The real control now (feature 006): this mock exists to show the
+            dish form as the design system sees it, and a skeleton where the
+            photograph goes stopped being honest the moment owners could upload
+            one.
+          */}
+          <ImageField
+            kind="dish"
+            current={null}
+            label={t("image")}
+            previewAlt={draft.name}
+            idPrefix="mock-dish-image"
+            onChange={() => undefined}
+          />
         </Field>
 
         <PriceInput

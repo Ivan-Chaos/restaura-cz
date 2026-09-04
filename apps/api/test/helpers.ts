@@ -205,3 +205,52 @@ export async function addItem(
     .expect(201);
   return response.body.item.id;
 }
+
+/**
+ * Posts a multipart image upload (feature 006).
+ *
+ * Wraps supertest's `attach`/`field` so a suite reads as "upload this buffer
+ * with this framing" rather than as multipart plumbing. The filename is
+ * deliberately a parameter with a misleading default available: acceptance is
+ * decided by decoding the bytes, and several tests exist to prove the name has
+ * no say in it.
+ */
+export function uploadImage(
+  testApp: TestApp,
+  cookie: string,
+  path: string,
+  body: Buffer,
+  options: {
+    crop?: { x: number; y: number; width: number; height: number };
+    filename?: string;
+    /** Only the fields listed, to exercise the all-or-none crop rule. */
+    partialCrop?: Record<string, string | number>;
+  } = {},
+) {
+  const pending = request(testApp.server)
+    .put(path)
+    .set('Cookie', cookie)
+    .attach('file', body, options.filename ?? 'upload.jpg');
+
+  if (options.crop) {
+    pending
+      .field('cropX', String(options.crop.x))
+      .field('cropY', String(options.crop.y))
+      .field('cropWidth', String(options.crop.width))
+      .field('cropHeight', String(options.crop.height));
+  }
+
+  for (const [name, value] of Object.entries(options.partialCrop ?? {})) {
+    pending.field(name, String(value));
+  }
+
+  return pending;
+}
+
+/** The first field error a response carries, as `field:CODE`. */
+export function firstFieldError(body: {
+  error?: { details?: { field: string; code: string }[] };
+}): string {
+  const detail = body.error?.details?.[0];
+  return detail ? `${detail.field}:${detail.code}` : 'none';
+}

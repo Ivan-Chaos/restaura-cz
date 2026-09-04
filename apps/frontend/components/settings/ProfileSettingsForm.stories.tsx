@@ -10,6 +10,7 @@ const profile: RestaurantProfile = {
   restaurantName: "U Zlaté Lípy",
   phones: ["+420 601 234 567"],
   location: "Náměstí Míru 12, 120 00 Praha 2",
+  logo: null,
 };
 
 const saves = async (): Promise<FormState> => ({ status: "success" });

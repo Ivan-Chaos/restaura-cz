@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
+import { ImageField } from "@/components/workspace/ImageField";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -14,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldCode, useActionForm, type ServerAction } from "@/hooks/use-action-form";
+import type { ImageModel } from "@/lib/design-system/types";
+import type { PendingImage } from "@/lib/validation/image";
 import { itemFormData } from "@/lib/validation/form-values";
 import { menuItemFormSchema, type MenuItemFormValues } from "@/lib/validation/schemas";
 
@@ -33,6 +37,8 @@ export interface ItemFormProps {
   successMessage?: string;
   /** Unique within the page, so labels and errors point at the right inputs. */
   idPrefix: string;
+  /** The dish's stored photograph, when editing one that has it. */
+  currentImage?: ImageModel | null;
 }
 
 /**
@@ -53,6 +59,7 @@ export function ItemForm({
   onSuccess,
   successMessage,
   idPrefix,
+  currentImage = null,
 }: ItemFormProps) {
   const t = useTranslations("MenuEditor");
   const tErrors = useTranslations("Auth.errors");
@@ -60,7 +67,16 @@ export function ItemForm({
 
   const isEditing = hidden.itemId !== undefined;
 
-  const { form, formAction, onSubmit, pending, summary } = useActionForm<ItemFormValues>({
+  /**
+   * What should happen to the photograph when this dish is saved.
+   *
+   * Held here rather than uploaded on the spot, which is what makes cancelling
+   * free: a file chosen and then abandoned was never sent, so there is no
+   * orphaned object in storage to clean up afterwards.
+   */
+  const [image, setImage] = useState<PendingImage>({ kind: "keep" });
+
+  const { form, formAction, onSubmit, pending, state, summary } = useActionForm<ItemFormValues>({
     action,
     schema: menuItemFormSchema,
     defaultValues: {
@@ -68,9 +84,12 @@ export function ItemForm({
       description: defaults?.description ?? "",
       priceCzk: defaults?.priceCzk ?? "",
     },
-    toFormData: (values) => itemFormData(values, hidden),
+    toFormData: (values) => itemFormData(values, hidden, image),
     onSuccess: (saved) => {
       if (successMessage) toast.success(successMessage);
+      // The photograph is stored now, so the field goes back to resting state
+      // and stops offering to upload what it already uploaded.
+      setImage({ kind: "keep" });
       // Adding: an empty form, ready for the next dish. Editing: the row is
       // about to close, so clearing it would only be a flicker.
       if (!isEditing) saved.reset();
@@ -82,6 +101,9 @@ export function ItemForm({
   const nameError = fieldCode(errors.name?.message);
   const descriptionError = fieldCode(errors.description?.message);
   const priceError = fieldCode(errors.priceCzk?.message);
+  // The file never passes through the zod schema — it is not a typed value — so
+  // its rejection arrives on the action's own field map instead.
+  const imageError = state.status === "error" ? state.fields?.image : undefined;
 
   return (
     <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
@@ -124,6 +146,17 @@ export function ItemForm({
             </FieldError>
           ) : null}
         </Field>
+
+        <ImageField
+          kind="dish"
+          current={currentImage}
+          label={t("itemPhoto")}
+          previewAlt={defaults?.name ?? t("itemPhoto")}
+          idPrefix={`${idPrefix}-image`}
+          error={imageError}
+          disabled={pending}
+          onChange={setImage}
+        />
 
         <Field data-invalid={priceError ? true : undefined}>
           <FieldLabel htmlFor={`${idPrefix}-price`}>{t("itemPrice")}</FieldLabel>

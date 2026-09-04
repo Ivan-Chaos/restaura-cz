@@ -27,6 +27,30 @@ This document is the single source of truth for the frontend ↔ API contract. P
 
 **Error codes**: `VALIDATION_FAILED` (400) · `UNAUTHENTICATED` (401) · `EMAIL_TAKEN` (409) · `INVALID_CREDENTIALS` (401) · `NOT_FOUND` (404) · `INTERNAL` (500).
 
+### Image references (feature 006)
+
+Every stored image travels as the same object, or `null` when there is none:
+
+```ts
+interface ImageRef { url: string; width: number; height: number }
+```
+
+`url` is absolute, under the deployment's image host. Storage keys are **never** exposed. The dimensions are the stored rendition's own, so a consumer can reserve the right box before the bytes arrive.
+
+**Upload requests** are `multipart/form-data` with one file part named `file` (≤ 10 MiB; JPEG, PNG or WebP **by content**, never by filename or declared type) and an optional framing: `cropX`, `cropY`, `cropWidth`, `cropHeight`, as integers in **oriented** source pixels — what the owner saw after the browser applied any EXIF rotation. All four or none; three coordinates are rejected rather than ignored. Without them the API centre-crops, which is what makes a plain form post with no client JavaScript work.
+
+The API always auto-orients, crops, resizes to one fixed rendition per kind, strips metadata, and discards the original. Logos are 512×512 PNG (transparency preserved); dish photos are 1600×1200 JPEG.
+
+**Additional field-error codes** (`details[].code`), all returned as `400 VALIDATION_FAILED` so a form marks the image control exactly as it marks a bad price:
+
+| Code | Field | Meaning |
+|---|---|---|
+| `MAX_FILE_SIZE` | `file` | Over the 10 MiB cap |
+| `IS_IMAGE` | `file` | Not a decodable JPEG, PNG or WebP (SVG, GIF, HEIC, renamed text, truncated files) |
+| `IS_CROP` | `crop` | Framing partially supplied, or it does not fit inside the oriented image |
+
+`IS_INT` and `MIN` may also appear on the individual crop fields.
+
 ## Auth endpoints
 
 ### POST /auth/sign-up
@@ -53,6 +77,28 @@ Request: `{ "email": "owner@example.com", "password": "min 8 chars" }`
 ### GET /auth/me 🔒
 
 - `200` → `{ "account": { "id", "email" } }`. Used by the frontend to gate workspace routes.
+
+### Profile shape (feature 006)
+
+Every response carrying a `profile` — sign-up, sign-in, `/auth/me`, `PUT /auth/profile` — includes `logo`:
+
+```json
+{ "profile": { "restaurantName": "U Zlaté Lípy", "phones": ["+420 601 234 567"], "location": "…", "logo": null } }
+```
+
+`PUT /auth/profile` does **not** accept `logo` in its body (the whitelist rejects it) and never changes it: the logo has its own endpoints, so saving the restaurant's details cannot disturb it.
+
+### PUT /auth/profile/logo 🔒
+
+Multipart, per the upload shape above. Requires a session **and** an existing profile; an account with `profile: null` gets `404`. Email verification is deliberately *not* required — the profile is editable before verification, and the logo follows the profile.
+
+- `200` → `{ "profile": { …, "logo": { "url": "…/logos/3f2c….png", "width": 512, "height": 512 } } }`
+- Replaces any existing logo; the previous object stops being served.
+- `400 VALIDATION_FAILED` per the code table; `401 UNAUTHENTICATED`.
+
+### DELETE /auth/profile/logo 🔒
+
+No body. `200` → `{ "profile": { …, "logo": null } }`. Idempotent: removing when none is set is still `200`. `404` when the account has no profile.
 
 ## Owner menu endpoints (all 🔒)
 
@@ -85,7 +131,7 @@ Full editor payload:
       {
         "id": "…", "title": "Starters", "position": 0,
         "items": [
-          { "id": "…", "name": "Soup", "description": null, "priceCzk": 89, "position": 0 }
+          { "id": "…", "name": "Soup", "description": null, "priceCzk": 89, "position": 0, "image": null }
         ]
       }
     ]
@@ -147,6 +193,24 @@ Request (at least one): `{ "name", "description", "priceCzk", "position" }` — 
 
 No body. `201` → `{ "item": … }` — a copy of the dish carrying the same name, description and price, inserted directly **after** the original, with the following siblings renumbered. One endpoint rather than a create plus a reorder, so a half-applied duplicate cannot exist.
 
+The copy's `image` is always `null` (feature 006): two rows must never reference one stored object, or deleting either would break the other.
+
+### PUT /menus/:menuId/sections/:sectionId/items/:itemId/image 🔒
+
+Multipart, per the upload shape in Conventions. `PATCH` on the item does **not** accept `image`; the photo has its own endpoints so an ordinary text edit is still an ordinary JSON request.
+
+- `200` → `{ "item": { …, "image": { "url": "…/dishes/9a1e….jpg", "width": 1600, "height": 1200 } } }`
+- Replaces any existing photo and touches the menu's `updatedAt`.
+- `400 VALIDATION_FAILED` per the code table; `401`; `403 EMAIL_UNVERIFIED`; `404` for a missing or foreign menu, section or item.
+
+### DELETE /menus/:menuId/sections/:sectionId/items/:itemId/image 🔒
+
+No body. `200` → `{ "item": { …, "image": null } }`. Idempotent. Touches `updatedAt`.
+
+### Deleting an item, section or menu (feature 006)
+
+Response shapes are unchanged. In addition to the row cascade, every stored photo beneath the deleted subtree is removed from object storage.
+
 ### DELETE /menus/:menuId/sections/:sectionId/items/:itemId
 
 `204`.
@@ -163,19 +227,27 @@ Serves a published menu for guest display (FR-018). Draft menus and unknown slug
 {
   "menu": {
     "name": "Lunch",
+    "restaurantName": "U Zlaté Lípy",
     "visualVariant": "default",
+    "logo": { "url": "…/logos/3f2c….png", "width": 512, "height": 512 },
     "sections": [
       {
         "title": "Starters",
-        "items": [ { "name": "Soup", "description": null, "priceCzk": 89 } ]
+        "items": [ { "name": "Soup", "description": null, "priceCzk": 89, "image": null } ]
       }
     ]
   }
 }
 ```
 
-- Display fields only — no ids, no account data, no timestamps.
+- Display fields only — no ids, no keys, no account data, no timestamps.
+- `restaurantName` (feature 006) travels so the logo has a text alternative naming the restaurant rather than the menu; a menu called "Lunch" depicts nothing. It is already visible on the restaurant's own menus and reveals nothing new.
+- `logo` and each item's `image` are `ImageRef | null`. Consumers MUST render the no-image presentation for `null` and MUST NOT treat it as an error, and MUST fall back to that same presentation if a URL fails to load.
 - Reflects the latest saved content on every request (FR-020); performance budget p95 ≤ 200 ms.
+
+### GET /dev-images/*key (development only)
+
+Serves stored renditions from the local disk, and exists **only** when the R2 variables are unset. Deployed environments serve images from the bucket's own hostname and never mount this route. `Cache-Control: public, max-age=31536000, immutable`; `404` for an unknown key. Not part of the production contract.
 
 ## Contract test obligations
 

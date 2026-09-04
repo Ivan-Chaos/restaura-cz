@@ -168,14 +168,90 @@ at the repository root, with the cross-app contract in its `contracts/http-api.m
 - **`GuestMenu` is not `SampleMenu`.** `SampleMenu` is the design system's showcase and always
   renders the specials strip and the full allergen legend, because its fixture always has that
   data. A menu built in the editor has none of it, and printing a legend for allergens nobody
-  declared tells guests something untrue. When the editor starts collecting photos, markers and
-  allergens, grow `GuestMenu` to match — the components already exist.
+  declared tells guests something untrue. Photographs have since arrived (feature 006) and
+  `GuestMenu` grew to match; markers and allergens are still to come, and the components for
+  them already exist.
 - **`lib/menu-display/adapter.ts` is the only seam** between the API's shape and the design
   system's `Menu`. Prices are korunas both sides (`{ kind: "single", … }`); category ids
   are slugified titles plus an index, because they double as element ids and two sections may
   share a title.
 - **A draft menu and an address that never existed answer identically** (404 plus the
   not-available page). Anything else lets the public route enumerate which menus exist.
+
+# Images: logos and dish photographs (feature 006)
+
+Owners upload one square logo per restaurant and at most one 4:3 photograph per
+dish. Both are optional and always have been survivable: a restaurant with no
+logo is shown by name, a dish with no photograph is shown without one. Spec:
+`specs/006-image-uploads/`.
+
+- **The browser never uploads to the API or to the bucket.** A file goes to a
+  Server Action in that action's own multipart body and is relayed onward by
+  `apiRequest`, which now accepts a `FormData` and sends it with **no**
+  `Content-Type` header — fetch generates the multipart boundary, and setting
+  the header by hand omits it and makes the body unparseable.
+- **The browser sends the original plus a rectangle; the API does the cropping.**
+  `ImageCropDialog` reports `{ x, y, width, height }` in **oriented** source
+  pixels — what the owner saw after the browser applied EXIF rotation — and
+  `processImage` calls `.rotate()` before measuring, so both sides describe the
+  same image without converting anything. One lossy encode, done once, server
+  side. A body with no rectangle is centre-cropped, which is what makes the
+  no-JavaScript path work.
+- **Acceptance is decided by decoding the bytes, never by the filename.**
+  `sharp` reports the format; only JPEG, PNG and WebP are stored. SVG, GIF and
+  HEIC are refused, so `dangerouslyAllowSVG` in `next.config.ts` can only ever
+  see SVGs from our own repository. The browser sniffs the same magic numbers in
+  `lib/validation/image.ts` first, so a renamed text file costs no request.
+- **Renditions are fixed: 512×512 PNG for a logo (alpha kept), 1600×1200 JPEG
+  for a dish.** The original never survives the request, and EXIF is stripped —
+  an owner photographing their kitchen should not be publishing its
+  coordinates.
+- **Keys are random UUIDs and are never derived from an id.** Stored images are
+  served from a public bucket with no authentication, so a key derived from an
+  account or a menu would let anyone who knows one address walk the rest.
+  Storage keys never cross the wire; only URLs do (`ImageRef`).
+- **Attach happens in the upload request, so there is no orphan state.** Write
+  the object under a new key, update the row, then delete the old key. If the
+  row update fails the just-written object is removed; if the delete fails the
+  row is already right and the key is logged. `node dist/images/sweep.js`
+  (`pnpm --filter api images:sweep`) collects anything left over that is more
+  than a day old — the grace period is what stops it deleting an upload still in
+  flight.
+- **A replacement always gets a new key**, which is why objects can be served
+  `immutable` for a year with no risk of a stale picture.
+- **`ImageField` is the one upload control**, shared by the logo in settings and
+  the photograph on a dish. It holds the chosen file in memory until the form is
+  saved — that is what makes cancelling free, and why this feature needs no
+  cleanup job for the ordinary case. `ImageCropDialog` is loaded with
+  `next/dynamic` only when a file is chosen, so the crop library never reaches a
+  guest route. Hosts pass `label` (their own vocabulary) and may pass
+  `removeSlot` to replace the built-in Remove — the logo does, because removing
+  it saves at once and so deserves a confirmation.
+- **The logo saves the moment a framing is confirmed; a dish photograph waits
+  for the dish to be saved.** Positioning a mark *is* the decision, whereas a
+  dish is not finished until its text is. `LogoField` is keyed on the stored
+  logo's URL so a completed save hands the field fresh state instead of leaving
+  the local preview on screen.
+- **`SafeImage` is the only client component the feature adds to the guest
+  page.** A stored object can go missing, and the browser's answer is a
+  broken-image icon — the one thing a restaurant's menu must never show. It
+  falls back to the placeholder a dish without a photograph gets, and to nothing
+  at all for a logo, so the restaurant name stands alone. `onError` is a
+  function prop, which is why it cannot be a Server Component.
+- **`GuestMenu` picks rows or cards per category, by whether anything in it has
+  a photograph.** That is what the presentation recipe's two layouts (`rows`,
+  `cards`) were always for. A long drinks list stays a list; a photographed
+  section becomes cards, because a photograph needs a card to sit in.
+- **`IMAGE_PUBLIC_URL` is build-time on the frontend** (it feeds
+  `images.remotePatterns`) and runtime on the API. They must match. Unset, both
+  fall back to the API's own `/dev-images` route backed by the local disk, which
+  is what lets the whole flow — and its end-to-end tests — run with no
+  Cloudflare account and no network. `dangerouslyAllowLocalIP` is derived from
+  that host, so pointing a build at a real bucket restores Next's SSRF
+  protection by itself.
+- **Fixtures live in `tests/fixtures/images/`**, with a README saying what each
+  one proves. The two large ones are generated on demand by `generate.mjs`
+  rather than committed.
 
 # Forms and validation
 

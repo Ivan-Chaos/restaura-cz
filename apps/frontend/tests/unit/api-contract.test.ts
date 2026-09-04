@@ -33,6 +33,7 @@ describe("response shapes match the contract", () => {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567"],
         location: "Náměstí Míru 12, 120 00 Praha 2",
+        logo: null,
       },
     };
     expectTypeOf(payload).toExtend<AccountResponse>();
@@ -61,6 +62,7 @@ describe("response shapes match the contract", () => {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567"],
         location: "Náměstí Míru 12, 120 00 Praha 2",
+        logo: null,
       },
     };
     expectTypeOf(payload).toExtend<AccountResponse>();
@@ -73,6 +75,7 @@ describe("response shapes match the contract", () => {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567", "222 333 444"],
         location: "Náměstí Míru 12, 120 00 Praha 2",
+        logo: { url: "https://img.example.com/logos/3f2c.png", width: 512, height: 512 },
       },
     };
     expectTypeOf(payload).toExtend<ProfileResponse>();
@@ -111,7 +114,14 @@ describe("response shapes match the contract", () => {
             title: "Starters",
             position: 0,
             items: [
-              { id: "item-1", name: "Soup", description: null, priceCzk: 89, position: 0 },
+              {
+                id: "item-1",
+                name: "Soup",
+                description: null,
+                priceCzk: 89,
+                position: 0,
+                image: null,
+              },
             ],
           },
         ],
@@ -139,14 +149,39 @@ describe("response shapes match the contract", () => {
     const payload = {
       menu: {
         name: "Lunch",
+        restaurantName: "U Zlaté Lípy",
         visualVariant: "default",
+        logo: { url: "https://img.example.com/logos/3f2c.png", width: 512, height: 512 },
         sections: [
-          { title: "Starters", items: [{ name: "Soup", description: null, priceCzk: 89 }] },
+          {
+            title: "Starters",
+            items: [
+              {
+                name: "Soup",
+                description: null,
+                priceCzk: 89,
+                image: {
+                  url: "https://img.example.com/dishes/9a1e.jpg",
+                  width: 1600,
+                  height: 1200,
+                },
+              },
+              { name: "Bread", description: null, priceCzk: 25, image: null },
+            ],
+          },
         ],
       },
     };
     expectTypeOf(payload).toExtend<PublicMenuResponse>();
     expect(JSON.stringify(payload)).not.toContain('"id"');
+    // The restaurant's name travels so the logo has a text alternative naming
+    // the restaurant rather than the menu (feature 006, FR-004).
+    expect(payload.menu.restaurantName).toBe("U Zlaté Lípy");
+    // A photographed dish and a plain one in the same menu is the normal case.
+    expect(payload.menu.sections[0]?.items[0]?.image?.width).toBe(1600);
+    expect(payload.menu.sections[0]?.items[1]?.image).toBeNull();
+    // Storage keys never cross the wire — only the URL a browser fetches.
+    expect(JSON.stringify(payload)).not.toContain('"key"');
   });
 
   it("carries any allowlisted visual variant, not only the default (feature 005)", () => {
@@ -162,7 +197,13 @@ describe("response shapes match the contract", () => {
       },
     };
     const publicMenu = {
-      menu: { name: "Lunch", visualVariant: "green-bar", sections: [] },
+      menu: {
+        name: "Lunch",
+        restaurantName: "U Zlaté Lípy",
+        visualVariant: "green-bar",
+        logo: null,
+        sections: [],
+      },
     };
     expectTypeOf(detail).toExtend<MenuDetailResponse>();
     expectTypeOf(publicMenu).toExtend<PublicMenuResponse>();

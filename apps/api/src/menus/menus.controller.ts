@@ -8,13 +8,18 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Req,
+  UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { SessionGuard, type AuthenticatedRequest } from '../common/session.guard.js';
 import { UuidParam } from '../common/uuid-param.pipe.js';
 import { VerifiedGuard } from '../common/verified.guard.js';
+import { CropDto, toCropRect } from '../images/dto/crop.dto.js';
+import { requireFile, type UploadedImage } from '../images/require-file.js';
+import { ImageUpload } from '../images/upload.interceptor.js';
 import { CreateItemDto, UpdateItemDto } from './dto/item.dto.js';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto.js';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto.js';
@@ -178,6 +183,57 @@ export class MenusController {
   ): Promise<{ item: ItemView }> {
     return {
       item: await this.menus.updateItem(this.accountId(request), menuId, sectionId, itemId, dto),
+    };
+  }
+
+  /**
+   * A dish's photograph (feature 006).
+   *
+   * Its own endpoint rather than a field on the item PATCH, so an ordinary text
+   * edit stays an ordinary JSON request: folding a file into it would make
+   * every price change a multipart upload, and would mix two failure domains in
+   * one call.
+   */
+  @Put(':menuId/sections/:sectionId/items/:itemId/image')
+  @HttpCode(HttpStatus.OK)
+  @ImageUpload()
+  async putItemImage(
+    @Req() request: Request,
+    @Param('menuId', UuidParam) menuId: string,
+    @Param('sectionId', UuidParam) sectionId: string,
+    @Param('itemId', UuidParam) itemId: string,
+    @UploadedFile() file: UploadedImage | undefined,
+    @Body() crop: CropDto,
+  ): Promise<{ item: ItemView }> {
+    const upload = requireFile(file);
+    return {
+      item: await this.menus.setItemImage(
+        this.accountId(request),
+        menuId,
+        sectionId,
+        itemId,
+        upload.buffer,
+        toCropRect(crop),
+      ),
+    };
+  }
+
+  /** Idempotent: a dish with no photograph is already in the state asked for. */
+  @Delete(':menuId/sections/:sectionId/items/:itemId/image')
+  @HttpCode(HttpStatus.OK)
+  async removeItemImage(
+    @Req() request: Request,
+    @Param('menuId', UuidParam) menuId: string,
+    @Param('sectionId', UuidParam) sectionId: string,
+    @Param('itemId', UuidParam) itemId: string,
+  ): Promise<{ item: ItemView }> {
+    return {
+      item: await this.menus.removeItemImage(
+        this.accountId(request),
+        menuId,
+        sectionId,
+        itemId,
+      ),
     };
   }
 

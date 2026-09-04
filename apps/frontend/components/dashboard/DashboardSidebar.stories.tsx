@@ -69,3 +69,20 @@ export const OnTheMenuEditor: Story = {
 export const WithALongRestaurantName: Story = {
   args: { restaurantName: "Restaurace U Zlaté Lípy a Slavnostních Příležitostí" },
 };
+
+/**
+ * With a logo uploaded (feature 006). It sits beside the name rather than
+ * replacing it: an owner signed into several restaurants reads the name, and
+ * the mark is the faster recognition once they know it.
+ */
+export const WithLogo: Story = {
+  args: {
+    restaurantName: "U Zlaté Lípy",
+    logo: {
+      src: "/sample-menu/svickova.svg",
+      alt: "U Zlaté Lípy",
+      width: 512,
+      height: 512,
+    },
+  },
+};

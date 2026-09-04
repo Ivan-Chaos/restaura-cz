@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -8,12 +9,16 @@ import {
   Put,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AppError } from '../common/app-error.js';
 import { SessionGuard, type AuthenticatedRequest } from '../common/session.guard.js';
 import { loadEnv } from '../config/env.js';
+import { CropDto, toCropRect } from '../images/dto/crop.dto.js';
+import { requireFile, type UploadedImage } from '../images/require-file.js';
+import { ImageUpload } from '../images/upload.interceptor.js';
 import {
   AuthService,
   type IssuedSession,
@@ -145,6 +150,47 @@ export class AuthController {
     if (!account) throw AppError.unauthenticated();
 
     return { profile: await this.auth.upsertProfile(account.id, dto) };
+  }
+
+  /**
+   * The restaurant's logo (feature 006).
+   *
+   * Session-guarded but deliberately **not** VerifiedGuard-guarded: the profile
+   * itself is editable before an address is confirmed, and the logo is part of
+   * the profile, so gating it more tightly than the name beside it would be an
+   * inconsistency an owner would notice and nobody could explain.
+   *
+   * Multipart rather than JSON, and separate from `PUT /auth/profile`, so an
+   * ordinary details save stays an ordinary JSON request and cannot disturb the
+   * image.
+   */
+  @Put('profile/logo')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SessionGuard)
+  @ImageUpload()
+  async putLogo(
+    @Req() request: Request,
+    @UploadedFile() file: UploadedImage | undefined,
+    @Body() crop: CropDto,
+  ): Promise<{ profile: PublicProfile }> {
+    const { account } = request as AuthenticatedRequest;
+    if (!account) throw AppError.unauthenticated();
+
+    const upload = requireFile(file);
+    return {
+      profile: await this.auth.setLogo(account.id, upload.buffer, toCropRect(crop)),
+    };
+  }
+
+  /** Idempotent: removing a logo that is not there is the state asked for. */
+  @Delete('profile/logo')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SessionGuard)
+  async deleteLogo(@Req() request: Request): Promise<{ profile: PublicProfile }> {
+    const { account } = request as AuthenticatedRequest;
+    if (!account) throw AppError.unauthenticated();
+
+    return { profile: await this.auth.removeLogo(account.id) };
   }
 
   private respondWithSession(issued: IssuedSession, response: Response): AccountPayload {

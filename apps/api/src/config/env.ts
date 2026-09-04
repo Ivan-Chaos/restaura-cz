@@ -2,6 +2,7 @@
  * Environment access, read at boot so a misconfigured process fails with a
  * readable message instead of at the first request with a connection error.
  */
+import { join } from 'node:path';
 import { DEFAULT_EMAIL_FROM } from '../mail/addresses.js';
 
 /**
@@ -53,6 +54,81 @@ function boolean(name: string, fallback: boolean): boolean {
   throw new Error(`Environment variable ${name} must be "true" or "false", got "${raw}".`);
 }
 
+/**
+ * Where uploaded images are kept.
+ *
+ * Two shapes rather than one with optional fields, because the adapter that
+ * consumes this needs either all five R2 values or none of them, and a type
+ * that can express "half configured" is a type every caller has to re-check.
+ */
+export type ImageStorageEnv =
+  | {
+      kind: 'r2';
+      accountId: string;
+      accessKeyId: string;
+      secretAccessKey: string;
+      bucket: string;
+      /** Public base URL, no trailing slash. */
+      publicUrl: string;
+    }
+  | {
+      kind: 'local';
+      /** Absolute path the API writes renditions under. */
+      directory: string;
+      /** Public base URL of the API's own /dev-images route, no trailing slash. */
+      publicUrl: string;
+    };
+
+/** The five variables that configure R2. All of them, or none of them. */
+const R2_VARIABLES = [
+  'R2_ACCOUNT_ID',
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
+  'R2_BUCKET',
+  'IMAGE_PUBLIC_URL',
+] as const;
+
+function withoutTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
+}
+
+/**
+ * Reads the image-storage configuration.
+ *
+ * Absent entirely, the API stores renditions on disk and serves them itself,
+ * so the whole upload flow is developable and testable with no credentials and
+ * no network — the same reasoning as `RESEND_API_KEY`. Half-present is always a
+ * mistake, and one that would otherwise surface as a 500 on the first upload,
+ * so it fails at boot naming exactly what is missing.
+ */
+export function loadImageStorageEnv(port: number, cwd = process.cwd()): ImageStorageEnv {
+  const present = R2_VARIABLES.filter((name) => optional(name) !== undefined);
+
+  if (present.length === 0) {
+    return {
+      kind: 'local',
+      directory: join(cwd, '.images'),
+      publicUrl: `http://localhost:${port}/dev-images`,
+    };
+  }
+
+  if (present.length !== R2_VARIABLES.length) {
+    const missing = R2_VARIABLES.filter((name) => optional(name) === undefined);
+    throw new Error(
+      `Image storage is half configured. Set all of ${R2_VARIABLES.join(', ')} or none of them. Missing: ${missing.join(', ')}.`,
+    );
+  }
+
+  return {
+    kind: 'r2',
+    accountId: required('R2_ACCOUNT_ID'),
+    accessKeyId: required('R2_ACCESS_KEY_ID'),
+    secretAccessKey: required('R2_SECRET_ACCESS_KEY'),
+    bucket: required('R2_BUCKET'),
+    publicUrl: withoutTrailingSlash(required('IMAGE_PUBLIC_URL')),
+  };
+}
+
 export interface Env {
   databaseUrl: string;
   port: number;
@@ -77,16 +153,23 @@ export interface Env {
    * frontend lives.
    */
   appUrl: string;
+  /**
+   * Where uploaded logos and dish photos are stored. Cloudflare R2 when the
+   * five R2 variables are set, the local disk otherwise.
+   */
+  imageStorage: ImageStorageEnv;
 }
 
 export function loadEnv(): Env {
   loadDotEnv();
+  const apiPort = port('PORT', 3001);
   return {
     databaseUrl: required('DATABASE_URL'),
-    port: port('PORT', 3001),
+    port: apiPort,
     cookieSecure: boolean('COOKIE_SECURE', false),
     resendApiKey: optional('RESEND_API_KEY'),
     emailFrom: optional('EMAIL_FROM') ?? DEFAULT_EMAIL_FROM,
-    appUrl: (optional('APP_URL') ?? 'http://localhost:3000').replace(/\/+$/, ''),
+    appUrl: withoutTrailingSlash(optional('APP_URL') ?? 'http://localhost:3000'),
+    imageStorage: loadImageStorageEnv(apiPort),
   };
 }

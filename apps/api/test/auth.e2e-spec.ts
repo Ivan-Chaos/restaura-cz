@@ -50,6 +50,7 @@ describe('auth (US1)', () => {
         // The owner's order and their own formatting both survive.
         phones: ['+420 601 234 567', '222 333 444'],
         location: 'Náměstí Míru 12, 120 00 Praha 2',
+        logo: null,
       });
     });
 
@@ -323,7 +324,7 @@ describe('auth (US1)', () => {
         email: owner.email,
         emailVerified: true,
       });
-      expect(response.body.profile).toEqual(PROFILE);
+      expect(response.body.profile).toEqual({ ...PROFILE, logo: null });
     });
 
     it('rejects a request with no session', async () => {

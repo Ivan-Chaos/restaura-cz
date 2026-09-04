@@ -1,8 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { and, asc, desc, eq, inArray, isNotNull, sql, type SQL } from 'drizzle-orm';
 import { AppError } from '../common/app-error.js';
 import { DRIZZLE, type DrizzleDb } from '../db/client.js';
-import { menu, menuItem, menuSection } from '../db/schema.js';
+import { menu, menuItem, menuSection, restaurantProfile } from '../db/schema.js';
+import { processImage, type CropRect } from '../images/image-processor.js';
+import { toImageRef, type ImageRef } from '../images/image-ref.js';
+import { newDishKey } from '../images/keys.js';
+import { IMAGE_STORAGE, type ImageStorage } from '../images/storage/image-storage.js';
 import { moveWithin } from './ordering.js';
 import { generateSlug } from './slug.js';
 
@@ -30,6 +34,8 @@ export interface ItemView {
   description: string | null;
   priceCzk: number;
   position: number;
+  /** The dish's photograph, or null — which is the normal state. */
+  image: ImageRef | null;
 }
 
 export interface SectionView {
@@ -48,11 +54,15 @@ export interface PublicMenuItem {
   name: string;
   description: string | null;
   priceCzk: number;
+  image: ImageRef | null;
 }
 
 export interface PublicMenuView {
   name: string;
+  /** The restaurant behind the menu, so its logo can be described in words. */
+  restaurantName: string;
   visualVariant: string;
+  logo: ImageRef | null;
   sections: { title: string; items: PublicMenuItem[] }[];
 }
 
@@ -63,7 +73,56 @@ type Executor = DrizzleDb | Tx;
 
 @Injectable()
 export class MenusService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDb) {}
+  private readonly logger = new Logger(MenusService.name);
+
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDb,
+    @Inject(IMAGE_STORAGE) private readonly storage: ImageStorage,
+  ) {}
+
+  /**
+   * Every column an `ItemView` is built from, in one place.
+   *
+   * Five queries return a dish, and before this they each listed their own
+   * columns — which is five places to forget when a column is added, and
+   * exactly how a photo would end up visible in the editor but missing from
+   * the guest page.
+   */
+  private static readonly ITEM_COLUMNS = {
+    id: menuItem.id,
+    name: menuItem.name,
+    description: menuItem.description,
+    priceCzk: menuItem.priceCzk,
+    position: menuItem.position,
+    imageKey: menuItem.imageKey,
+    imageWidth: menuItem.imageWidth,
+    imageHeight: menuItem.imageHeight,
+  };
+
+  /** One row, one wire shape. Storage keys never leave this method. */
+  private toItemView(row: {
+    id: string;
+    name: string;
+    description: string | null;
+    priceCzk: number;
+    position: number;
+    imageKey: string | null;
+    imageWidth: number | null;
+    imageHeight: number | null;
+  }): ItemView {
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      priceCzk: row.priceCzk,
+      position: row.position,
+      image: toImageRef(this.storage, {
+        key: row.imageKey,
+        width: row.imageWidth,
+        height: row.imageHeight,
+      }),
+    };
+  }
 
   // ---------------------------------------------------------------- menus
 
@@ -102,14 +161,7 @@ export class MenusService {
 
     const items = sections.length
       ? await this.db
-          .select({
-            id: menuItem.id,
-            sectionId: menuItem.sectionId,
-            name: menuItem.name,
-            description: menuItem.description,
-            priceCzk: menuItem.priceCzk,
-            position: menuItem.position,
-          })
+          .select({ ...MenusService.ITEM_COLUMNS, sectionId: menuItem.sectionId })
           .from(menuItem)
           .where(
             inArray(
@@ -128,13 +180,7 @@ export class MenusService {
         ...section,
         items: items
           .filter((item) => item.sectionId === section.id)
-          .map((item) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            priceCzk: item.priceCzk,
-            position: item.position,
-          })),
+          .map((item) => this.toItemView(item)),
       })),
     };
   }
@@ -159,9 +205,26 @@ export class MenusService {
   }
 
   async deleteMenu(accountId: string, menuId: string): Promise<void> {
-    await this.requireOwnedMenu(this.db, accountId, menuId);
-    // Sections and items go with it through ON DELETE CASCADE.
-    await this.db.delete(menu).where(eq(menu.id, menuId));
+    let orphaned: string[] = [];
+
+    await this.db.transaction(async (tx) => {
+      await this.requireOwnedMenu(tx, accountId, menuId);
+
+      // The cascade removes the rows that name these objects, so the keys have
+      // to be read while those rows still exist.
+      orphaned = await this.imageKeysOfItems(
+        tx,
+        inArray(
+          menuItem.sectionId,
+          tx.select({ id: menuSection.id }).from(menuSection).where(eq(menuSection.menuId, menuId)),
+        ),
+      );
+
+      // Sections and items go with it through ON DELETE CASCADE.
+      await tx.delete(menu).where(eq(menu.id, menuId));
+    });
+
+    await this.forget(orphaned, 'deleting a menu');
   }
 
   // ----------------------------------------------------------- publishing
@@ -202,9 +265,28 @@ export class MenusService {
 
   /** The guest-facing read. Draft menus and unknown slugs are equally not found. */
   async getPublicMenu(slug: string): Promise<PublicMenuView> {
+    /**
+     * An inner join on the profile, not a left join: publishing requires a
+     * verified account with a completed profile, so every published menu has
+     * one. A menu that somehow does not is unpublishable and is reported as
+     * not found, like any other address that leads nowhere.
+     *
+     * The restaurant's name comes along because the logo needs a text
+     * alternative that names the restaurant — a menu called "Polední menu"
+     * describes nothing about the mark beside it (feature 006, FR-004).
+     */
     const [found] = await this.db
-      .select({ id: menu.id, name: menu.name, visualVariant: menu.visualVariant })
+      .select({
+        id: menu.id,
+        name: menu.name,
+        visualVariant: menu.visualVariant,
+        restaurantName: restaurantProfile.restaurantName,
+        logoKey: restaurantProfile.logoKey,
+        logoWidth: restaurantProfile.logoWidth,
+        logoHeight: restaurantProfile.logoHeight,
+      })
       .from(menu)
+      .innerJoin(restaurantProfile, eq(restaurantProfile.accountId, menu.accountId))
       .where(and(eq(menu.publicSlug, slug), eq(menu.status, 'published')))
       .limit(1);
 
@@ -217,6 +299,9 @@ export class MenusService {
         itemName: menuItem.name,
         itemDescription: menuItem.description,
         itemPriceCzk: menuItem.priceCzk,
+        itemImageKey: menuItem.imageKey,
+        itemImageWidth: menuItem.imageWidth,
+        itemImageHeight: menuItem.imageHeight,
       })
       .from(menuSection)
       .leftJoin(menuItem, eq(menuItem.sectionId, menuSection.id))
@@ -248,11 +333,26 @@ export class MenusService {
           name: row.itemName,
           description: row.itemDescription,
           priceCzk: row.itemPriceCzk,
+          image: toImageRef(this.storage, {
+            key: row.itemImageKey,
+            width: row.itemImageWidth,
+            height: row.itemImageHeight,
+          }),
         });
       }
     }
 
-    return { name: found.name, visualVariant: found.visualVariant, sections };
+    return {
+      name: found.name,
+      restaurantName: found.restaurantName,
+      visualVariant: found.visualVariant,
+      logo: toImageRef(this.storage, {
+        key: found.logoKey,
+        width: found.logoWidth,
+        height: found.logoHeight,
+      }),
+      sections,
+    };
   }
 
   // ------------------------------------------------------------- sections
@@ -309,15 +409,22 @@ export class MenusService {
   }
 
   async deleteSection(accountId: string, menuId: string, sectionId: string): Promise<void> {
+    let orphaned: string[] = [];
+
     await this.db.transaction(async (tx) => {
       await this.requireOwnedMenu(tx, accountId, menuId);
       await this.requireSection(tx, menuId, sectionId);
+
+      // Read before the cascade takes the rows that name these objects.
+      orphaned = await this.imageKeysOfItems(tx, eq(menuItem.sectionId, sectionId));
 
       // Items in the section go with it through ON DELETE CASCADE.
       await tx.delete(menuSection).where(eq(menuSection.id, sectionId));
       await this.writeSectionPositions(tx, await this.sectionIdsInOrder(tx, menuId));
       await this.touchMenu(tx, menuId);
     });
+
+    await this.forget(orphaned, 'deleting a section');
   }
 
   // ---------------------------------------------------------------- items
@@ -346,13 +453,9 @@ export class MenusService {
       if (!row) throw new Error('Item insert returned no row');
 
       await this.touchMenu(tx, menuId);
-      return {
-        id: row.id,
-        name: row.name,
-        description: row.description,
-        priceCzk: row.priceCzk,
-        position: row.position,
-      };
+      // A new dish has no photograph. The insert returns every column, so the
+      // shared mapper builds the view rather than a second column list.
+      return this.toItemView(row);
     });
   }
 
@@ -411,18 +514,12 @@ export class MenusService {
       await this.touchMenu(tx, menuId);
 
       const [row] = await tx
-        .select({
-          id: menuItem.id,
-          name: menuItem.name,
-          description: menuItem.description,
-          priceCzk: menuItem.priceCzk,
-          position: menuItem.position,
-        })
+        .select(MenusService.ITEM_COLUMNS)
         .from(menuItem)
         .where(eq(menuItem.id, copy.id))
         .limit(1);
       if (!row) throw new Error('Duplicated item vanished inside its own transaction');
-      return row;
+      return this.toItemView(row);
     });
   }
 
@@ -455,18 +552,12 @@ export class MenusService {
       await this.touchMenu(tx, menuId);
 
       const [row] = await tx
-        .select({
-          id: menuItem.id,
-          name: menuItem.name,
-          description: menuItem.description,
-          priceCzk: menuItem.priceCzk,
-          position: menuItem.position,
-        })
+        .select(MenusService.ITEM_COLUMNS)
         .from(menuItem)
         .where(eq(menuItem.id, itemId))
         .limit(1);
       if (!row) throw AppError.notFound();
-      return row;
+      return this.toItemView(row);
     });
   }
 
@@ -476,15 +567,160 @@ export class MenusService {
     sectionId: string,
     itemId: string,
   ): Promise<void> {
+    let orphaned: string[] = [];
+
     await this.db.transaction(async (tx) => {
       await this.requireOwnedMenu(tx, accountId, menuId);
       await this.requireSection(tx, menuId, sectionId);
       await this.requireItem(tx, sectionId, itemId);
 
+      // Collected before the row goes: afterwards there is nothing left to say
+      // which object belonged to it, and it would be an orphan forever.
+      orphaned = await this.imageKeysOfItems(tx, eq(menuItem.id, itemId));
+
       await tx.delete(menuItem).where(eq(menuItem.id, itemId));
       await this.writeItemPositions(tx, await this.itemIdsInOrder(tx, sectionId));
       await this.touchMenu(tx, menuId);
     });
+
+    await this.forget(orphaned, 'deleting a dish');
+  }
+
+  // -------------------------------------------------------- dish photographs
+
+  /**
+   * Stores a photograph for a dish, replacing any existing one (feature 006).
+   *
+   * The same ordering as the logo, for the same reasons: process first so a
+   * file that is not an image never reaches storage, write under a new random
+   * key so no cache can serve the old picture at the new address, update the
+   * row, and only then delete what it displaced.
+   */
+  async setItemImage(
+    accountId: string,
+    menuId: string,
+    sectionId: string,
+    itemId: string,
+    file: Buffer,
+    crop?: CropRect,
+  ): Promise<ItemView> {
+    await this.requireOwnedMenu(this.db, accountId, menuId);
+    await this.requireSection(this.db, menuId, sectionId);
+    await this.requireItem(this.db, sectionId, itemId);
+
+    const rendition = await processImage(file, 'dish', crop);
+    const key = newDishKey();
+
+    await this.storage.put(key, rendition.buffer, rendition.contentType);
+
+    let written: { item: ItemView; previousKey: string | null };
+    try {
+      written = await this.writeItemImage(menuId, itemId, {
+        imageKey: key,
+        imageWidth: rendition.width,
+        imageHeight: rendition.height,
+      });
+    } catch (error) {
+      // The object exists but nothing references it. Removing it here is what
+      // keeps a failed save from leaving litter behind.
+      await this.forget([key], 'compensating for a failed dish image update');
+      throw error;
+    }
+
+    await this.forget(written.previousKey ? [written.previousKey] : [], 'replaced dish photo');
+    return written.item;
+  }
+
+  /** Idempotent: a dish with no photograph is already in the state asked for. */
+  async removeItemImage(
+    accountId: string,
+    menuId: string,
+    sectionId: string,
+    itemId: string,
+  ): Promise<ItemView> {
+    await this.requireOwnedMenu(this.db, accountId, menuId);
+    await this.requireSection(this.db, menuId, sectionId);
+    await this.requireItem(this.db, sectionId, itemId);
+
+    const written = await this.writeItemImage(menuId, itemId, {
+      imageKey: null,
+      imageWidth: null,
+      imageHeight: null,
+    });
+
+    await this.forget(written.previousKey ? [written.previousKey] : [], 'removed dish photo');
+    return written.item;
+  }
+
+  /**
+   * Writes the three image columns and reports the key they replaced.
+   *
+   * One statement, so reading the old key and writing the new one cannot
+   * interleave with another request doing the same: whichever lands second owns
+   * the row, and the key it displaced is the one it deletes.
+   */
+  private async writeItemImage(
+    menuId: string,
+    itemId: string,
+    columns: { imageKey: string | null; imageWidth: number | null; imageHeight: number | null },
+  ): Promise<{ item: ItemView; previousKey: string | null }> {
+    return this.db.transaction(async (tx) => {
+      const previous = tx.$with('previous').as(
+        tx.select({ imageKey: menuItem.imageKey }).from(menuItem).where(eq(menuItem.id, itemId)),
+      );
+
+      const [row] = await tx
+        .with(previous)
+        .update(menuItem)
+        .set(columns)
+        .where(eq(menuItem.id, itemId))
+        .returning({
+          ...MenusService.ITEM_COLUMNS,
+          previousKey: sql<string | null>`(select ${previous.imageKey} from ${previous})`,
+        });
+
+      if (!row) throw AppError.notFound();
+
+      await this.touchMenu(tx, menuId);
+
+      const { previousKey, ...item } = row;
+      return {
+        item: this.toItemView(item),
+        previousKey: previousKey === columns.imageKey ? null : previousKey,
+      };
+    });
+  }
+
+  /** The stored photographs of every dish matching a condition. */
+  private async imageKeysOfItems(executor: Executor, where: SQL): Promise<string[]> {
+    const rows = await executor
+      .select({ imageKey: menuItem.imageKey })
+      .from(menuItem)
+      .where(and(where, isNotNull(menuItem.imageKey)))
+      .limit(MAX_ITEMS_PER_MENU);
+
+    return rows.map((row) => row.imageKey).filter((key): key is string => key !== null);
+  }
+
+  /**
+   * Deletes objects nothing references any more, without letting a storage
+   * failure undo a database write that already succeeded.
+   *
+   * The row is the record; an object nothing points at is litter, and litter is
+   * what the sweep command collects. So a failure here is logged with the key
+   * and swallowed rather than turned into an error for an action that worked.
+   */
+  private async forget(keys: string[], reason: string): Promise<void> {
+    if (keys.length === 0) return;
+
+    try {
+      await this.storage.delete(keys);
+    } catch (error) {
+      this.logger.error(
+        `Could not delete ${keys.join(', ')} after ${reason}; the sweep will collect it.`,
+        error instanceof Error ? error.stack : error,
+      );
+    }
   }
 
   // ---------------------------------------------------- ownership lookups
@@ -559,18 +795,14 @@ export class MenusService {
   }
 
   private async itemsOfSection(executor: Executor, sectionId: string): Promise<ItemView[]> {
-    return executor
-      .select({
-        id: menuItem.id,
-        name: menuItem.name,
-        description: menuItem.description,
-        priceCzk: menuItem.priceCzk,
-        position: menuItem.position,
-      })
+    const rows = await executor
+      .select(MenusService.ITEM_COLUMNS)
       .from(menuItem)
       .where(eq(menuItem.sectionId, sectionId))
       .orderBy(asc(menuItem.position), asc(menuItem.id))
       .limit(MAX_ITEMS_PER_MENU);
+
+    return rows.map((row) => this.toItemView(row));
   }
 
   // -------------------------------------------------------------- helpers

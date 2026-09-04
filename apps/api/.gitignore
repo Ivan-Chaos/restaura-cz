@@ -1,0 +1,3 @@
+# Renditions written by the local image-storage adapter (feature 006).
+# Only used when the R2 variables are unset; never committed.
+.images/

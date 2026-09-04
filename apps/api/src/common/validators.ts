@@ -35,6 +35,43 @@ export function AtLeastOneOf(fields: string[], options?: ValidationOptions) {
   };
 }
 
+@ValidatorConstraint({ name: 'isCrop', async: false })
+class AllOrNoneConstraint implements ValidatorConstraintInterface {
+  validate(_value: unknown, args: ValidationArguments): boolean {
+    const object = args.object as Record<string, unknown>;
+    const defined = (args.constraints as string[]).filter(
+      (field) => object[field] !== undefined,
+    ).length;
+    return defined === 0 || defined === (args.constraints as string[]).length;
+  }
+
+  defaultMessage(args: ValidationArguments): string {
+    return `${(args.constraints as string[]).join(', ')} must be provided together or not at all`;
+  }
+}
+
+/**
+ * Rejects a body carrying only part of a group that is meaningless in pieces.
+ *
+ * The crop rectangle is the case it exists for: three of four coordinates
+ * describe nothing, and silently ignoring the partial set would store a
+ * centre-crop while the owner believed they had chosen a framing. Declared on
+ * one property, like `AtLeastOneOf`, so the failure lands on a single field the
+ * form can point at.
+ */
+export function AllOrNoneOf(fields: string[], options?: ValidationOptions) {
+  return function (object: object, propertyName: string): void {
+    registerDecorator({
+      name: 'isCrop',
+      target: object.constructor,
+      propertyName,
+      constraints: fields,
+      options,
+      validator: AllOrNoneConstraint,
+    });
+  };
+}
+
 /** Characters an owner may reasonably type: digits, spacing and grouping. */
 const PHONE_SHAPE = /^\+?[0-9 ()-]{5,24}$/;
 
