@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronUp, Copy, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, EyeOff, Pencil } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
+import { AvailabilityBadge } from "@/components/menu/AvailabilityBadge";
+import { DietaryMarkerList } from "@/components/menu/DietaryMarkerList";
+import { SpiceLevel } from "@/components/menu/SpiceLevel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatMoney, formatPriceInput } from "@/lib/design-system/price";
 import type { ServerAction } from "@/hooks/use-action-form";
@@ -42,10 +46,17 @@ export function ItemRow({
   isLast,
 }: ItemRowProps) {
   const t = useTranslations("MenuEditor");
+  const tAvailability = useTranslations("Availability");
   const locale = useLocale();
   const [editing, setEditing] = useState(false);
 
   const itemHidden = { ...hidden, itemId: item.id };
+  const isHidden = item.availability === "hidden";
+  const declaresSomething =
+    item.dietary.length > 0 ||
+    item.allergens.length > 0 ||
+    item.warnings.length > 0 ||
+    item.spiceLevel > 0;
 
   if (editing) {
     return (
@@ -67,6 +78,11 @@ export function ItemRow({
             // The owner's own notation, not JavaScript's: a Czech owner who
             // typed 56,50 should not reopen the dish to find 56.5.
             priceCzk: formatPriceInput(locale, item.priceCzk),
+            dietary: item.dietary,
+            allergens: item.allergens,
+            warnings: item.warnings,
+            spiceLevel: item.spiceLevel as 0 | 1 | 2 | 3,
+            availability: item.availability,
           }}
         />
       </li>
@@ -95,6 +111,34 @@ export function ItemRow({
         <p className="font-medium">{item.name}</p>
         {item.description ? (
           <p className="text-muted-foreground text-sm">{item.description}</p>
+        ) : null}
+
+        {/*
+          What the dish declares, read back where it was entered. Without this
+          an owner cannot tell a dish they have described from one they have
+          not, and the only way to check would be to open the form again.
+        */}
+        {isHidden || item.availability !== "available" || declaresSomething ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {item.availability === "hidden" ? (
+              // AvailabilityBadge knows only the three states a guest can
+              // see, and rightly so — this one exists only in the editor.
+              <Badge variant="secondary">
+                <EyeOff aria-hidden="true" />
+                {tAvailability("hidden")}
+              </Badge>
+            ) : (
+              <AvailabilityBadge status={item.availability} />
+            )}
+            {item.spiceLevel > 0 ? (
+              <SpiceLevel level={item.spiceLevel as 1 | 2 | 3} />
+            ) : null}
+            <DietaryMarkerList
+              dietary={item.dietary}
+              allergens={item.allergens}
+              warnings={item.warnings}
+            />
+          </div>
         ) : null}
       </div>
 

@@ -1,7 +1,12 @@
 import { useTranslations } from "next-intl";
 import type { ComponentProps } from "react";
 
-import { DIETARY_MARKERS, type DietaryMarkerId } from "@/lib/design-system/dietary";
+import {
+  DIETARY_MARKERS,
+  DISH_WARNINGS,
+  type DietaryMarkerId,
+  type DishWarningId,
+} from "@/lib/design-system/dietary";
 import { cn } from "@/lib/utils";
 
 /**
@@ -23,11 +28,18 @@ const SIZE_CLASSES: Record<"sm" | "md", string> = {
   md: "size-4",
 };
 
-export interface DietaryMarkerProps extends Omit<ComponentProps<"span">, "children"> {
-  id: DietaryMarkerId;
+interface MarkerBaseProps extends Omit<ComponentProps<"span">, "children"> {
   showLabel?: boolean;
   size?: "sm" | "md";
 }
+
+/**
+ * Two vocabularies, one component, because a guest reads them as one strip and
+ * they must never differ in size, spacing or how the label is hidden. The
+ * discriminant keeps the id and its catalogue from being mismatched.
+ */
+export type DietaryMarkerProps = MarkerBaseProps &
+  ({ kind?: "dietary"; id: DietaryMarkerId } | { kind: "warning"; id: DishWarningId });
 
 /**
  * One dietary claim — icon plus label. When `showLabel` is false the label
@@ -36,19 +48,31 @@ export interface DietaryMarkerProps extends Omit<ComponentProps<"span">, "childr
  */
 export function DietaryMarker({
   id,
+  kind = "dietary",
   showLabel = true,
   size = "md",
   className,
   ...props
 }: DietaryMarkerProps) {
-  const t = useTranslations("DietaryMarkers");
-  const marker = DIETARY_MARKERS[id];
+  // Both namespaces are read unconditionally: `useTranslations` is a hook, so
+  // choosing one inside a branch would change the hook order between renders.
+  const tMarkers = useTranslations("DietaryMarkers");
+  const tWarnings = useTranslations("DishWarnings");
+
+  const marker =
+    kind === "warning"
+      ? DISH_WARNINGS[id as DishWarningId]
+      : DIETARY_MARKERS[id as DietaryMarkerId];
   const Icon = marker.icon;
-  const label = t(marker.labelKey);
+  const label =
+    kind === "warning"
+      ? tWarnings(marker.labelKey as DishWarningId)
+      : tMarkers(marker.labelKey as DietaryMarkerId);
 
   return (
     <span
       data-slot="dietary-marker"
+      data-kind={kind}
       className={cn(
         // `relative` is load-bearing: the label below falls back to `sr-only`,
         // which is `position: absolute`. Without a positioned ancestor its

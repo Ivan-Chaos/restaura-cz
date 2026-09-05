@@ -16,6 +16,13 @@ const item: MenuItemView = {
   priceCzk: 89,
   position: 1,
   image: null,
+  // Declaring something is the interesting case for this row: it is what the
+  // marker strip and the availability badge are there to show.
+  dietary: ["vegetarian"],
+  allergens: [3, 7],
+  spiceLevel: 1,
+  warnings: ["servedVeryHot"],
+  availability: "available",
 };
 
 const meta = {

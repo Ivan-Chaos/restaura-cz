@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { PublicMenu } from "@/lib/api/types";
-import { toDisplayMenu } from "@/lib/menu-display/adapter";
+import {
+  toDisplayMenu,
+  visibleItemCount,
+  type DisplayMenuSource,
+  type SourceItem,
+} from "@/lib/menu-display/adapter";
 
 /**
  * The adapter is the seam between what the API stores and what the design
@@ -9,7 +13,30 @@ import { toDisplayMenu } from "@/lib/menu-display/adapter";
  * sections, so every mapping rule in data-model.md is pinned here.
  */
 
-const menu: PublicMenu = {
+/**
+ * A dish declaring nothing, which is what most of them are.
+ *
+ * A factory rather than repeated literals so that the fields these tests are
+ * not about — markers, allergens, warnings, heat, availability — stay out of
+ * the way, and so the next field added to the contract is one edit here rather
+ * than one per fixture.
+ */
+function dish(
+  values: Partial<SourceItem> & { name: string; priceCzk: number },
+): SourceItem {
+  return {
+    description: null,
+    image: null,
+    dietary: [],
+    allergens: [],
+    spiceLevel: 0,
+    warnings: [],
+    availability: "available",
+    ...values,
+  };
+}
+
+const menu: DisplayMenuSource = {
   name: "U Modré kachny",
   restaurantName: "U Modré kachny",
   visualVariant: "default",
@@ -18,11 +45,11 @@ const menu: PublicMenu = {
     {
       title: "Polévky",
       items: [
-        { name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: 89, image: null },
-        { name: "Hovězí vývar", description: null, priceCzk: 79, image: null },
+        dish({ name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: 89 }),
+        dish({ name: "Hovězí vývar", priceCzk: 79 }),
       ],
     },
-    { title: "Hlavní jídla", items: [{ name: "Svíčková", description: null, priceCzk: 245, image: null }] },
+    { title: "Hlavní jídla", items: [dish({ name: "Svíčková", priceCzk: 245 })] },
   ],
 };
 
@@ -101,7 +128,7 @@ describe("toDisplayMenu", () => {
   it("keeps a price of zero rather than treating it as missing", () => {
     const free = toDisplayMenu({
       ...menu,
-      sections: [{ title: "Doplňky", items: [{ name: "Voda", description: null, priceCzk: 0, image: null }] }],
+      sections: [{ title: "Doplňky", items: [dish({ name: "Voda", priceCzk: 0 })] }],
     });
 
     expect(free.categories[0]?.items[0]?.price).toEqual({
@@ -146,7 +173,7 @@ describe("toDisplayMenu with images", () => {
       sections: [
         {
           title: "Polévky",
-          items: [{ name: "Kulajda", description: null, priceCzk: 89, image: PHOTO }],
+          items: [dish({ name: "Kulajda", priceCzk: 89, image: PHOTO })],
         },
       ],
     });
@@ -193,8 +220,8 @@ describe("toDisplayMenu with images", () => {
         {
           title: "Polévky",
           items: [
-            { name: "Kulajda", description: null, priceCzk: 89, image: PHOTO },
-            { name: "Vývar", description: null, priceCzk: 79, image: null },
+            dish({ name: "Kulajda", priceCzk: 89, image: PHOTO }),
+            dish({ name: "Vývar", priceCzk: 79 }),
           ],
         },
       ],
@@ -202,5 +229,122 @@ describe("toDisplayMenu with images", () => {
 
     expect(display.categories[0]?.items[0]?.image).toBeDefined();
     expect(display.categories[0]?.items[1]?.image).toBeUndefined();
+  });
+});
+
+/**
+ * What a dish declares (feature 008).
+ *
+ * This is the one seam between the API's shape and the design system's, so
+ * these cases are what stand between "the owner ticked vegan" and a guest, a
+ * preview and a PDF all agreeing about it.
+ */
+describe("declarations", () => {
+  function withItems(items: SourceItem[]) {
+    return toDisplayMenu({ ...menu, sections: [{ title: "Polévky", items }] });
+  }
+
+  it("carries markers, allergens, warnings and heat through", () => {
+    const display = withItems([
+      dish({
+        name: "Kulajda",
+        priceCzk: 89,
+        dietary: ["vegetarian", "lenten"],
+        allergens: [3, 7],
+        warnings: ["rawOrUndercooked"],
+        spiceLevel: 2,
+      }),
+    ]);
+
+    expect(display.categories[0]?.items[0]).toMatchObject({
+      dietary: ["vegetarian", "lenten"],
+      allergens: [3, 7],
+      warnings: ["rawOrUndercooked"],
+      spiceLevel: 2,
+    });
+  });
+
+  it("leaves an empty declaration absent rather than empty", () => {
+    // The display model says "absent" where the API says "empty", and every
+    // component tests these for truthiness. An empty array would render a strip
+    // with nothing in it.
+    const item = withItems([dish({ name: "Kulajda", priceCzk: 89 })]).categories[0]?.items[0];
+
+    expect(item).not.toHaveProperty("dietary");
+    expect(item).not.toHaveProperty("allergens");
+    expect(item).not.toHaveProperty("warnings");
+    expect(item).not.toHaveProperty("spiceLevel");
+    expect(item).not.toHaveProperty("availability");
+  });
+
+  it("keeps limited and sold out, which a guest needs to read", () => {
+    const display = withItems([
+      dish({ name: "Kulajda", priceCzk: 89, availability: "limited" }),
+      dish({ name: "Vývar", priceCzk: 79, availability: "soldOut" }),
+    ]);
+
+    expect(display.categories[0]?.items.map((item) => item.availability)).toEqual([
+      "limited",
+      "soldOut",
+    ]);
+  });
+
+  it("drops a hidden dish, so preview and print cannot show one", () => {
+    // The public endpoint filters these out already; this is what protects
+    // /preview and /print/**, which build from the owner's own MenuDetail.
+    const display = withItems([
+      dish({ name: "Kulajda", priceCzk: 89 }),
+      dish({ name: "Zelňačka", priceCzk: 59, availability: "hidden" }),
+    ]);
+
+    expect(display.categories[0]?.items.map((item) => item.name)).toEqual(["Kulajda"]);
+  });
+
+  it("keeps the heading of a category whose dishes are all hidden", () => {
+    const display = withItems([
+      dish({ name: "Zelňačka", priceCzk: 59, availability: "hidden" }),
+    ]);
+
+    expect(display.categories[0]?.name).toBe("Polévky");
+    expect(display.categories[0]?.items).toEqual([]);
+  });
+
+  it("numbers the dishes a guest sees, not the ones behind them", () => {
+    // Ids are positional, so a hidden dish in the middle must not leave a gap.
+    const display = withItems([
+      dish({ name: "Zelňačka", priceCzk: 59, availability: "hidden" }),
+      dish({ name: "Kulajda", priceCzk: 89 }),
+    ]);
+
+    expect(display.categories[0]?.items[0]?.id).toBe("polevky-1-item-1");
+  });
+});
+
+describe("visibleItemCount", () => {
+  it("counts what would reach the page", () => {
+    expect(
+      visibleItemCount([
+        {
+          title: "Polévky",
+          items: [
+            dish({ name: "Kulajda", priceCzk: 89 }),
+            dish({ name: "Zelňačka", priceCzk: 59, availability: "hidden" }),
+          ],
+        },
+      ]),
+    ).toBe(1);
+  });
+
+  it("is zero for a menu whose every dish is hidden", () => {
+    // Which is what makes the PDF download say "nothing to print" instead of
+    // producing a document of headings with nothing under them.
+    expect(
+      visibleItemCount([
+        {
+          title: "Polévky",
+          items: [dish({ name: "Zelňačka", priceCzk: 59, availability: "hidden" })],
+        },
+      ]),
+    ).toBe(0);
   });
 });

@@ -43,6 +43,13 @@
       "when": 1788544885382,
       "tag": "0005_workable_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788611890567,
+      "tag": "0006_mysterious_the_santerians",
+      "breakpoints": true
     }
   ]
 }

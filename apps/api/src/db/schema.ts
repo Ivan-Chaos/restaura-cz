@@ -5,6 +5,7 @@ import {
   integer,
   numeric,
   pgTable,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -244,6 +245,37 @@ export const menuItem = pgTable(
     imageWidth: integer('image_width'),
     imageHeight: integer('image_height'),
     position: integer('position').notNull(),
+    /**
+     * Positive, opt-in dietary claims — the ids in `menus/item-attributes.ts`.
+     *
+     * An array rather than a child table, for the same three reasons as
+     * `restaurantProfile.phones`: the list is capped, has no per-entry
+     * metadata, and is always read and written whole, so a join would buy
+     * nothing. `{}` rather than NULL is the empty state, so "this dish
+     * declares nothing" has exactly one spelling and no read path has to handle
+     * two.
+     */
+    dietary: text('dietary').array().notNull().default([]),
+    /**
+     * The EU 1169/2011 numbers a guest reads off the legend, 1–14. The number
+     * is the model, not a rendering of a name: Czech menus print numbers, so
+     * numbering names at render time would move the legend's authority out of
+     * the system of record.
+     */
+    allergens: smallint('allergens').array().notNull().default([]),
+    /** 0 = not spicy, 3 = very. A degree, so a number rather than a marker. */
+    spiceLevel: integer('spice_level').notNull().default(0),
+    /** Cautions that are facts about the dish, not claims about a diet. */
+    warnings: text('warnings').array().notNull().default([]),
+    /**
+     * Whether guests may see this dish at all.
+     *
+     * `hidden` is the only value with a structural consequence — the item is
+     * left out of the public payload entirely — which is why it is a column and
+     * not a deletion: the owner keeps the dish, its photograph and its position
+     * while it is off the menu tonight.
+     */
+    availability: text('availability').notNull().default('available'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -259,6 +291,46 @@ export const menuItem = pgTable(
       'menu_item_image_complete',
       sql`(${table.imageKey} is null and ${table.imageWidth} is null and ${table.imageHeight} is null)
           or (${table.imageKey} is not null and ${table.imageWidth} > 0 and ${table.imageHeight} > 0)`,
+    ),
+    /**
+     * The vocabularies are pinned in `menus/item-attributes.ts`; these are what
+     * make them true. `<@` is array containment, so it asserts every element is
+     * in the allowlist without a subquery — which a CHECK may not contain.
+     *
+     * That same restriction is why duplicates are not rejected here: every way
+     * to say "no repeated element" in SQL needs a subquery, and `<@` plus a
+     * cardinality bound does not imply uniqueness ({1,1,1} satisfies both). The
+     * service normalises instead, through `orderedSubsetOf`.
+     *
+     * The cardinality bounds are the whole catalogue — a vegan lentil soup can
+     * honestly carry every dietary id — so they are defensive caps in the
+     * spirit of MAX_ITEMS_PER_MENU, not product rules. They are written as
+     * literals rather than interpolated constants because drizzle-kit diffs the
+     * rendered SQL textually, and a TS constant in a `sql` template becomes a
+     * bound parameter instead of a literal.
+     */
+    check(
+      'menu_item_dietary_known',
+      sql`cardinality(${table.dietary}) <= 7
+          and ${table.dietary} <@ array['vegetarian', 'vegan', 'glutenFree', 'lactoseFree', 'halal', 'kosher', 'lenten']::text[]`,
+    ),
+    /** The `::smallint[]` cast is load-bearing: array[1,2,…] infers as
+        integer[], and smallint[] <@ integer[] has no operator, so without it
+        the constraint fails to create. */
+    check(
+      'menu_item_allergens_known',
+      sql`cardinality(${table.allergens}) <= 14
+          and ${table.allergens} <@ array[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]::smallint[]`,
+    ),
+    check('menu_item_spice_level_range', sql`${table.spiceLevel} between 0 and 3`),
+    check(
+      'menu_item_warnings_known',
+      sql`cardinality(${table.warnings}) <= 5
+          and ${table.warnings} <@ array['containsAlcohol', 'rawOrUndercooked', 'mayContainBones', 'servedVeryHot', 'containsCaffeine']::text[]`,
+    ),
+    check(
+      'menu_item_availability_known',
+      sql`${table.availability} in ('available', 'limited', 'soldOut', 'hidden')`,
     ),
   ],
 );

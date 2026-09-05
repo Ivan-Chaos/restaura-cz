@@ -210,7 +210,22 @@ describe('publishing and public display (US3, US4)', () => {
         sections: [
           {
             title: 'Polévky',
-            items: [{ name: 'Kulajda', description: 'S vejcem', priceCzk: 89, image: null }],
+            items: [
+              {
+                name: 'Kulajda',
+                description: 'S vejcem',
+                priceCzk: 89,
+                image: null,
+                // A dish that declares nothing still says so explicitly: the
+                // columns are NOT NULL with empty defaults, so there is one
+                // spelling of "nothing declared" rather than two.
+                dietary: [],
+                allergens: [],
+                spiceLevel: 0,
+                warnings: [],
+                availability: 'available',
+              },
+            ],
           },
         ],
       });
@@ -287,6 +302,136 @@ describe('publishing and public display (US3, US4)', () => {
         .expect(200);
 
       expect(response.body.menu.sections).toEqual([{ title: 'Připravujeme', items: [] }]);
+    });
+  });
+
+  describe('what a hidden dish does to the guest payload', () => {
+    /** Publishes one section carrying a dish in each availability state. */
+    async function menuOfEveryAvailability() {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Kulajda',
+        priceCzk: 89,
+        availability: 'available',
+      });
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Gulášovka',
+        priceCzk: 79,
+        availability: 'limited',
+      });
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Dršťková',
+        priceCzk: 69,
+        availability: 'soldOut',
+      });
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Zelňačka',
+        priceCzk: 59,
+        availability: 'hidden',
+      });
+
+      const published = await request(testApp.server)
+        .post(`/menus/${menuId}/publish`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      return { menuId, sectionId, slug: published.body.publicSlug as string };
+    }
+
+    it('leaves a hidden dish out while sold-out and limited ones stay', async () => {
+      const { slug } = await menuOfEveryAvailability();
+
+      const response = await request(testApp.server).get(`/public/menus/${slug}`).expect(200);
+
+      const items = response.body.menu.sections[0].items as {
+        name: string;
+        availability: string;
+      }[];
+      // Sold out is information a guest needs — it stops them ordering what is
+      // gone. Hidden is the owner saying the dish is not on the menu tonight.
+      expect(items.map((item) => item.name)).toEqual(['Kulajda', 'Gulášovka', 'Dršťková']);
+      expect(items.map((item) => item.availability)).toEqual([
+        'available',
+        'limited',
+        'soldOut',
+      ]);
+      expect(JSON.stringify(response.body)).not.toContain('Zelňačka');
+    });
+
+    it('keeps the owner seeing every dish, hidden ones included', async () => {
+      const { menuId } = await menuOfEveryAvailability();
+
+      const detail = await request(testApp.server)
+        .get(`/menus/${menuId}`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      // The whole point of hiding rather than deleting: it is still there to
+      // put back tomorrow, with its price and its place in the list intact.
+      expect(
+        detail.body.menu.sections[0].items.map((item: { name: string }) => item.name),
+      ).toEqual(['Kulajda', 'Gulášovka', 'Dršťková', 'Zelňačka']);
+    });
+
+    it('keeps the heading of a section whose dishes are all hidden', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Zelňačka',
+        priceCzk: 59,
+        availability: 'hidden',
+      });
+
+      const published = await request(testApp.server)
+        .post(`/menus/${menuId}/publish`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      const response = await request(testApp.server)
+        .get(`/public/menus/${published.body.publicSlug}`)
+        .expect(200);
+
+      // Indistinguishable from a section that simply has nothing in it, which
+      // is the point: one visible outcome, one payload shape. This is also what
+      // proves the filter sits in the join condition — in the WHERE clause it
+      // would take the section's heading with it.
+      expect(response.body.menu.sections).toEqual([{ title: 'Polévky', items: [] }]);
+    });
+
+    it('carries markers, allergens, warnings and heat to the guest', async () => {
+      const menuId = await createMenu(testApp, owner.cookie);
+      const sectionId = await addSection(testApp, owner.cookie, menuId, 'Polévky');
+      await addItem(testApp, owner.cookie, menuId, sectionId, {
+        name: 'Kulajda',
+        priceCzk: 89,
+        dietary: ['vegetarian', 'lenten'],
+        allergens: [7, 3],
+        spiceLevel: 2,
+        warnings: ['rawOrUndercooked'],
+      });
+
+      const published = await request(testApp.server)
+        .post(`/menus/${menuId}/publish`)
+        .set('Cookie', owner.cookie)
+        .expect(200);
+
+      const response = await request(testApp.server)
+        .get(`/public/menus/${published.body.publicSlug}`)
+        .expect(200);
+
+      expect(response.body.menu.sections[0].items[0]).toEqual({
+        name: 'Kulajda',
+        description: null,
+        priceCzk: 89,
+        image: null,
+        // Catalogue order, not the order they were sent in.
+        dietary: ['vegetarian', 'lenten'],
+        allergens: [3, 7],
+        spiceLevel: 2,
+        warnings: ['rawOrUndercooked'],
+        availability: 'available',
+      });
     });
   });
 });

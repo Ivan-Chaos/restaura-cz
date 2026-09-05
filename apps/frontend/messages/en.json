@@ -488,7 +488,8 @@
   "Availability": {
     "available": "Available",
     "limited": "Only a few left",
-    "soldOut": "Sold out"
+    "soldOut": "Sold out",
+    "hidden": "Hidden from the menu"
   },
   "Price": {
     "from": "from {price}",
@@ -503,8 +504,17 @@
     "lactoseFree": "Lactose free",
     "halal": "Halal",
     "kosher": "Kosher",
+    "lenten": "Lenten-friendly",
     "spicy": "Spicy",
     "more": "{count, plural, one {# more marker} other {# more markers}}"
+  },
+  "DishWarnings": {
+    "title": "Warnings",
+    "containsAlcohol": "Contains alcohol",
+    "rawOrUndercooked": "Raw or undercooked",
+    "mayContainBones": "May contain bones or shells",
+    "servedVeryHot": "Served very hot",
+    "containsCaffeine": "Contains caffeine"
   },
   "Allergens": {
     "title": "Allergens",
@@ -557,6 +567,8 @@
     "image": "Photo",
     "price": "Price",
     "dietary": "Dietary and allergens",
+    "dietGroup": "Diet",
+    "observanceGroup": "Religious and fasting",
     "availability": "Availability",
     "save": "Save dish",
     "saving": "Saving…",
@@ -671,6 +683,7 @@
       "IS_LENGTH": "Use at least 8 characters.",
       "MAX_LENGTH": "This is too long.",
       "MIN": "This value cannot be negative.",
+      "MAX": "This is more than the highest allowed value.",
       "AT_LEAST_ONE_DEFINED": "Change at least one field.",
       "INVALID": "This value is not valid.",
       "IS_PHONE": "Enter a valid phone number.",
@@ -848,6 +861,7 @@
       "IS_LENGTH": "This field is required.",
       "MAX_LENGTH": "This is too long.",
       "MIN": "The price cannot be negative.",
+      "MAX": "This is more than the highest allowed value.",
       "AT_LEAST_ONE_DEFINED": "Change at least one field.",
       "IS_PHONE": "Enter a valid phone number.",
       "IS_ARRAY": "This value is not valid.",
@@ -859,7 +873,10 @@
       "IS_CROP": "That framing does not fit the image. Adjust it and try again."
     },
     "itemPhoto": "Photo",
-    "itemPhotoOf": "Photo of {name}"
+    "itemPhotoOf": "Photo of {name}",
+    "itemSpiciness": "Spiciness",
+    "spiceNotSpicy": "Not spicy",
+    "itemAvailabilityHint": "A hidden dish stays here for you to bring back, but guests do not see it on the menu or on the PDF."
   },
   "Publish": {
     "draft": "Draft",

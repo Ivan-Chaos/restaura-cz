@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+import {
+  ALLERGEN_IDS,
+  API_DIETARY_IDS,
+  AVAILABILITY_IDS,
+  DISH_WARNING_IDS,
+} from "@/lib/design-system/dietary";
 import { VISUAL_VARIANT_IDS, type VisualVariantId } from "@/lib/menu-display/variants";
 
 import {
@@ -236,10 +242,63 @@ const priceCzk = z
   .transform((raw) => Number(raw.replace(",", ".")))
   .pipe(z.number().min(0, "MIN"));
 
+/**
+ * A set of ids, as a form posts them.
+ *
+ * Repeated inputs under one name, read back with `getAll`, exactly like the
+ * phone list — which is what lets the no-JavaScript path work: a checkbox posts
+ * its value or nothing at all, so a group of them *is* the array.
+ *
+ * Unknown ids are `IS_IN`, matching the API's `@IsIn`, so a value the browser
+ * refuses and the same value the API refuses render through one translation.
+ */
+function idSet<T extends string>(ids: readonly [T, ...T[]]) {
+  return z.array(z.enum(ids, { message: "IS_IN" })).max(ids.length, "ARRAY_MAX_SIZE");
+}
+
+const dietary = idSet(API_DIETARY_IDS as unknown as [string, ...string[]]);
+const warnings = idSet(DISH_WARNING_IDS as unknown as [string, ...string[]]);
+
+/**
+ * Allergen numbers, which arrive from a form as strings.
+ *
+ * `IS_INT` before the range check for the same reason the price puts
+ * `IS_NUMBER` first: "12,5" and "" are type problems, and `CODE_PRIORITY`
+ * prefers those over a range complaint that would only confuse.
+ */
+const allergens = z
+  .array(
+    z
+      .string()
+      .trim()
+      .regex(/^\d+$/, "IS_INT")
+      .transform((raw) => Number(raw))
+      .pipe(z.number().int("IS_INT").min(1, "MIN").max(ALLERGEN_IDS.length, "MAX")),
+  )
+  .max(ALLERGEN_IDS.length, "ARRAY_MAX_SIZE");
+
+/** 0–3, and 0 is what a dish is unless somebody says otherwise. */
+const spiceLevel = z
+  .string()
+  .trim()
+  .regex(/^\d+$/, "IS_INT")
+  .transform((raw) => Number(raw))
+  .pipe(z.number().int("IS_INT").min(0, "MIN").max(3, "MAX"));
+
+const availability = z.enum(
+  AVAILABILITY_IDS as unknown as [string, ...string[]],
+  { message: "IS_IN" },
+);
+
 export const menuItemSchema = z.object({
   name: itemName,
   description: itemDescription,
   priceCzk,
+  dietary,
+  allergens,
+  warnings,
+  spiceLevel,
+  availability,
 });
 
 /**

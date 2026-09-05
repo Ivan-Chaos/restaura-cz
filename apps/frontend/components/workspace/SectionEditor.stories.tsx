@@ -25,6 +25,11 @@ const filled: MenuSectionView = {
       priceCzk: 89,
       position: 0,
       image: null,
+      dietary: ["vegan"],
+      allergens: [7],
+      spiceLevel: 0,
+      warnings: [],
+      availability: "available",
     },
     {
       id: "item-2",
@@ -33,6 +38,12 @@ const filled: MenuSectionView = {
       priceCzk: 79,
       position: 1,
       image: null,
+      dietary: [],
+      allergens: [],
+      spiceLevel: 0,
+      warnings: [],
+      // One dish off the menu tonight, so the editor shows what that looks like.
+      availability: "hidden",
     },
   ],
 };

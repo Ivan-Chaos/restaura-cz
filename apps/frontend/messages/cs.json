@@ -488,7 +488,8 @@
   "Availability": {
     "available": "K dispozici",
     "limited": "Poslední kusy",
-    "soldOut": "Vyprodáno"
+    "soldOut": "Vyprodáno",
+    "hidden": "Skryto z menu"
   },
   "Price": {
     "from": "od {price}",
@@ -503,8 +504,17 @@
     "lactoseFree": "Bez laktózy",
     "halal": "Halal",
     "kosher": "Košer",
+    "lenten": "Postní",
     "spicy": "Pálivé",
     "more": "{count, plural, one {# další označení} few {# další označení} other {# dalších označení}}"
+  },
+  "DishWarnings": {
+    "title": "Upozornění",
+    "containsAlcohol": "Obsahuje alkohol",
+    "rawOrUndercooked": "Syrové nebo tepelně neupravené",
+    "mayContainBones": "Může obsahovat kosti nebo skořápky",
+    "servedVeryHot": "Podáváme velmi horké",
+    "containsCaffeine": "Obsahuje kofein"
   },
   "Allergens": {
     "title": "Alergeny",
@@ -557,6 +567,8 @@
     "image": "Fotografie",
     "price": "Cena",
     "dietary": "Dieta a alergeny",
+    "dietGroup": "Strava",
+    "observanceGroup": "Náboženské a postní",
     "availability": "Dostupnost",
     "save": "Uložit jídlo",
     "saving": "Ukládá se…",
@@ -671,6 +683,7 @@
       "IS_LENGTH": "Použijte alespoň 8 znaků.",
       "MAX_LENGTH": "Tento údaj je příliš dlouhý.",
       "MIN": "Hodnota nesmí být záporná.",
+      "MAX": "Tato hodnota je vyšší než povolené maximum.",
       "AT_LEAST_ONE_DEFINED": "Změňte alespoň jedno pole.",
       "INVALID": "Tato hodnota není platná.",
       "IS_PHONE": "Zadejte platné telefonní číslo.",
@@ -848,6 +861,7 @@
       "IS_LENGTH": "Toto pole je povinné.",
       "MAX_LENGTH": "Tento údaj je příliš dlouhý.",
       "MIN": "Cena nesmí být záporná.",
+      "MAX": "Tato hodnota je vyšší než povolené maximum.",
       "AT_LEAST_ONE_DEFINED": "Změňte alespoň jedno pole.",
       "IS_PHONE": "Zadejte platné telefonní číslo.",
       "IS_ARRAY": "Tato hodnota není platná.",
@@ -859,7 +873,10 @@
       "IS_CROP": "Toto umístění se do obrázku nevejde. Upravte ho a zkuste to znovu."
     },
     "itemPhoto": "Fotka",
-    "itemPhotoOf": "Fotka jídla {name}"
+    "itemPhotoOf": "Fotka jídla {name}",
+    "itemSpiciness": "Pálivost",
+    "spiceNotSpicy": "Nepálivé",
+    "itemAvailabilityHint": "Skryté jídlo tu zůstane, abyste ho mohli vrátit, ale hosté ho v menu ani v PDF neuvidí."
   },
   "Publish": {
     "draft": "Koncept",

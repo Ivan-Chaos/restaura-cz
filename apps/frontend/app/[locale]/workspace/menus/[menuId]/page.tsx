@@ -12,6 +12,7 @@ import { PrintDownloads } from "@/components/workspace/PrintDownloads";
 import { PublishControls } from "@/components/workspace/PublishControls";
 import { SectionEditor } from "@/components/workspace/SectionEditor";
 import { VariantSwitcher } from "@/components/workspace/VariantSwitcher";
+import { visibleItemCount } from "@/lib/menu-display/adapter";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import {
@@ -104,7 +105,7 @@ export default async function MenuEditorPage({
           menuId={menu.id}
           menuName={menu.name}
           status={menu.status}
-          hasDishes={menu.sections.some((section) => section.items.length > 0)}
+          hasDishes={visibleItemCount(menu.sections) > 0}
           plan={planOf(session?.account)}
         />
 

@@ -1,5 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
+import type {
+  AllergenNumber,
+  ApiDietaryId,
+  DishWarningId,
+} from "@/lib/design-system/dietary";
+
 import { parseSessionCookie, SESSION_COOKIE } from "@/lib/api/cookies";
 import { toFormState } from "@/lib/api/form-state";
 import type {
@@ -121,6 +127,28 @@ describe("response shapes match the contract", () => {
                 priceCzk: 89,
                 position: 0,
                 image: null,
+                // Feature 008. Always present, never null: the columns are NOT
+                // NULL with empty defaults, so a dish that declares nothing
+                // says so in one way rather than two.
+                dietary: [] as ApiDietaryId[],
+                allergens: [] as AllergenNumber[],
+                spiceLevel: 0,
+                warnings: [] as DishWarningId[],
+                availability: "available" as const,
+              },
+              {
+                id: "item-2",
+                name: "Tartare",
+                description: null,
+                priceCzk: 245,
+                position: 1,
+                image: null,
+                dietary: ["glutenFree"] as ApiDietaryId[],
+                allergens: [3, 10] as AllergenNumber[],
+                spiceLevel: 1,
+                warnings: ["rawOrUndercooked"] as DishWarningId[],
+                // Owner-side only: a guest never receives this dish at all.
+                availability: "hidden" as const,
               },
             ],
           },
@@ -129,6 +157,9 @@ describe("response shapes match the contract", () => {
     };
     expectTypeOf(payload).toExtend<MenuDetailResponse>();
     expect(payload.menu.sections[0]?.items[0]?.priceCzk).toBe(89);
+    // The editor is the one place a hidden dish is still visible — that is what
+    // makes hiding reversible rather than a delete with extra steps.
+    expect(payload.menu.sections[0]?.items[1]?.availability).toBe("hidden");
   });
 
   it("accepts the documented publish and unpublish responses", () => {
@@ -165,8 +196,23 @@ describe("response shapes match the contract", () => {
                   width: 1600,
                   height: 1200,
                 },
+                dietary: ["vegetarian"] as ApiDietaryId[],
+                allergens: [7] as AllergenNumber[],
+                spiceLevel: 2,
+                warnings: ["servedVeryHot"] as DishWarningId[],
+                availability: "soldOut" as const,
               },
-              { name: "Bread", description: null, priceCzk: 25, image: null },
+              {
+                name: "Bread",
+                description: null,
+                priceCzk: 25,
+                image: null,
+                dietary: [] as ApiDietaryId[],
+                allergens: [] as AllergenNumber[],
+                spiceLevel: 0,
+                warnings: [] as DishWarningId[],
+                availability: "available" as const,
+              },
             ],
           },
         ],
@@ -174,6 +220,9 @@ describe("response shapes match the contract", () => {
     };
     expectTypeOf(payload).toExtend<PublicMenuResponse>();
     expect(JSON.stringify(payload)).not.toContain('"id"');
+    // "Sold out" travels because a guest needs to read it; "hidden" cannot
+    // appear here at all, because the API leaves such a dish out entirely.
+    expect(JSON.stringify(payload)).not.toContain("hidden");
     // The restaurant's name travels so the logo has a text alternative naming
     // the restaurant rather than the menu (feature 006, FR-004).
     expect(payload.menu.restaurantName).toBe("U Zlaté Lípy");

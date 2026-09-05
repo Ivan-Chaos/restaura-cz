@@ -167,10 +167,11 @@ at the repository root, with the cross-app contract in its `contracts/http-api.m
   The upgrade path, if load ever demands it, is tag-based revalidation on publish/unpublish/save.
 - **`GuestMenu` is not `SampleMenu`.** `SampleMenu` is the design system's showcase and always
   renders the specials strip and the full allergen legend, because its fixture always has that
-  data. A menu built in the editor has none of it, and printing a legend for allergens nobody
-  declared tells guests something untrue. Photographs have since arrived (feature 006) and
-  `GuestMenu` grew to match; markers and allergens are still to come, and the components for
-  them already exist.
+  data. A menu built in the editor has only what its owner typed, and printing a legend for
+  allergens nobody declared tells guests something untrue. Photographs arrived with feature 006
+  and markers, allergens and warnings with feature 008, so `GuestMenu` has grown to match — but
+  on the menu's own terms: `declarationsOf(menu)` gathers what the dishes actually declare, and
+  the legend renders only that, or not at all.
 - **`lib/menu-display/adapter.ts` is the only seam** between the API's shape and the design
   system's `Menu`. Prices are korunas both sides (`{ kind: "single", … }`); category ids
   are slugified titles plus an index, because they double as element ids and two sections may
@@ -303,6 +304,41 @@ come from `Intl.DisplayNames`, never from the message catalogues, and they appea
 popup: ICU data differs between Node and the browser, so a name in the server-rendered trigger
 would be a hydration mismatch waiting for a version bump. libphonenumber decides *formatting*;
 `lib/api/phone.ts` still decides what is *acceptable*, mirroring the API.
+
+# What a dish declares (feature 008)
+
+Every dish carries five more things: dietary markers, the fourteen EU allergen numbers, a
+spiciness of 0–3, warnings, and one availability state. Spec: `specs/008-dish-details-availability/`.
+
+- **`lib/menu-display/adapter.ts` is still the only seam, and it now filters as well as maps.**
+  A dish whose `availability` is `hidden` is dropped in `toCategory`. The public endpoint already
+  drops it server-side, so on the guest page that is a no-op; it is load-bearing for `/preview`
+  and `/print/**`, which build from the owner's own `MenuDetail` and would otherwise print a dish
+  the owner had taken off the menu. `visibleItemCount` is the same rule for "is there anything to
+  print", so an all-hidden menu says "nothing to print" rather than rendering blank paper.
+- **Two vocabularies, deliberately.** `DIETARY_MARKER_IDS` is what a component may *render*;
+  `API_DIETARY_IDS` is what an owner may *store*, and `tests/unit/item-attributes.test.ts` pins it
+  against the API. `spicy` is in the first and not the second: heat is a degree, it travels as
+  `spiceLevel`, and offering both would draw two flames on one dish.
+- **A set clears with `[]`, never with `null`.** The difference from `description` is the column:
+  a description is nullable, a declaration is NOT NULL with an empty default. There is no "no
+  dietary information", only "none declared".
+- **Every editor control has to post by itself.** This is why `DietaryPicker` is built from real
+  `<input type="checkbox">` chips and not from `Toggle`, and why spiciness and availability are
+  radios rather than a `Switch` and a `Select`. A `Toggle` is a `<button aria-pressed>`: it posts
+  nothing, so with client JavaScript unavailable an owner could not have declared a single
+  allergen — and allergens are the one thing on a Czech menu that is not optional. A group of
+  checkboxes under one name *is* the array, read back with `getAll`, exactly like the phone list.
+  `components/menu/forms/AvailabilitySwitch.tsx` remains the design system's showcase for the same
+  idea and is not what the editor uses.
+- **Never define a component inside a render body.** `DietaryPicker`'s chip started life as a
+  `Chip` declared inside the component. A component defined in a render body is a *new type* on
+  every render, so React unmounts and remounts it instead of updating it — which throws away
+  focus. Ticking one box with the keyboard moved focus to the document and the next key press went
+  nowhere. Invisible in a click-through, obvious the moment anyone uses the keyboard, and caught
+  by the story that toggles a chip twice.
+- **A label either wraps its control or points at it, not both.** Doing both activates the control
+  twice in a real browser, so a chip toggled straight back off.
 
 # Legal pages and cookie consent
 

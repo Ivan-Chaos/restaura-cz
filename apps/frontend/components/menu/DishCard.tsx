@@ -143,10 +143,11 @@ export function DishCard({
           </div>
         )}
 
-        {(item.dietary?.length || item.allergens?.length) && (
+        {(item.dietary?.length || item.allergens?.length || item.warnings?.length) && (
           <DietaryMarkerList
             dietary={item.dietary}
             allergens={item.allergens}
+            warnings={item.warnings}
             className="mt-auto"
           />
         )}

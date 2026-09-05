@@ -246,7 +246,7 @@ describe("readImageUpload", () => {
 });
 
 describe("form bodies", () => {
-  const VALUES = { name: "Svíčková", description: "", priceCzk: "189" };
+  const VALUES = { name: "Svíčková", description: "", priceCzk: "189", dietary: [], allergens: [], warnings: [], spiceLevel: "0", availability: "available" };
   const HIDDEN = { locale: "cs", menuId: "m1", sectionId: "s1" };
 
   it("sends no image parts when the image is untouched", () => {

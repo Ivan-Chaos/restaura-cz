@@ -61,6 +61,7 @@ export function DishRow({
       item.spiceLevel ||
       item.dietary?.length ||
       item.allergens?.length ||
+      item.warnings?.length ||
       availability !== "available",
   );
 
@@ -144,7 +145,11 @@ export function DishRow({
           ))}
           {item.spiceLevel ? <SpiceLevel level={item.spiceLevel} /> : null}
           <AvailabilityBadge status={availability} />
-          <DietaryMarkerList dietary={item.dietary} allergens={item.allergens} />
+          <DietaryMarkerList
+            dietary={item.dietary}
+            allergens={item.allergens}
+            warnings={item.warnings}
+          />
         </div>
       ) : null}
 

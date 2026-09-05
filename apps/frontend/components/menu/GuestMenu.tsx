@@ -4,6 +4,7 @@ import type { Menu } from "@/lib/design-system/types";
 import { PRESENTATIONS, type Presentation } from "@/lib/menu-display/presentation";
 
 import { CategoryNav } from "./CategoryNav";
+import { DietaryLegend, declarationsOf, hasDeclarations } from "./DietaryLegend";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MenuFooter } from "./MenuFooter";
 import { MenuHeader } from "./MenuHeader";
@@ -23,8 +24,10 @@ export interface GuestMenuProps {
  * allergen legend, because its fixture always has that data. A menu built in
  * the editor has none of it yet, and printing a legend for allergens nobody
  * declared would tell guests something untrue. Photographs have since arrived
- * (feature 006) and this composition grew to match; markers and allergens are
- * still to come, and the components for them are already there.
+ * (feature 006) and markers, allergens and warnings with them (feature 008),
+ * so this composition has grown to match — but on the menu's own terms: the
+ * legend below lists only what this menu actually declares, and a menu that
+ * declares nothing gets no legend at all.
  *
  * The `presentation` recipe decides structure — header layout, nav shape,
  * section heading, whether dishes are rows or cards — while the theme in scope
@@ -42,6 +45,7 @@ export interface GuestMenuProps {
 export function GuestMenu({ menu, presentation = PRESENTATIONS.classic }: GuestMenuProps) {
   const { establishment, categories } = menu;
   const hasContent = categories.some((category) => category.items.length > 0);
+  const declares = declarationsOf(menu);
 
   return (
     <>
@@ -67,6 +71,16 @@ export function GuestMenu({ menu, presentation = PRESENTATIONS.classic }: GuestM
       <main className="flex-1">
         <Container size="md">
           <MenuSections categories={categories} presentation={presentation} />
+
+          {/*
+            Only the markers, warnings and allergen numbers this menu actually
+            uses. A legend is a promise that the numbers on the dishes mean
+            something; printing all fourteen when the kitchen declared two makes
+            the other twelve read as "we checked, and no".
+          */}
+          {hasDeclarations(declares) ? (
+            <DietaryLegend declares={declares} compact className="mt-8" />
+          ) : null}
 
           {/* An owner may publish an empty menu; that is a choice, not an error. */}
           {!hasContent && categories.length === 0 ? <div className="py-6" /> : null}

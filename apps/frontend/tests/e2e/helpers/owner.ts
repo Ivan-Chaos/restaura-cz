@@ -203,7 +203,17 @@ export async function addSection(page: Page, title: string): Promise<void> {
 export async function addItem(
   page: Page,
   section: string,
-  item: { name: string; description?: string; price: string },
+  item: {
+    name: string;
+    description?: string;
+    price: string;
+    /** Declarations (feature 008), given by the value each control posts. */
+    dietary?: string[];
+    allergens?: number[];
+    warnings?: string[];
+    spiceLevel?: 0 | 1 | 2 | 3;
+    availability?: "available" | "limited" | "soldOut" | "hidden";
+  },
 ): Promise<void> {
   const card = sectionCard(page, section);
 
@@ -216,6 +226,33 @@ export async function addItem(
       .fill(item.description);
   }
   await card.getByRole("textbox", { name: /^(cena|price|preis)$/i }).fill(item.price);
+
+  // Found by the value each input posts rather than by its label: the values
+  // are the wire vocabulary and are identical in every locale, whereas the
+  // labels are not — and this suite runs in Czech.
+  //
+  // Clicked through the wrapping label, which is what a person clicks: the
+  // input itself is `sr-only`, so it has a box but the label sits over it, and
+  // Playwright rightly refuses to click something covered by another element.
+  const tick = async (name: string, value: string | number) => {
+    await card.locator(`label:has(input[name="${name}"][value="${value}"])`).click();
+  };
+  for (const id of item.dietary ?? []) {
+    await tick("dietary", id);
+  }
+  for (const number of item.allergens ?? []) {
+    await tick("allergens", number);
+  }
+  for (const id of item.warnings ?? []) {
+    await tick("warnings", id);
+  }
+  if (item.spiceLevel !== undefined) {
+    await tick("spiceLevel", item.spiceLevel);
+  }
+  if (item.availability !== undefined) {
+    await tick("availability", item.availability);
+  }
+
   await card.getByRole("button", { name: /přidat jídlo|add dish|gericht hinzufügen/i }).click();
 
   await expect(card.getByText(item.name, { exact: true })).toBeVisible();

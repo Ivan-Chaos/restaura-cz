@@ -4,7 +4,11 @@ import { useId, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import type { AllergenNumber, DietaryMarkerId } from "@/lib/design-system/dietary";
+import type {
+  AllergenNumber,
+  ApiDietaryId,
+  DishWarningId,
+} from "@/lib/design-system/dietary";
 import type { Availability, PriceModel } from "@/lib/design-system/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,8 +32,9 @@ interface DishDraft {
   description: string;
   category: string;
   price: PriceModel;
-  dietary: DietaryMarkerId[];
+  dietary: ApiDietaryId[];
   allergens: AllergenNumber[];
+  warnings: DishWarningId[];
   availability: Availability;
 }
 
@@ -42,6 +47,7 @@ const INITIAL_DRAFT: DishDraft = {
   price: { kind: "single", amount: { amount: 0, currency: "CZK" } },
   dietary: [],
   allergens: [],
+  warnings: [],
   availability: "available",
 };
 
@@ -176,10 +182,12 @@ export function EditDishFormMock({ simulateFailure = false, className }: EditDis
         />
 
         <DietaryPicker
+          idPrefix="mock-dish"
           value={draft.dietary}
           allergens={draft.allergens}
-          onChange={({ dietary, allergens }) =>
-            setDraft((prev) => ({ ...prev, dietary, allergens }))
+          warnings={draft.warnings}
+          onChange={({ dietary, allergens, warnings }) =>
+            setDraft((prev) => ({ ...prev, dietary, allergens, warnings }))
           }
         />
 

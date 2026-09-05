@@ -8,7 +8,7 @@ import { ThemeScope } from "@/components/theme/ThemeScope";
 import { routing } from "@/i18n/routing";
 import { getMenu } from "@/lib/api/actions/menus";
 import { requireProfile } from "@/lib/api/session";
-import { toDisplayMenu } from "@/lib/menu-display/adapter";
+import { toDisplayMenu, visibleItemCount } from "@/lib/menu-display/adapter";
 import { presentationForTheme } from "@/lib/menu-display/presentation";
 import { themeForVariant } from "@/lib/menu-display/variants";
 import { planOf, resolveBranding } from "@/lib/plans/entitlements";
@@ -59,7 +59,7 @@ export default async function PrintMenuPage({
 
   // Nothing to print is not an error page's job to explain — the editor
   // disables the download and says why. Here it is simply not a document.
-  if (!menu.sections.some((section) => section.items.length > 0)) notFound();
+  if (visibleItemCount(menu.sections) === 0) notFound();
 
   const { branding } = await searchParams;
   const showBranding = resolveBranding(

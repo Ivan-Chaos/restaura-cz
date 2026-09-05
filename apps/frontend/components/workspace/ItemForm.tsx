@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
+import { DietaryPicker } from "@/components/menu/forms/DietaryPicker";
+import { AvailabilityField } from "@/components/workspace/AvailabilityField";
 import { ImageField } from "@/components/workspace/ImageField";
+import { SpiceLevelField } from "@/components/workspace/SpiceLevelField";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -16,7 +19,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fieldCode, useActionForm, type ServerAction } from "@/hooks/use-action-form";
-import type { ImageModel } from "@/lib/design-system/types";
+import type {
+  AllergenNumber,
+  ApiDietaryId,
+  AvailabilityId,
+  DishWarningId,
+} from "@/lib/design-system/dietary";
+import type { ImageModel, SpiceLevel } from "@/lib/design-system/types";
 import type { PendingImage } from "@/lib/validation/image";
 import { itemFormData } from "@/lib/validation/form-values";
 import { menuItemFormSchema, type MenuItemFormValues } from "@/lib/validation/schemas";
@@ -27,7 +36,19 @@ export interface ItemFormProps {
   action: ServerAction;
   /** Ids the action needs: locale, menuId, sectionId and, when editing, itemId. */
   hidden: Record<string, string>;
-  defaults?: Partial<ItemFormValues>;
+  /**
+   * What the row already holds. The declaration groups are typed in their own
+   * vocabularies rather than as the form’s strings, because that is how the
+   * editor row has them and converting twice invites one of the conversions to
+   * be wrong.
+   */
+  defaults?: Partial<Omit<ItemFormValues, "dietary" | "allergens" | "warnings" | "spiceLevel" | "availability">> & {
+    dietary?: ApiDietaryId[];
+    allergens?: AllergenNumber[];
+    warnings?: DishWarningId[];
+    spiceLevel?: SpiceLevel;
+    availability?: AvailabilityId;
+  };
   submitLabel: string;
   /** Rendered beside submit when editing, to leave the row alone. */
   onCancel?: () => void;
@@ -42,8 +63,8 @@ export interface ItemFormProps {
 }
 
 /**
- * Adding a dish and editing one take the same three fields, so they share a
- * form. The only difference is whether an itemId is present in `hidden`.
+ * Adding a dish and editing one take the same fields, so they share a form. The
+ * only difference is whether an itemId is present in `hidden`.
  *
  * Validated by react-hook-form against the same schema the Server Action
  * re-reads, which is what makes a rejected submit keep what was typed: the
@@ -76,6 +97,25 @@ export function ItemForm({
    */
   const [image, setImage] = useState<PendingImage>({ kind: "keep" });
 
+  /**
+   * What the dish declares.
+   *
+   * Held here rather than registered with react-hook-form because these are
+   * checkbox and radio *groups*: the DOM already holds the answer under a
+   * repeated name, and RHF's value would be a second copy of it with its own
+   * chance to disagree. `toFormData` reads this state, the browser posts the
+   * same inputs when JavaScript never loads, and `readItem` parses both.
+   */
+  const [declarations, setDeclarations] = useState({
+    dietary: (defaults?.dietary ?? []) as ApiDietaryId[],
+    allergens: (defaults?.allergens ?? []) as AllergenNumber[],
+    warnings: (defaults?.warnings ?? []) as DishWarningId[],
+  });
+  const [spiceLevel, setSpiceLevel] = useState<SpiceLevel>(defaults?.spiceLevel ?? 0);
+  const [availability, setAvailability] = useState<AvailabilityId>(
+    defaults?.availability ?? "available",
+  );
+
   const { form, formAction, onSubmit, pending, state, summary } = useActionForm<ItemFormValues>({
     action,
     schema: menuItemFormSchema,
@@ -83,8 +123,25 @@ export function ItemForm({
       name: defaults?.name ?? "",
       description: defaults?.description ?? "",
       priceCzk: defaults?.priceCzk ?? "",
+      dietary: [],
+      allergens: [],
+      warnings: [],
+      spiceLevel: "0",
+      availability: "available",
     },
-    toFormData: (values) => itemFormData(values, hidden, image),
+    toFormData: (values) =>
+      itemFormData(
+        {
+          ...values,
+          dietary: declarations.dietary,
+          allergens: declarations.allergens.map(String),
+          warnings: declarations.warnings,
+          spiceLevel: String(spiceLevel),
+          availability,
+        },
+        hidden,
+        image,
+      ),
     onSuccess: (saved) => {
       if (successMessage) toast.success(successMessage);
       // The photograph is stored now, so the field goes back to resting state
@@ -92,7 +149,14 @@ export function ItemForm({
       setImage({ kind: "keep" });
       // Adding: an empty form, ready for the next dish. Editing: the row is
       // about to close, so clearing it would only be a flicker.
-      if (!isEditing) saved.reset();
+      if (!isEditing) {
+        saved.reset();
+        // The declaration groups live outside react-hook-form, so `reset` does
+        // not reach them — the next dish would inherit the last one's allergens.
+        setDeclarations({ dietary: [], allergens: [], warnings: [] });
+        setSpiceLevel(0);
+        setAvailability("available");
+      }
       onSuccess?.();
     },
   });
@@ -156,6 +220,29 @@ export function ItemForm({
           error={imageError}
           disabled={pending}
           onChange={setImage}
+        />
+
+        <DietaryPicker
+          idPrefix={idPrefix}
+          value={declarations.dietary}
+          allergens={declarations.allergens}
+          warnings={declarations.warnings}
+          disabled={pending}
+          onChange={setDeclarations}
+        />
+
+        <SpiceLevelField
+          idPrefix={idPrefix}
+          value={spiceLevel}
+          disabled={pending}
+          onChange={setSpiceLevel}
+        />
+
+        <AvailabilityField
+          idPrefix={idPrefix}
+          value={availability}
+          disabled={pending}
+          onChange={setAvailability}
         />
 
         <Field data-invalid={priceError ? true : undefined}>

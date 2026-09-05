@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { and, asc, desc, eq, inArray, isNotNull, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, ne, sql, type SQL } from 'drizzle-orm';
 import { AppError } from '../common/app-error.js';
 import { DRIZZLE, type DrizzleDb } from '../db/client.js';
 import { menu, menuItem, menuSection, restaurantProfile } from '../db/schema.js';
@@ -7,6 +7,17 @@ import { processImage, type CropRect } from '../images/image-processor.js';
 import { toImageRef, type ImageRef } from '../images/image-ref.js';
 import { newDishKey } from '../images/keys.js';
 import { IMAGE_STORAGE, type ImageStorage } from '../images/storage/image-storage.js';
+import {
+  ALLERGEN_NUMBERS,
+  DIETARY_IDS,
+  WARNING_IDS,
+  orderedSubsetOf,
+  type AllergenNumber,
+  type Availability,
+  type DietaryId,
+  type PublicAvailability,
+  type WarningId,
+} from './item-attributes.js';
 import { moveWithin } from './ordering.js';
 import { generateSlug } from './slug.js';
 
@@ -36,6 +47,15 @@ export interface ItemView {
   position: number;
   /** The dish's photograph, or null — which is the normal state. */
   image: ImageRef | null;
+  /** Deduped and in catalogue order, so two dishes with the same claims read identically. */
+  dietary: DietaryId[];
+  /** EU 1169/2011 numbers, ascending. */
+  allergens: AllergenNumber[];
+  /** 0–3. */
+  spiceLevel: number;
+  warnings: WarningId[];
+  /** Owner-side only: `hidden` means guests never see this dish. */
+  availability: Availability;
 }
 
 export interface SectionView {
@@ -55,6 +75,15 @@ export interface PublicMenuItem {
   description: string | null;
   priceCzk: number;
   image: ImageRef | null;
+  dietary: DietaryId[];
+  allergens: AllergenNumber[];
+  spiceLevel: number;
+  warnings: WarningId[];
+  /**
+   * Never `hidden`: such a dish is filtered out of this payload entirely, so
+   * the type says what the query guarantees.
+   */
+  availability: PublicAvailability;
 }
 
 export interface PublicMenuView {
@@ -97,6 +126,11 @@ export class MenusService {
     imageKey: menuItem.imageKey,
     imageWidth: menuItem.imageWidth,
     imageHeight: menuItem.imageHeight,
+    dietary: menuItem.dietary,
+    allergens: menuItem.allergens,
+    spiceLevel: menuItem.spiceLevel,
+    warnings: menuItem.warnings,
+    availability: menuItem.availability,
   };
 
   /** One row, one wire shape. Storage keys never leave this method. */
@@ -109,6 +143,11 @@ export class MenusService {
     imageKey: string | null;
     imageWidth: number | null;
     imageHeight: number | null;
+    dietary: string[];
+    allergens: number[];
+    spiceLevel: number;
+    warnings: string[];
+    availability: string;
   }): ItemView {
     return {
       id: row.id,
@@ -121,6 +160,13 @@ export class MenusService {
         width: row.imageWidth,
         height: row.imageHeight,
       }),
+      // The columns are plain text and smallint; the CHECK constraints are what
+      // make these narrowings true. Same reasoning as `toSummary`'s status.
+      dietary: row.dietary as DietaryId[],
+      allergens: row.allergens as AllergenNumber[],
+      spiceLevel: row.spiceLevel,
+      warnings: row.warnings as WarningId[],
+      availability: row.availability as Availability,
     };
   }
 
@@ -302,9 +348,22 @@ export class MenusService {
         itemImageKey: menuItem.imageKey,
         itemImageWidth: menuItem.imageWidth,
         itemImageHeight: menuItem.imageHeight,
+        itemDietary: menuItem.dietary,
+        itemAllergens: menuItem.allergens,
+        itemSpiceLevel: menuItem.spiceLevel,
+        itemWarnings: menuItem.warnings,
+        itemAvailability: menuItem.availability,
       })
       .from(menuSection)
-      .leftJoin(menuItem, eq(menuItem.sectionId, menuSection.id))
+      .leftJoin(
+        menuItem,
+        // The hidden filter belongs in the join condition, not in the WHERE: a
+        // WHERE clause is evaluated after the left join has produced its rows,
+        // so `ne(null, 'hidden')` would be NULL and would discard the all-null
+        // row an empty section produces. A section would then vanish both when
+        // it has no items and when all of its items are hidden.
+        and(eq(menuItem.sectionId, menuSection.id), ne(menuItem.availability, 'hidden')),
+      )
       .where(eq(menuSection.menuId, found.id))
       .orderBy(
         asc(menuSection.position),
@@ -338,6 +397,13 @@ export class MenusService {
             width: row.itemImageWidth,
             height: row.itemImageHeight,
           }),
+          dietary: (row.itemDietary ?? []) as DietaryId[],
+          allergens: (row.itemAllergens ?? []) as AllergenNumber[],
+          spiceLevel: row.itemSpiceLevel ?? 0,
+          warnings: (row.itemWarnings ?? []) as WarningId[],
+          // The join already excluded 'hidden', so the narrowing is the query's
+          // guarantee rather than an assumption.
+          availability: (row.itemAvailability ?? 'available') as PublicAvailability,
         });
       }
     }
@@ -433,7 +499,16 @@ export class MenusService {
     accountId: string,
     menuId: string,
     sectionId: string,
-    values: { name: string; description?: string; priceCzk: number },
+    values: {
+      name: string;
+      description?: string;
+      priceCzk: number;
+      dietary?: DietaryId[];
+      allergens?: AllergenNumber[];
+      spiceLevel?: number;
+      warnings?: WarningId[];
+      availability?: Availability;
+    },
   ): Promise<ItemView> {
     return this.db.transaction(async (tx) => {
       await this.requireOwnedMenu(tx, accountId, menuId);
@@ -447,6 +522,13 @@ export class MenusService {
           name: values.name,
           description: values.description ?? null,
           priceCzk: values.priceCzk,
+          // `orderedSubsetOf` returns [] for undefined, so it is the defaulting
+          // step as well as the normalising one — there is no `?? []` to forget.
+          dietary: orderedSubsetOf(DIETARY_IDS, values.dietary),
+          allergens: orderedSubsetOf(ALLERGEN_NUMBERS, values.allergens),
+          spiceLevel: values.spiceLevel ?? 0,
+          warnings: orderedSubsetOf(WARNING_IDS, values.warnings),
+          availability: values.availability ?? 'available',
           position: siblings.length,
         })
         .returning();
@@ -485,6 +567,11 @@ export class MenusService {
           description: menuItem.description,
           priceCzk: menuItem.priceCzk,
           position: menuItem.position,
+          dietary: menuItem.dietary,
+          allergens: menuItem.allergens,
+          spiceLevel: menuItem.spiceLevel,
+          warnings: menuItem.warnings,
+          availability: menuItem.availability,
         })
         .from(menuItem)
         .where(and(eq(menuItem.id, itemId), eq(menuItem.sectionId, sectionId)))
@@ -499,6 +586,17 @@ export class MenusService {
           name: source.name,
           description: source.description,
           priceCzk: source.priceCzk,
+          // Already normalised in the row they came from, so copied verbatim.
+          // Not `...ITEM_COLUMNS`: that set carries the image columns, and a
+          // copy must leave those NULL or deleting one dish would break the
+          // other's photograph.
+          dietary: source.dietary,
+          allergens: source.allergens,
+          spiceLevel: source.spiceLevel,
+          // A hidden dish duplicates hidden: the copy is a draft of the same
+          // thing, and publishing it is a decision the owner makes on purpose.
+          availability: source.availability,
+          warnings: source.warnings,
           position: siblings.length,
         })
         .returning();
@@ -528,7 +626,17 @@ export class MenusService {
     menuId: string,
     sectionId: string,
     itemId: string,
-    patch: { name?: string; description?: string | null; priceCzk?: number; position?: number },
+    patch: {
+      name?: string;
+      description?: string | null;
+      priceCzk?: number;
+      position?: number;
+      dietary?: DietaryId[];
+      allergens?: AllergenNumber[];
+      spiceLevel?: number;
+      warnings?: WarningId[];
+      availability?: Availability;
+    },
   ): Promise<ItemView> {
     return this.db.transaction(async (tx) => {
       await this.requireOwnedMenu(tx, accountId, menuId);
@@ -539,6 +647,20 @@ export class MenusService {
         ...(patch.name !== undefined ? { name: patch.name } : {}),
         ...(patch.description !== undefined ? { description: patch.description } : {}),
         ...(patch.priceCzk !== undefined ? { priceCzk: patch.priceCzk } : {}),
+        // An empty array is a value, not an absence: it clears the set. The
+        // column is NOT NULL, so there is no second way to say "declares
+        // nothing".
+        ...(patch.dietary !== undefined
+          ? { dietary: orderedSubsetOf(DIETARY_IDS, patch.dietary) }
+          : {}),
+        ...(patch.allergens !== undefined
+          ? { allergens: orderedSubsetOf(ALLERGEN_NUMBERS, patch.allergens) }
+          : {}),
+        ...(patch.spiceLevel !== undefined ? { spiceLevel: patch.spiceLevel } : {}),
+        ...(patch.warnings !== undefined
+          ? { warnings: orderedSubsetOf(WARNING_IDS, patch.warnings) }
+          : {}),
+        ...(patch.availability !== undefined ? { availability: patch.availability } : {}),
       };
       if (Object.keys(fields).length > 0) {
         await tx.update(menuItem).set(fields).where(eq(menuItem.id, itemId));

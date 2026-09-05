@@ -488,7 +488,8 @@
   "Availability": {
     "available": "Verfügbar",
     "limited": "Nur noch wenige",
-    "soldOut": "Ausverkauft"
+    "soldOut": "Ausverkauft",
+    "hidden": "Nicht auf der Karte"
   },
   "Price": {
     "from": "ab {price}",
@@ -503,8 +504,17 @@
     "lactoseFree": "Laktosefrei",
     "halal": "Halal",
     "kosher": "Koscher",
+    "lenten": "Fastenfreundlich",
     "spicy": "Scharf",
     "more": "{count, plural, one {# weitere Kennzeichnung} other {# weitere Kennzeichnungen}}"
+  },
+  "DishWarnings": {
+    "title": "Hinweise",
+    "containsAlcohol": "Enthält Alkohol",
+    "rawOrUndercooked": "Roh oder nicht durchgegart",
+    "mayContainBones": "Kann Knochen oder Schalen enthalten",
+    "servedVeryHot": "Sehr heiß serviert",
+    "containsCaffeine": "Enthält Koffein"
   },
   "Allergens": {
     "title": "Allergene",
@@ -557,6 +567,8 @@
     "image": "Foto",
     "price": "Preis",
     "dietary": "Ernährung und Allergene",
+    "dietGroup": "Ernährung",
+    "observanceGroup": "Religiös und Fastenzeit",
     "availability": "Verfügbarkeit",
     "save": "Gericht speichern",
     "saving": "Wird gespeichert…",
@@ -671,6 +683,7 @@
       "IS_LENGTH": "Verwenden Sie mindestens 8 Zeichen.",
       "MAX_LENGTH": "Diese Angabe ist zu lang.",
       "MIN": "Der Wert darf nicht negativ sein.",
+      "MAX": "Dieser Wert liegt über dem erlaubten Höchstwert.",
       "AT_LEAST_ONE_DEFINED": "Ändern Sie mindestens ein Feld.",
       "INVALID": "Dieser Wert ist ungültig.",
       "IS_PHONE": "Geben Sie eine gültige Telefonnummer ein.",
@@ -848,6 +861,7 @@
       "IS_LENGTH": "Dieses Feld ist erforderlich.",
       "MAX_LENGTH": "Diese Angabe ist zu lang.",
       "MIN": "Der Preis darf nicht negativ sein.",
+      "MAX": "Dieser Wert liegt über dem erlaubten Höchstwert.",
       "AT_LEAST_ONE_DEFINED": "Ändern Sie mindestens ein Feld.",
       "IS_PHONE": "Geben Sie eine gültige Telefonnummer ein.",
       "IS_ARRAY": "Dieser Wert ist ungültig.",
@@ -859,7 +873,10 @@
       "IS_CROP": "Dieser Ausschnitt passt nicht ins Bild. Bitte anpassen."
     },
     "itemPhoto": "Foto",
-    "itemPhotoOf": "Foto von {name}"
+    "itemPhotoOf": "Foto von {name}",
+    "itemSpiciness": "Schärfe",
+    "spiceNotSpicy": "Nicht scharf",
+    "itemAvailabilityHint": "Ein ausgeblendetes Gericht bleibt hier erhalten, Gäste sehen es aber weder auf der Karte noch im PDF."
   },
   "Publish": {
     "draft": "Entwurf",

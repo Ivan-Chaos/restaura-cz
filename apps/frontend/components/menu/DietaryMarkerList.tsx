@@ -6,8 +6,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import {
   allergenByNumber,
   DIETARY_MARKERS,
+  DISH_WARNINGS,
   type AllergenNumber,
   type DietaryMarkerId,
+  type DishWarningId,
 } from "@/lib/design-system/dietary";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +18,8 @@ import { DietaryMarker } from "./DietaryMarker";
 export interface DietaryMarkerListProps extends Omit<ComponentProps<"div">, "children"> {
   dietary?: DietaryMarkerId[];
   allergens?: AllergenNumber[];
+  /** Cautions. Shown ahead of the claims, and first to survive `max`. */
+  warnings?: DishWarningId[];
   /** Total chips to show before the rest collapse into a "+N" chip. */
   max?: number;
 }
@@ -30,14 +34,25 @@ export interface DietaryMarkerListProps extends Omit<ComponentProps<"div">, "chi
 export function DietaryMarkerList({
   dietary = [],
   allergens = [],
+  warnings = [],
   max,
   className,
   ...props
 }: DietaryMarkerListProps) {
   const tDietary = useTranslations("DietaryMarkers");
+  const tWarnings = useTranslations("DishWarnings");
   const tAllergens = useTranslations("Allergens");
 
   const entries = [
+    // Warnings lead, and so are the last to be collapsed into "+N": a caution a
+    // guest may need to act on outranks a claim they were only hoping for.
+    ...warnings.map((id) => ({
+      key: `warning-${id}`,
+      label: tWarnings(DISH_WARNINGS[id].labelKey),
+      node: (
+        <DietaryMarker key={`warning-${id}`} kind="warning" id={id} showLabel={false} size="sm" />
+      ),
+    })),
     ...dietary.map((id) => ({
       key: `dietary-${id}`,
       label: tDietary(DIETARY_MARKERS[id].labelKey),

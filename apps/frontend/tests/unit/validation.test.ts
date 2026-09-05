@@ -367,7 +367,21 @@ describe("readVerifyCode", () => {
  * failures gets reported decides whether the message under the field is useful.
  */
 describe("readItem", () => {
-  const VALID_ITEM = { name: "Kulajda", description: "Se zastřeným vejcem", priceCzk: "89" };
+  /** Declarations default to "nothing", which is what an untouched form posts. */
+  const NO_DECLARATIONS = {
+    dietary: [],
+    allergens: [],
+    warnings: [],
+    spiceLevel: "0",
+    availability: "available",
+  };
+
+  const VALID_ITEM = {
+    name: "Kulajda",
+    description: "Se zastřeným vejcem",
+    priceCzk: "89",
+    ...NO_DECLARATIONS,
+  };
 
   it("accepts a complete dish and sends the price as a number", () => {
     const result = readItem(form(VALID_ITEM));
@@ -377,14 +391,21 @@ describe("readItem", () => {
       name: "Kulajda",
       description: "Se zastřeným vejcem",
       priceCzk: 89,
+      dietary: [],
+      allergens: [],
+      warnings: [],
+      spiceLevel: 0,
+      availability: "available",
     });
   });
 
   it("trims what was typed", () => {
-    const result = readItem(form({ name: "  Kulajda  ", description: "  ", priceCzk: " 89 " }));
+    const result = readItem(
+      form({ name: "  Kulajda  ", description: "  ", priceCzk: " 89 ", ...NO_DECLARATIONS }),
+    );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.values).toEqual({ name: "Kulajda", description: "", priceCzk: 89 });
+    expect(result.values).toMatchObject({ name: "Kulajda", description: "", priceCzk: 89 });
   });
 
   it.each([
@@ -514,17 +535,75 @@ describe("readVisualVariant", () => {
 describe("itemFormData and inlineTextFormData", () => {
   const hidden = { locale: "cs", menuId: "menu-1", sectionId: "section-1" };
 
+  /** A dish declaring nothing, which is what the form posts before anything is ticked. */
+  const plain = { dietary: [], allergens: [], warnings: [], spiceLevel: "0", availability: "available" };
+
   it("round-trips a dish through the same reader the action uses", () => {
-    const values = { name: "Kulajda", description: "S vejcem", priceCzk: "56,50" };
+    const values = { name: "Kulajda", description: "S vejcem", priceCzk: "56,50", ...plain };
     const result = readItem(itemFormData(values, hidden));
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.values).toEqual({ name: "Kulajda", description: "S vejcem", priceCzk: 56.5 });
+    expect(result.values).toEqual({
+      name: "Kulajda",
+      description: "S vejcem",
+      priceCzk: 56.5,
+      dietary: [],
+      allergens: [],
+      warnings: [],
+      spiceLevel: 0,
+      availability: "available",
+    });
+  });
+
+  it("round-trips what a dish declares, under repeated names", () => {
+    const values = {
+      name: "Kulajda",
+      description: "",
+      priceCzk: "89",
+      ...plain,
+      dietary: ["vegetarian", "lenten"],
+      allergens: ["3", "7"],
+      warnings: ["rawOrUndercooked"],
+      spiceLevel: "2",
+      availability: "soldOut",
+    };
+    const formData = itemFormData(values, hidden);
+
+    // One name, several values — the same shape the checkboxes post directly,
+    // which is what makes the no-JavaScript path identical to this one.
+    expect(formData.getAll("dietary")).toEqual(["vegetarian", "lenten"]);
+    expect(formData.getAll("allergens")).toEqual(["3", "7"]);
+
+    const result = readItem(formData);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.values).toMatchObject({
+      dietary: ["vegetarian", "lenten"],
+      allergens: [3, 7],
+      warnings: ["rawOrUndercooked"],
+      spiceLevel: 2,
+      availability: "soldOut",
+    });
+  });
+
+  it.each([
+    ["a marker outside the catalogue", { dietary: ["spicy"] }, "dietary"],
+    ["an allergen off the legend", { allergens: ["15"] }, "allergens"],
+    ["a spice level off the scale", { spiceLevel: "4" }, "spiceLevel"],
+    ["an availability nobody defined", { availability: "maybe" }, "availability"],
+  ])("refuses %s before it reaches the API", (_label, override, field) => {
+    const values = { name: "Kulajda", description: "", priceCzk: "89", ...plain, ...override };
+    const result = readItem(itemFormData(values, hidden));
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    const fields = fieldsOf(result) ?? {};
+    expect(Object.keys(fields).some((key) => key.startsWith(field))).toBe(true);
   });
 
   it("carries the ids the action needs", () => {
     const formData = itemFormData(
-      { name: "Kulajda", description: "", priceCzk: "89" },
+      { name: "Kulajda", description: "", priceCzk: "89", ...plain },
       { ...hidden, itemId: "item-1" },
     );
     expect(formData.get("locale")).toBe("cs");
@@ -534,7 +613,10 @@ describe("itemFormData and inlineTextFormData", () => {
   });
 
   it("posts the price as typed, so the action validates what the owner wrote", () => {
-    const formData = itemFormData({ name: "K", description: "", priceCzk: "56,50" }, hidden);
+    const formData = itemFormData(
+      { name: "K", description: "", priceCzk: "56,50", ...plain },
+      hidden,
+    );
     expect(formData.get("priceCzk")).toBe("56,50");
   });
 
@@ -554,6 +636,11 @@ describe("menuItemFormSchema", () => {
       name: "Kulajda",
       description: "",
       priceCzk: "56,50",
+      dietary: [],
+      allergens: [],
+      warnings: [],
+      spiceLevel: "0",
+      availability: "available",
     });
     expect(client.success).toBe(true);
     if (!client.success) return;

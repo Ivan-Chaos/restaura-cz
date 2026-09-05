@@ -240,6 +240,31 @@ function imageFailure(error: Parameters<typeof toFormState>[0]): FormState {
   return localValidationError({ image: code ?? "INVALID" });
 }
 
+/**
+ * What a dish declares, as the API's item body carries it.
+ *
+ * Sent on both create and edit, and always in full: these are sets, and a set
+ * is only ever posted whole. An empty array is therefore an instruction —
+ * "declares nothing" — and not an omission, which is why nothing here is
+ * conditionally spread the way `description` is. The column behind each one is
+ * NOT NULL with an empty default, so there is no null to send.
+ */
+function declarationsOf(values: {
+  dietary: string[];
+  allergens: number[];
+  warnings: string[];
+  spiceLevel: number;
+  availability: string;
+}) {
+  return {
+    dietary: values.dietary,
+    allergens: values.allergens,
+    warnings: values.warnings,
+    spiceLevel: values.spiceLevel,
+    availability: values.availability,
+  };
+}
+
 export async function addItemAction(
   _previous: FormState,
   formData: FormData,
@@ -267,6 +292,7 @@ export async function addItemAction(
         // Absent rather than empty: a dish with no description does not have a
         // blank one.
         ...(description === "" ? {} : { description }),
+        ...declarationsOf(parsed.values),
       },
     },
   );
@@ -308,6 +334,9 @@ export async function updateItemAction(
         priceCzk,
         // Explicit null clears it; the API distinguishes null from absent.
         description: description === "" ? null : description,
+        // The sets clear with `[]` rather than with null — the difference is
+        // the column: a description is nullable, a declaration is not.
+        ...declarationsOf(parsed.values),
       },
     },
   );

@@ -23,6 +23,8 @@ This document is the single source of truth for the frontend ↔ API contract. P
 }
 ```
 
+Field codes are class-validator constraint names uppercased, so `@Length` arrives as `IS_LENGTH` and `@Max` as `MAX`. An unrecognised one degrades to a generic "not valid" rather than vanishing.
+
 `details` is present only for `VALIDATION_FAILED`. Frontend rendering keys off `error.code` (and `details[].field`/`details[].code` for forms), mapping to `next-intl` messages — raw `message` text is never shown to users (root constitution III).
 
 **Error codes**: `VALIDATION_FAILED` (400) · `UNAUTHENTICATED` (401) · `EMAIL_TAKEN` (409) · `INVALID_CREDENTIALS` (401) · `NOT_FOUND` (404) · `INTERNAL` (500).
@@ -192,20 +194,42 @@ Request (at least one): `{ "title": "…", "position": 2 }` — position is clam
 
 `204`. Cascades items (UI confirms first — edge case).
 
+### What a dish declares (feature 008)
+
+Five fields travel with every item. Their vocabularies are pinned in `apps/api/src/menus/item-attributes.ts` and copied into `apps/frontend/lib/design-system/dietary.ts`, each side holding the other to it in a test.
+
+```
+dietary       vegetarian | vegan | glutenFree | lactoseFree | halal | kosher | lenten
+allergens     1 … 14                       (EU Regulation 1169/2011, in its own order)
+warnings      containsAlcohol | rawOrUndercooked | mayContainBones | servedVeryHot | containsCaffeine
+availability  available | limited | soldOut | hidden
+spiceLevel    0 … 3                        (0 = not spicy)
+```
+
+`spicy` is deliberately not a dietary marker: heat is a degree, so it travels as `spiceLevel`.
+
+All five are **always present and never `null`** on the way out — the columns are NOT NULL with empty defaults, so "declares nothing" has exactly one spelling. Sets are stored deduplicated and in catalogue order, whatever order they arrived in, so two dishes carrying the same claims read identically. A repeated entry is normalised away rather than refused.
+
 ### POST /menus/:menuId/sections/:sectionId/items
 
-Request: `{ "name": "1–200 chars", "description": "≤ 2000 chars, optional", "priceCzk": 89 }`
+Request: `{ "name": "1–200 chars", "description": "≤ 2000 chars, optional", "priceCzk": 89, "dietary": [], "allergens": [], "spiceLevel": 0, "warnings": [], "availability": "available" }`
 
 - Validation (FR-009): `name` required; `priceCzk` required, number with at most two decimal places, ≥ 0; `description` optional/nullable.
-- `201` → `{ "item": { "id", "name", "description", "priceCzk", "position" } }` — appended at the end.
+- The five declaration fields are optional, and omitting one is the same as sending its empty value — so a caller that has never heard of them keeps working unchanged.
+- Extra field codes: `IS_ARRAY`, `ARRAY_MAX_SIZE`, `IS_IN` (reported per entry, as `dietary.0`), `IS_INT`, `MIN`, `MAX`.
+- `201` → `{ "item": { "id", "name", "description", "priceCzk", "position", "image", "dietary", "allergens", "spiceLevel", "warnings", "availability" } }` — appended at the end.
 
 ### PATCH /menus/:menuId/sections/:sectionId/items/:itemId
 
-Request (at least one): `{ "name", "description", "priceCzk", "position" }` — same validation; `description: null` clears it. `200` → `{ "item": … }`.
+Request (at least one): `{ "name", "description", "priceCzk", "position", "dietary", "allergens", "spiceLevel", "warnings", "availability" }` — same validation; `description: null` clears it. `200` → `{ "item": … }`.
+
+A set clears with `[]`, not with `null`, and `[]` counts as a change. `null` on any of the five is a `400 VALIDATION_FAILED` (`IS_ARRAY`, `IS_INT` or `IS_IN`), because the column is NOT NULL with a default: there is no "no dietary information", only "none declared".
 
 ### POST /menus/:menuId/sections/:sectionId/items/:itemId/duplicate
 
-No body. `201` → `{ "item": … }` — a copy of the dish carrying the same name, description and price, inserted directly **after** the original, with the following siblings renumbered. One endpoint rather than a create plus a reorder, so a half-applied duplicate cannot exist.
+No body. `201` → `{ "item": … }` — a copy of the dish carrying the same name, description, price and declarations, inserted directly **after** the original, with the following siblings renumbered. One endpoint rather than a create plus a reorder, so a half-applied duplicate cannot exist.
+
+`availability` is copied verbatim too, so a hidden dish duplicates hidden: the copy is a draft of the same thing.
 
 The copy's `image` is always `null` (feature 006): two rows must never reference one stored object, or deleting either would break the other.
 
@@ -229,6 +253,10 @@ Response shapes are unchanged. In addition to the row cascade, every stored phot
 
 `204`.
 
+### PATCH /menus/:menuId — `visualVariant: null` (feature 008 correction)
+
+`400 VALIDATION_FAILED`, code `IS_IN`. It previously reached the UPDATE and answered `500`; the column is NOT NULL with a default, so there was never a null to accept.
+
 ## Public endpoint (no auth)
 
 ### GET /public/menus/:slug
@@ -247,7 +275,13 @@ Serves a published menu for guest display (FR-018). Draft menus and unknown slug
     "sections": [
       {
         "title": "Starters",
-        "items": [ { "name": "Soup", "description": null, "priceCzk": 89, "image": null } ]
+        "items": [
+          {
+            "name": "Soup", "description": null, "priceCzk": 89, "image": null,
+            "dietary": ["vegetarian"], "allergens": [3, 7], "spiceLevel": 2,
+            "warnings": ["rawOrUndercooked"], "availability": "soldOut"
+          }
+        ]
       }
     ]
   }
@@ -257,6 +291,9 @@ Serves a published menu for guest display (FR-018). Draft menus and unknown slug
 - Display fields only — no ids, no keys, no account data, no timestamps.
 - `restaurantName` (feature 006) travels so the logo has a text alternative naming the restaurant rather than the menu; a menu called "Lunch" depicts nothing. It is already visible on the restaurant's own menus and reveals nothing new.
 - `logo` and each item's `image` are `ImageRef | null`. Consumers MUST render the no-image presentation for `null` and MUST NOT treat it as an error, and MUST fall back to that same presentation if a URL fails to load.
+- Each item's declarations travel as above, with `availability` narrowed to `available | limited | soldOut`.
+- **A dish whose `availability` is `hidden` is absent from this payload entirely** (feature 008). `limited` and `soldOut` still travel, because telling a guest what is gone is the point of saying it.
+- **A section whose dishes are all hidden still appears, with `items: []`** — indistinguishable from a section that has nothing in it, which is correct: one visible outcome, one payload shape.
 - Reflects the latest saved content on every request (FR-020); performance budget p95 ≤ 200 ms.
 
 ### GET /dev-images/*key (development only)

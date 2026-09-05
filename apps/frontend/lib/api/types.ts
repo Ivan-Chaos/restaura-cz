@@ -1,3 +1,9 @@
+import type {
+  AllergenNumber,
+  ApiDietaryId,
+  AvailabilityId,
+  DishWarningId,
+} from "@/lib/design-system/dietary";
 import type { PlanId } from "@/lib/landing/plans";
 
 /**
@@ -45,6 +51,8 @@ export type FieldErrorCode =
   | "IS_LENGTH"
   | "MAX_LENGTH"
   | "MIN"
+  /** A spice level above the 0–3 scale. class-validator names `@Max` `max`. */
+  | "MAX"
   | "AT_LEAST_ONE_DEFINED"
   /** A phone number the API could not read as one. */
   | "IS_PHONE"
@@ -178,6 +186,22 @@ export interface MenuItemView {
    * copy without one.
    */
   image: ImageRef | null;
+  /**
+   * What the dish declares (feature 008). Always present, never null: the
+   * columns are NOT NULL with empty defaults, so "declares nothing" has one
+   * spelling rather than two.
+   */
+  dietary: ApiDietaryId[];
+  /** EU 1169/2011 numbers, ascending. */
+  allergens: AllergenNumber[];
+  /** 0–3, where 0 is not spicy. */
+  spiceLevel: number;
+  warnings: DishWarningId[];
+  /**
+   * Owner-side only. `hidden` is the one value guests never see, because such
+   * a dish is left out of the public payload entirely.
+   */
+  availability: AvailabilityId;
 }
 
 export interface MenuSectionView {
@@ -228,6 +252,15 @@ export interface PublicMenuItem {
   description: string | null;
   priceCzk: number;
   image: ImageRef | null;
+  dietary: ApiDietaryId[];
+  allergens: AllergenNumber[];
+  spiceLevel: number;
+  warnings: DishWarningId[];
+  /**
+   * Never `"hidden"`: the API filters such a dish out of this payload, so the
+   * type says what the endpoint guarantees rather than what the column allows.
+   */
+  availability: Exclude<AvailabilityId, "hidden">;
 }
 
 export interface PublicMenuSection {

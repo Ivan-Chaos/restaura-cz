@@ -118,6 +118,14 @@ export function itemFormData(
   // same schema, and sending a number here would mean the two paths validated
   // different things.
   formData.set("priceCzk", values.priceCzk);
+  // Appended under one repeated name each, matching what the checkboxes post
+  // directly: the action reads them with `getAll` either way, so the two paths
+  // cannot disagree about what was ticked.
+  for (const id of values.dietary) formData.append("dietary", id);
+  for (const number of values.allergens) formData.append("allergens", number);
+  for (const id of values.warnings) formData.append("warnings", id);
+  formData.set("spiceLevel", values.spiceLevel);
+  formData.set("availability", values.availability);
   appendImage(formData, image);
   return withHidden(formData, hidden);
 }

@@ -1,10 +1,28 @@
 import {
   registerDecorator,
+  ValidateIf,
   ValidatorConstraint,
   type ValidationArguments,
   type ValidationOptions,
   type ValidatorConstraintInterface,
 } from 'class-validator';
+
+/**
+ * `@IsOptional()` for a column that cannot be null.
+ *
+ * class-validator's `@IsOptional` skips every validator below it when the value
+ * is `null` *or* `undefined`. That is right for a nullable column — it is why
+ * `description: null` clears a description — and wrong for a NOT NULL one: the
+ * null sails past validation, reaches the UPDATE, and comes back to the caller
+ * as a 23502 dressed up as a 500.
+ *
+ * This skips only the absent case, so `null` reaches the validators below it
+ * and is answered with an honest 400. `ValidateIf` registers property metadata,
+ * so `whitelist: true` still recognises the property and will not strip it.
+ */
+export function OptionalButNotNull(): PropertyDecorator {
+  return ValidateIf((_object: unknown, value: unknown) => value !== undefined);
+}
 
 @ValidatorConstraint({ name: 'atLeastOneDefined', async: false })
 class AtLeastOneDefinedConstraint implements ValidatorConstraintInterface {

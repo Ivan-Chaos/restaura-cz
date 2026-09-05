@@ -31,6 +31,30 @@ export const EditDish: Story = {
       name: "Kulajda",
       description: "Se zastřeným vejcem a koprem",
       priceCzk: "89",
+      dietary: ["vegetarian"],
+      allergens: [3, 7],
+      warnings: ["servedVeryHot"],
+      spiceLevel: 1,
+      availability: "limited",
+    },
+  },
+};
+
+/**
+ * A dish taken off the menu for the evening (feature 008).
+ *
+ * It keeps everything — price, photograph, place in the section — and the only
+ * thing that changes is that guests do not see it. That is the difference
+ * between hiding and deleting, and it is why this is a field and not a button.
+ */
+export const HiddenDish: Story = {
+  args: {
+    submitLabel: "Uložit",
+    defaults: {
+      name: "Zelňačka",
+      description: "",
+      priceCzk: "59",
+      availability: "hidden",
     },
   },
 };
@@ -112,5 +136,67 @@ export const WithPhotograph: Story = {
       width: 1600,
       height: 1200,
     },
+  },
+};
+
+/**
+ * The declaration groups are checkboxes and radios, not buttons, so the form
+ * carries what was ticked whether or not our JavaScript ever ran.
+ *
+ * This asserts the DOM rather than the submitted body on purpose: the browser
+ * builds the body from exactly these inputs when it submits a form itself, so
+ * proving the inputs are right proves the no-JavaScript path is right.
+ */
+export const DeclarationsPostAsRepeatedNames: Story = {
+  args: {
+    submitLabel: "Uložit",
+    defaults: {
+      name: "Tatarák",
+      description: "",
+      priceCzk: "245",
+      dietary: ["glutenFree"],
+      allergens: [3, 10],
+      warnings: ["rawOrUndercooked"],
+      spiceLevel: 2,
+      availability: "soldOut",
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const posted = new FormData();
+    for (const input of canvasElement.querySelectorAll<HTMLInputElement>("input:checked")) {
+      posted.append(input.name, input.value);
+    }
+
+    await expect(posted.getAll("dietary")).toEqual(["glutenFree"]);
+    await expect(posted.getAll("allergens")).toEqual(["3", "10"]);
+    await expect(posted.getAll("warnings")).toEqual(["rawOrUndercooked"]);
+    // Radios: exactly one of each, always.
+    await expect(posted.getAll("spiceLevel")).toEqual(["2"]);
+    await expect(posted.getAll("availability")).toEqual(["soldOut"]);
+  },
+};
+
+/**
+ * Ticking an allergen and saving leaves the next dish a clean sheet.
+ *
+ * The declaration groups live outside react-hook-form, so `reset()` does not
+ * reach them — without the explicit clear, every dish added after a fish soup
+ * would quietly inherit its allergens, which is the worst possible field to get
+ * wrong by carry-over.
+ */
+export const ClearsDeclarationsAfterAdding: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(canvas.getByRole("textbox", { name: "Název jídla" }), "Kulajda");
+    await userEvent.type(canvas.getByRole("textbox", { name: "Cena" }), "89");
+
+    const [firstAllergen] = canvasElement.querySelectorAll<HTMLInputElement>(
+      'input[name="allergens"]',
+    );
+    await userEvent.click(firstAllergen!);
+    await expect(firstAllergen).toBeChecked();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Přidat jídlo" }));
+
+    await waitFor(() => expect(firstAllergen).not.toBeChecked());
   },
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { plainToInstance } from 'class-transformer';
-import { IsEmpty, IsOptional, validateSync } from 'class-validator';
-import { AllOrNoneOf, isPhoneNumber } from './validators.js';
+import { IsArray, IsEmpty, IsIn, IsOptional, validateSync } from 'class-validator';
+import { AllOrNoneOf, OptionalButNotNull, isPhoneNumber } from './validators.js';
 
 /**
  * The rule is deliberately permissive about *shape* and strict about *content*:
@@ -83,5 +83,60 @@ describe('AllOrNoneOf', () => {
     ['only the second', { b: 2 }],
   ])('rejects %s, reporting against the declaring property', (_label, body) => {
     expect(codesFor(body)).toContain('both:isCrop');
+  });
+});
+
+/**
+ * The distinction this decorator exists for.
+ *
+ * `@IsOptional()` waves both `undefined` and `null` past every validator below
+ * it. For a nullable column that is right — it is how `description: null`
+ * clears a description. For a NOT NULL column it is a trap: the null reaches
+ * the UPDATE and comes back to the caller as a 500 with nothing actionable in
+ * it. These cases pin the two behaviours side by side so the difference stays
+ * visible to whoever adds the next PATCH field.
+ */
+describe('OptionalButNotNull', () => {
+  class Patch {
+    /** Nullable column: null is a real instruction, so it must pass. */
+    @IsOptional()
+    @IsArray()
+    nullable?: string[] | null;
+
+    /** NOT NULL column with a default: there is no "no value", only the empty one. */
+    @OptionalButNotNull()
+    @IsArray()
+    @IsIn(['vegan', 'kosher'], { each: true })
+    required?: string[];
+  }
+
+  function codesFor(body: Record<string, unknown>): string[] {
+    return validateSync(plainToInstance(Patch, body)).flatMap((error) =>
+      Object.keys(error.constraints ?? {}).map((name) => `${error.property}:${name}`),
+    );
+  }
+
+  it('lets an absent field through, like @IsOptional would', () => {
+    expect(codesFor({})).toEqual([]);
+  });
+
+  it('lets a valid value through', () => {
+    expect(codesFor({ required: ['vegan'] })).toEqual([]);
+  });
+
+  it('lets an empty array through, because clearing is a change', () => {
+    expect(codesFor({ required: [] })).toEqual([]);
+  });
+
+  it('rejects null instead of waving it past', () => {
+    expect(codesFor({ required: null })).toContain('required:isArray');
+  });
+
+  it('still applies the validators below it', () => {
+    expect(codesFor({ required: ['spicy'] })).toContain('required:isIn');
+  });
+
+  it('leaves @IsOptional alone: a nullable field still accepts null', () => {
+    expect(codesFor({ nullable: null })).toEqual([]);
   });
 });

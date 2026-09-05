@@ -98,6 +98,17 @@ export function readItem(formData: FormData) {
       name: text(formData, "name"),
       description: text(formData, "description"),
       priceCzk: text(formData, "priceCzk"),
+      // Checkbox groups: each ticked box posts its own value under one name and
+      // an unticked one posts nothing, so `getAll` is the whole reading. An
+      // empty result is a real answer — "this dish declares nothing" — not a
+      // missing field.
+      dietary: rows(formData, "dietary"),
+      allergens: rows(formData, "allergens"),
+      warnings: rows(formData, "warnings"),
+      // Radio groups always post exactly one value; the defaults below are what
+      // an older form, or a hand-written request, would leave out.
+      spiceLevel: text(formData, "spiceLevel") || "0",
+      availability: text(formData, "availability") || "available",
     }),
   );
 }

@@ -1,4 +1,4 @@
-import type { AllergenNumber, DietaryMarkerId } from "./dietary";
+import type { AllergenNumber, DietaryMarkerId, DishWarningId } from "./dietary";
 
 /**
  * Display models.
@@ -61,6 +61,11 @@ export interface MenuItem {
   dietary?: DietaryMarkerId[];
   /** EU 1169/2011 numbers, as Czech menus print them. */
   allergens?: AllergenNumber[];
+  /**
+   * Cautions a guest may need to act on, as opposed to the claims above.
+   * Rendered in the same strip, ahead of the markers.
+   */
+  warnings?: DishWarningId[];
   availability?: Availability;
   highlights?: Highlight[];
   spiceLevel?: SpiceLevel;

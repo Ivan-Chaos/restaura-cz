@@ -213,7 +213,16 @@ export async function addItem(
   cookie: string,
   menuId: string,
   sectionId: string,
-  values: { name: string; description?: string; priceCzk: number },
+  values: {
+    name: string;
+    description?: string;
+    priceCzk: number;
+    dietary?: string[];
+    allergens?: number[];
+    spiceLevel?: number;
+    warnings?: string[];
+    availability?: string;
+  },
 ): Promise<string> {
   const response = await request(testApp.server)
     .post(`/menus/${menuId}/sections/${sectionId}/items`)

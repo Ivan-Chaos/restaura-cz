@@ -4,6 +4,7 @@ import { getMenu } from "@/lib/api/actions/menus";
 import { SESSION_COOKIE } from "@/lib/api/cookies";
 import { getSession } from "@/lib/api/session";
 import type { MenuDetail } from "@/lib/api/types";
+import { visibleItemCount } from "@/lib/menu-display/adapter";
 import { planOf } from "@/lib/plans/entitlements";
 import type { PlanId } from "@/lib/landing/plans";
 
@@ -81,9 +82,16 @@ export async function loadPrintContext(menuId: string): Promise<ContextResult> {
   };
 }
 
-/** A menu with no dishes has nothing to print. */
+/**
+ * A menu with no dishes has nothing to print.
+ *
+ * Counted the way a guest would count: a hidden dish is not on the menu, so a
+ * menu whose every dish is hidden is empty. Rendering it would produce a
+ * document with headings and nothing under them, which reads as a broken
+ * download rather than as the decision the owner actually made.
+ */
 export function hasPrintableContent(menu: MenuDetail): boolean {
-  return menu.sections.some((section) => section.items.length > 0);
+  return visibleItemCount(menu.sections) > 0;
 }
 
 export function pdfResponse(document: Buffer, filename: string): Response {
