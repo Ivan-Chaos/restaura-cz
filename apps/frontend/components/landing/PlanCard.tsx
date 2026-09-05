@@ -42,7 +42,7 @@ export function PlanCard({ plan, className }: PlanCardProps) {
 
   const href =
     plan.cta === "signup"
-      ? resolveSignupHref(locale, t("cta.mailSubjectSignup"))
+      ? resolveSignupHref(locale)
       : resolveNotifyHref(
           locale,
           plan.id,

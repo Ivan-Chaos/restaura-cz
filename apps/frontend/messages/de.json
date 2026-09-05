@@ -98,7 +98,6 @@
       }
     },
     "cta": {
-      "mailSubjectSignup": "Ich möchte mit Restaura starten",
       "mailSubjectNotify": "Benachrichtigen Sie mich zum Start von {plan}"
     },
     "assets": {

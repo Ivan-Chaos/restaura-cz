@@ -28,7 +28,7 @@ export function LandingHeader({ className }: LandingHeaderProps) {
   const t = useTranslations("Landing");
   const locale = useLocale();
 
-  const signupHref = resolveSignupHref(locale, t("cta.mailSubjectSignup"));
+  const signupHref = resolveSignupHref(locale);
 
   return (
     <header

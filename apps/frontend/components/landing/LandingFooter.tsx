@@ -27,7 +27,7 @@ export function LandingFooter({ className }: LandingFooterProps) {
   const t = useTranslations("Landing");
   const locale = useLocale();
 
-  const signupHref = resolveSignupHref(locale, t("cta.mailSubjectSignup"));
+  const signupHref = resolveSignupHref(locale);
   const contactHref = `mailto:${LANDING_CONTACT_EMAIL}`;
 
   return (

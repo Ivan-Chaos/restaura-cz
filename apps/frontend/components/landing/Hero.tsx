@@ -34,7 +34,7 @@ export function Hero({ poster, clip, className }: HeroProps) {
   const t = useTranslations("Landing");
   const locale = useLocale();
 
-  const signupHref = resolveSignupHref(locale, t("cta.mailSubjectSignup"));
+  const signupHref = resolveSignupHref(locale);
 
   return (
     <section

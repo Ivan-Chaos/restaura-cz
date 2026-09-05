@@ -7,6 +7,7 @@ import {
   LANDING_CONTACT_EMAIL,
   resolveNotifyHref,
   resolveSignupHref,
+  SIGNUP_PATH,
 } from "@/lib/landing/links";
 import { VISUAL_VARIANT_IDS } from "@/lib/menu-display/variants";
 
@@ -41,7 +42,6 @@ describe("style demos", () => {
  * for a product that has not launched.
  */
 
-const SIGNUP_SUBJECT = "I would like to start with Restaura";
 const NOTIFY_SUBJECT = "Notify me when Pro launches";
 
 afterEach(() => {
@@ -50,40 +50,50 @@ afterEach(() => {
 });
 
 describe("resolveSignupHref", () => {
-  it("falls back to a real mailbox when no sign-up exists yet", () => {
-    const href = resolveSignupHref("cs", SIGNUP_SUBJECT);
-    expect(href.startsWith(`mailto:${LANDING_CONTACT_EMAIL}`)).toBe(true);
-    expect(href).toContain(encodeURIComponent(SIGNUP_SUBJECT));
+  it("goes to the app's own sign-up by default", () => {
+    // Registration exists, so "get started" starts. It used to open a mail
+    // client, which asked someone who pressed a button to write a letter
+    // about a form one click away.
+    expect(resolveSignupHref("cs")).toBe(SIGNUP_PATH);
+  });
+
+  it("stays locale-less, because the localised Link adds the prefix", () => {
+    // A "/cs/sign-up" here would be handed to next-intl's Link and come out
+    // as "/cs/cs/sign-up".
+    for (const locale of ["cs", "en", "de"]) {
+      expect(resolveSignupHref(locale)).toBe("/sign-up");
+    }
+  });
+
+  it("is an internal href, so it routes through the localised Link", () => {
+    expect(isInternalHref(resolveSignupHref("cs"))).toBe(true);
   });
 
   it("uses the configured destination once one is set", () => {
     process.env.NEXT_PUBLIC_SIGNUP_URL = "https://forms.example/start";
-    expect(resolveSignupHref("de", SIGNUP_SUBJECT)).toBe(
-      "https://forms.example/start",
-    );
+    expect(resolveSignupHref("de")).toBe("https://forms.example/start");
   });
 
   it("substitutes the locale into a template", () => {
     process.env.NEXT_PUBLIC_SIGNUP_URL = "https://app.example/{locale}/signup";
-    expect(resolveSignupHref("de", SIGNUP_SUBJECT)).toBe(
-      "https://app.example/de/signup",
-    );
+    expect(resolveSignupHref("de")).toBe("https://app.example/de/signup");
   });
 
   it("never resolves to an empty target", () => {
     for (const locale of ["cs", "en", "de"]) {
-      expect(resolveSignupHref(locale, SIGNUP_SUBJECT).length).toBeGreaterThan(
-        1,
-      );
-      expect(resolveSignupHref(locale, SIGNUP_SUBJECT)).not.toBe("#");
+      expect(resolveSignupHref(locale).length).toBeGreaterThan(1);
+      expect(resolveSignupHref(locale)).not.toBe("#");
     }
   });
 });
 
 describe("resolveNotifyHref", () => {
   it("captures interest by email when nothing is configured", () => {
+    // Still a mailbox, and deliberately: the paid tiers have nothing to sign
+    // up to yet, so there is no form to send anyone to. This is the one CTA
+    // the sign-up route did not replace.
     const href = resolveNotifyHref("cs", "pro", NOTIFY_SUBJECT);
-    expect(href.startsWith("mailto:")).toBe(true);
+    expect(href.startsWith(`mailto:${LANDING_CONTACT_EMAIL}`)).toBe(true);
     expect(href).toContain(encodeURIComponent(NOTIFY_SUBJECT));
   });
 

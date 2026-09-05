@@ -3,19 +3,28 @@ import type { PlanId } from "./plans";
 /**
  * Where the landing page's calls to action go.
  *
- * There is no sign-up backend yet, and a marketing page whose only button is a
- * dead `#` is worse than no button. So every CTA resolves through here: an
- * environment variable when the owner has somewhere to send people (a form, and
- * later the real sign-up route), and a `mailto:` with a translated subject line
- * when they do not. Both are real destinations, and swapping one for the other
- * never touches a component.
+ * Every CTA resolves through here so that a destination is configuration rather
+ * than markup, and so that no button can end up a dead `#`.
+ *
+ * "Start for free" now goes to the real sign-up route: registration, email
+ * confirmation and the workspace all exist, so sending someone who pressed
+ * "Get started" to a mail client instead was asking them to write a letter
+ * about a form that is one click away. The `mailto:` fallback remains for
+ * "notify me", because the paid tiers genuinely have nothing to sign up to yet.
  *
  * `NEXT_PUBLIC_*` values are inlined at build time and are public by
  * definition — these are destinations, not secrets.
  */
 
-/** Fallback destination. Reachable today, unlike a sign-up flow that does not exist. */
+/** For the footer's own contact link, and for the plans that have not launched. */
 export const LANDING_CONTACT_EMAIL = "hello@restaura.cz";
+
+/**
+ * The app's own sign-up. Locale-less on purpose: `CtaButton` hands an internal
+ * href to the localised `Link`, which adds the prefix. Writing `/cs/sign-up`
+ * here would produce `/cs/cs/sign-up`.
+ */
+export const SIGNUP_PATH = "/sign-up";
 
 function mailto(subject: string): string {
   return `mailto:${LANDING_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
@@ -35,14 +44,14 @@ function fillTemplate(
 }
 
 /**
- * "Start for free". `subject` is the already-translated fallback mail subject —
- * resolving it is the caller's job, because only the component has the locale's
- * messages in hand.
+ * "Start for free" — the app's own sign-up, unless a deployment points its
+ * marketing elsewhere (an external form, a different app) with
+ * `NEXT_PUBLIC_SIGNUP_URL`.
  */
-export function resolveSignupHref(locale: string, subject: string): string {
+export function resolveSignupHref(locale: string): string {
   const configured = process.env.NEXT_PUBLIC_SIGNUP_URL;
   if (configured) return fillTemplate(configured, { locale });
-  return mailto(subject);
+  return SIGNUP_PATH;
 }
 
 /** "Notify me" on a coming-soon plan. Never a checkout, by construction. */
