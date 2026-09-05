@@ -210,3 +210,36 @@
     --ambient: none;
   }
 }
+
+/**
+ * Paper (feature 007). A backdrop filter does not survive printing, and an
+ * ambient gradient across every page is ink nobody asked for — so a frosted
+ * theme prints on the solid surface it already falls back to everywhere else
+ * blur is unavailable. Same overrides, same place, for the same reason the
+ * block above is here rather than in a theme file.
+ */
+@media print {
+  [data-theme] {
+    --panel: var(--surface-raised);
+    --panel-blur: 0px;
+    --ambient: none;
+    --ambient-motion: none;
+  }
+
+  /**
+   * A cookie notice is a screen affordance and must never be printed.
+   *
+   * It is rendered by the root layout, so it reaches every route — including
+   * the print routes, which nest under that layout like everything else. Being
+   * `position: fixed`, a printing browser repeats it on *every* page, so a
+   * four-page menu came out with four cookie banners.
+   *
+   * Hidden here rather than in the print routes because the rule is not about
+   * them: nobody printing a guest menu, or a page of terms, wants a banner on
+   * the paper either. The renderer emulates print media, so this covers the
+   * generated PDFs and their previews as well.
+   */
+  [data-slot="cookie-banner"] {
+    display: none !important;
+  }
+}

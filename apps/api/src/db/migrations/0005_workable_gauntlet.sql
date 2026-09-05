@@ -1,0 +1,2 @@
+ALTER TABLE "owner_account" ADD COLUMN "plan" text DEFAULT 'free' NOT NULL;--> statement-breakpoint
+ALTER TABLE "owner_account" ADD CONSTRAINT "owner_account_plan_known" CHECK ("owner_account"."plan" in ('free', 'pro', 'proPlus'));

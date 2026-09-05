@@ -326,3 +326,66 @@ catalogue gate proves all three languages describe the same document. All three 
   three speculative RSC requests to a policy nobody opens is a real cost on a real connection.
 - **The operator's identity comes from `NEXT_PUBLIC_LEGAL_*`.** Unset, the pages say they are
   drafts. Do not hard-code a company name to make that notice go away.
+
+# Printing: PDF menu and table stickers (feature 007)
+
+An owner can take two documents away from a menu: the menu itself as an A4 PDF,
+and a sheet of numbered table QR stickers, four to a page. Both are rendered in
+the menu's own visual style. Spec: `specs/007-pdf-menu-stickers/`.
+
+- **The frontend produces the documents, not the API.** A style is CSS —
+  `[data-theme]` tokens, `next/font` faces, Tailwind utilities, a presentation
+  recipe — so the only honest way to print one in its style is to let a browser
+  lay it out. `lib/pdf/` launches a headless Chromium (`playwright-core`, the
+  same engine the e2e suite drives) that loads our own print routes over HTTP.
+  The API's whole contribution is `account.plan`.
+- **`app/[locale]/print/**` are real pages, gated like `/preview`.** They carry
+  `requireProfile` themselves because they are not under `/workspace`, they are
+  `force-dynamic`, and they are `noindex`. An owner can open one and use the
+  browser's own print dialog; the renderer just automates that.
+- **`app/api/print/**` are the only thing the browser calls.** It fetches its
+  own origin, gets `application/pdf` back, and saves it with the filename from
+  `Content-Disposition`. That keeps "the browser never calls the API" intact and
+  is what makes a failure showable: a refusal is `{ error: { code } }`, rendered
+  through `Print.errors`, with a Retry beside it. The whole buffer is built
+  before a byte is sent, so a failure is never a truncated file.
+- **Entitlement is decided twice, server-side, and never by the request.**
+  `resolveBranding(planOf(account), requested)` runs in the route handler and
+  again in the print page. A free account asking for `branding=0` still gets the
+  Restaura line — the query parameter is a preference, not an authority.
+- **`MenuSections` is shared by `GuestMenu` and `PrintMenu`.** The rows-or-cards
+  decision lives in one place, so a printed menu cannot drift from the one on a
+  guest's phone. `avoidPageBreaks` adds the print classes and is inert on screen.
+- **`qr-foreground` / `qr-surface` are the only colours a QR code may use.**
+  Near-black on near-white in every theme and both appearances, held to 7:1 by
+  `CONTRAST_PAIRS`. Green Bar's light appearance is a dark board, so a code drawn
+  in `foreground`/`background` there would be inverted, and many scanners refuse
+  an inverted code outright. `QrCode` draws the path with `currentColor` from the
+  matrix in `lib/pdf/qr.ts`; the package's own SVG output is not used because it
+  hard-codes hex.
+- **A sticker's code encodes `?table=N`, and the guest page ignores it.** The
+  number is known when the sticker is printed and unrecoverable later, so it is
+  carried for a future ordering feature. `app/[locale]/m/[slug]` is untouched and
+  renders identically with and without it.
+- **Paper is always light.** A fresh browser context carries no stored appearance
+  preference, so `next-themes` resolves "system" to light and every theme prints
+  its light tokens with no CSS change. `@media print` in `globals.css` gives the
+  translucent themes their solid fallback — a backdrop filter does not survive
+  printing and an ambient gradient is ink nobody asked for.
+- **`print.css` owns paper geometry, and only that.** `@page`, the running band,
+  the sticker grid, the cut guides. Millimetres are correct there: a cut line has
+  to be 91mm, not `p-4`. `preferCSSPageSize` is set on the renderer so the
+  browser's print dialog and the PDF agree about margins.
+- **One browser per process, bounded concurrency.** `lib/pdf/browser.ts` keeps a
+  singleton on `globalThis` (survives HMR, relaunches if disconnected);
+  `lib/pdf/semaphore.ts` caps concurrent renders at `PDF_MAX_CONCURRENT_RENDERS`.
+  A context per request, never a shared page, is what keeps one owner's session
+  out of another's document.
+- **Deployment needs a Node server with a Chromium.** `pnpm exec playwright
+  install chromium --with-deps` in the image, or `PDF_CHROMIUM_PATH`. The four
+  `PDF_*` variables are documented in `.env.example`. This does not run
+  serverless.
+- **Never import `lib/pdf/render.ts` or `lib/pdf/request.ts` from a client
+  component** — the first pulls in `playwright-core`, the second `next/headers`.
+  The shared bits live in `lib/pdf/paper.ts` (A4 dimensions) and
+  `lib/pdf/errors.ts` (the error codes) for exactly that reason.

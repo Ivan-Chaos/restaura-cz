@@ -1,17 +1,13 @@
 import { Container } from "@/components/layout/Container";
-import { Grid } from "@/components/layout/Grid";
 import { AppearanceToggle } from "@/components/theme/AppearanceToggle";
 import type { Menu } from "@/lib/design-system/types";
-import { PRESENTATIONS, usesCards, type Presentation } from "@/lib/menu-display/presentation";
+import { PRESENTATIONS, type Presentation } from "@/lib/menu-display/presentation";
 
-import { CategoryHeading } from "./CategoryHeading";
 import { CategoryNav } from "./CategoryNav";
-import { DishCard } from "./DishCard";
-import { DishRow } from "./DishRow";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MenuFooter } from "./MenuFooter";
 import { MenuHeader } from "./MenuHeader";
-import { MenuPanel } from "./MenuPanel";
+import { MenuSections } from "./MenuSections";
 
 export interface GuestMenuProps {
   menu: Menu;
@@ -70,62 +66,7 @@ export function GuestMenu({ menu, presentation = PRESENTATIONS.classic }: GuestM
 
       <main className="flex-1">
         <Container size="md">
-          {categories.map((category, index) => {
-            const photographed = category.items.some((item) => item.image);
-            const layout = photographed ? presentation.cards : presentation.rows;
-            // Classic keeps its own rule — photographed food as cards, plain
-            // lists as rows — because its two layouts are both "rows" and the
-            // difference it cares about is the picture, not the recipe.
-            const asCards =
-              presentation.id === "classic" ? photographed : usesCards(layout);
-
-            const body = asCards ? (
-              <Grid cols={{ base: 1, md: 2 }} gap={4}>
-                {category.items.map((item, itemIndex) => (
-                  <DishCard
-                    key={item.id}
-                    item={item}
-                    surface={
-                      layout === "glass" ? "glass" : layout === "editorial" ? "flat" : "raised"
-                    }
-                    priceTreatment={presentation.id === "classic" ? undefined : presentation.price}
-                    // Only the first photograph is worth pre-loading; every
-                    // other one is below the fold on any supported viewport.
-                    priority={index === 0 && itemIndex === 0}
-                  />
-                ))}
-              </Grid>
-            ) : (
-              <div>
-                {category.items.map((item) => (
-                  <DishRow
-                    key={item.id}
-                    item={item}
-                    layout={layout}
-                    priceTreatment={presentation.price}
-                  />
-                ))}
-              </div>
-            );
-
-            return (
-              <section
-                key={category.id}
-                id={category.id}
-                aria-labelledby={`${category.id}-heading`}
-                className="scroll-mt-20 py-6"
-              >
-                <CategoryHeading
-                  id={`${category.id}-heading`}
-                  name={category.name}
-                  count={category.items.length}
-                  style={presentation.section}
-                  index={index}
-                />
-                {presentation.panel ? <MenuPanel>{body}</MenuPanel> : body}
-              </section>
-            );
-          })}
+          <MenuSections categories={categories} presentation={presentation} />
 
           {/* An owner may publish an empty menu; that is a choice, not an error. */}
           {!hasContent && categories.length === 0 ? <div className="py-6" /> : null}

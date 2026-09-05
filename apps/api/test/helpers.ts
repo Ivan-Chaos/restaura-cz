@@ -91,6 +91,23 @@ export async function markEmailVerified(accountId: string): Promise<void> {
 }
 
 /**
+ * Puts an account on a plan.
+ *
+ * No endpoint does this — billing is a later feature — so a test that needs a
+ * paid account reaches for the database, the same way it does for email
+ * confirmation. Deliberately takes a `string` so a test can also prove the
+ * CHECK constraint refuses a plan outside the catalogue.
+ */
+export async function setPlan(accountId: string, plan: string): Promise<void> {
+  await withDatabase(async (client) => {
+    await client.query('update "owner_account" set "plan" = $1 where "id" = $2', [
+      plan,
+      accountId,
+    ]);
+  });
+}
+
+/**
  * Replaces the outstanding code with one the test knows.
  *
  * The API stores only a hash, so a test cannot read the code that was

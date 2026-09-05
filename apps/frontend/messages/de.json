@@ -905,5 +905,56 @@
     "confirm": "Diesen Ausschnitt verwenden",
     "cancel": "Abbrechen",
     "loading": "Bild wird vorbereitet…"
+  },
+  "Print": {
+    "downloadMenu": "Speisekarte als PDF herunterladen",
+    "downloadStickers": "QR-Aufkleber herunterladen",
+    "menuNeedsDishes": "Fügen Sie der Karte zuerst mindestens ein Gericht hinzu.",
+    "stickersNeedPublish": "Aufkleber brauchen eine veröffentlichte Karte — die QR-Codes führen auf eine öffentliche Adresse.",
+    "dialogTitle": {
+      "menu": "Speisekarte als PDF",
+      "stickers": "QR-Aufkleber für Tische"
+    },
+    "dialogDescription": {
+      "menu": "Druckfertig auf A4, im Stil Ihrer Karte.",
+      "stickers": "Vier Aufkleber pro Seite. Mit 100 % drucken und an den Schnittlinien trennen."
+    },
+    "countLabel": "Anzahl der Aufkleber",
+    "countHint": "Einer pro Tisch, nummeriert ab eins.",
+    "countInvalid": "Geben Sie eine ganze Zahl von 1 bis 200 ein.",
+    "perPageLabel": "Aufkleber pro Seite",
+    "perPageOption": "{count} pro Seite",
+    "perPageHint": "{sheets, plural, one {# Blatt Papier} other {# Blatt Papier}}. Weniger pro Seite bedeutet größere Aufkleber.",
+    "perPageHintPlain": "Weniger pro Seite bedeutet größere Aufkleber.",
+    "brandingLabel": "Restaura-Branding anzeigen",
+    "brandingHint": "Ihr Tarif erlaubt es, die Zeile „Powered by restaura.cz“ wegzulassen.",
+    "previewAlt": "Vorschau der ersten Seite",
+    "previewLoading": "Vorschau wird erstellt…",
+    "previewUnavailable": "Die Vorschau konnte nicht erstellt werden. Der Download funktioniert trotzdem.",
+    "download": "Herunterladen",
+    "preparing": "Dokument wird vorbereitet…",
+    "retry": "Erneut versuchen",
+    "downloaded": "Dokument heruntergeladen.",
+    "cancel": "Schließen",
+    "errors": {
+      "UNAUTHENTICATED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+      "NOT_FOUND": "Diese Karte konnten wir nicht finden.",
+      "VALIDATION_FAILED": "Bitte prüfen Sie die Einstellungen oben.",
+      "NOT_PUBLISHED": "Veröffentlichen Sie die Karte zuerst — die QR-Codes führen auf eine öffentliche Adresse.",
+      "EMPTY_MENU": "Diese Karte enthält noch keine Gerichte zum Drucken.",
+      "RENDER_TIMEOUT": "Die Vorbereitung hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+      "RENDER_FAILED": "Das Dokument konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+    },
+    "scanPrompt": "Scannen und Karte ansehen",
+    "table": "Tisch {number}",
+    "fileSuffix": {
+      "menu": "speisekarte",
+      "stickers": "tischaufkleber"
+    },
+    "metaTitle": {
+      "menu": "Speisekarte zum Drucken",
+      "stickers": "QR-Aufkleber zum Drucken"
+    },
+    "poweredBy": "Powered by restaura.cz"
   }
 }

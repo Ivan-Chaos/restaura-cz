@@ -323,6 +323,9 @@ describe('auth (US1)', () => {
         id: owner.accountId,
         email: owner.email,
         emailVerified: true,
+        // Every account starts on the free plan; nothing in the API moves it
+        // yet (feature 007).
+        plan: 'free',
       });
       expect(response.body.profile).toEqual({ ...PROFILE, logo: null });
     });

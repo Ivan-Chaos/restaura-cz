@@ -905,5 +905,56 @@
     "confirm": "Use this framing",
     "cancel": "Cancel",
     "loading": "Preparing the image…"
+  },
+  "Print": {
+    "downloadMenu": "Download menu PDF",
+    "downloadStickers": "Download table stickers",
+    "menuNeedsDishes": "Add at least one dish to the menu first.",
+    "stickersNeedPublish": "Stickers need a published menu — the QR codes need a public address.",
+    "dialogTitle": {
+      "menu": "Menu PDF",
+      "stickers": "Table QR stickers"
+    },
+    "dialogDescription": {
+      "menu": "Ready to print on A4, in your menu's style.",
+      "stickers": "Four stickers per page. Print at 100% and cut along the guides."
+    },
+    "countLabel": "Number of stickers",
+    "countHint": "One per table, numbered from one.",
+    "countInvalid": "Enter a whole number from 1 to 200.",
+    "perPageLabel": "Stickers per page",
+    "perPageOption": "{count} per page",
+    "perPageHint": "{sheets, plural, one {# sheet of paper} other {# sheets of paper}}. Fewer per page means larger stickers.",
+    "perPageHintPlain": "Fewer per page means larger stickers.",
+    "brandingLabel": "Show Restaura branding",
+    "brandingHint": "Your plan lets you leave the “Powered by restaura.cz” line off.",
+    "previewAlt": "Preview of the first page",
+    "previewLoading": "Preparing the preview…",
+    "previewUnavailable": "The preview could not be produced. You can still download the document.",
+    "download": "Download",
+    "preparing": "Preparing your document…",
+    "retry": "Try again",
+    "downloaded": "Document downloaded.",
+    "cancel": "Close",
+    "errors": {
+      "UNAUTHENTICATED": "Your session has expired. Please sign in again.",
+      "NOT_FOUND": "We could not find that menu.",
+      "VALIDATION_FAILED": "Please check the options above.",
+      "NOT_PUBLISHED": "Publish the menu first — the QR codes need a public address.",
+      "EMPTY_MENU": "This menu has no dishes to print yet.",
+      "RENDER_TIMEOUT": "That took too long to prepare. Please try again.",
+      "RENDER_FAILED": "We could not prepare the document. Please try again."
+    },
+    "scanPrompt": "Scan to see the menu",
+    "table": "Table {number}",
+    "fileSuffix": {
+      "menu": "menu",
+      "stickers": "table-stickers"
+    },
+    "metaTitle": {
+      "menu": "Menu for printing",
+      "stickers": "Table stickers for printing"
+    },
+    "poweredBy": "Powered by restaura.cz"
   }
 }

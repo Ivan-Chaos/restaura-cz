@@ -56,6 +56,15 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  /**
+   * `playwright-core` launches a real Chromium to turn the print routes into
+   * PDFs (feature 007). It is Node-only — native binaries, `child_process`,
+   * a browser it spawns — so it must be `require`d at runtime rather than
+   * traced and bundled into the server build.
+   *
+   * See `node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/serverExternalPackages.md`.
+   */
+  serverExternalPackages: ["playwright-core"],
   experimental: {
     serverActions: {
       /**

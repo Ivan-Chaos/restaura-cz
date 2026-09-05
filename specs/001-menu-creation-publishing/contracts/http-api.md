@@ -51,6 +51,20 @@ The API always auto-orients, crops, resizes to one fixed rendition per kind, str
 
 `IS_INT` and `MIN` may also appear on the individual crop fields.
 
+### Account plan (feature 007)
+
+Every response carrying an `account` — sign-up, sign-in, `/auth/me` — includes `plan`:
+
+```jsonc
+{ "account": { "id": "8d1c…", "email": "owner@example.com", "emailVerified": true, "plan": "free" } }
+```
+
+**Plan ids**: `free` · `pro` · `proPlus`. Pinned in `apps/api/src/auth/plans.ts` and mirrored by `PlanId` in `apps/frontend/lib/landing/plans.ts`; a database CHECK constraint refuses anything else.
+
+`plan` is never absent. A consumer reading an older API without the field MUST treat it as `free`. No endpoint changes a plan — billing is a later feature — so today it is set directly in the database. The frontend derives one entitlement from it: the "Powered by restaura.cz" line on a downloaded PDF may be omitted only for `pro` and `proPlus`.
+
+PDF and QR-sticker generation are served by the frontend's own route handlers, not by this API; they consume `GET /menus/:menuId` and `GET /auth/me`. See `specs/007-pdf-menu-stickers/contracts/print-ui.md`.
+
 ## Auth endpoints
 
 ### POST /auth/sign-up
@@ -76,7 +90,7 @@ Request: `{ "email": "owner@example.com", "password": "min 8 chars" }`
 
 ### GET /auth/me 🔒
 
-- `200` → `{ "account": { "id", "email" } }`. Used by the frontend to gate workspace routes.
+- `200` → `{ "account": { "id", "email", "emailVerified", "plan" }, "profile": … }`. Used by the frontend to gate workspace routes and to decide plan entitlements.
 
 ### Profile shape (feature 006)
 

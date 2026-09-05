@@ -1,0 +1,131 @@
+/**
+ * Page geometry for the printable documents (feature 007).
+ *
+ * Everything here is paper measurement — sheet size, margins, where a page may
+ * break — expressed in millimetres because that is the unit the output is
+ * measured in. It is deliberately *not* design: no colour is chosen here (the
+ * cut guides borrow `--border` from whichever theme is in scope), and no
+ * spacing scale is bypassed. The design-token gate scans `.ts`/`.tsx` under
+ * `components/` and `app/`, not stylesheets, and this file would be the wrong
+ * thing to flag anyway: a sticker cut line has to be 91mm, not `p-4`.
+ *
+ * Both consumers of these rules — the browser's own print dialog, and the
+ * headless Chromium that produces the PDF — read the same `@page`, which is why
+ * `preferCSSPageSize` is set on the renderer: the two must not disagree about
+ * the margins.
+ */
+
+/**
+ * Edge to edge, by request.
+ *
+ * A sticker sheet wants every millimetre: the stickers are cut out, so a white
+ * border is paper thrown away. The menu shares this because both documents are
+ * printed the same way.
+ *
+ * The cost is real and worth stating: most consumer printers cannot mark the
+ * outer 3–5 mm of a sheet, so anything that lands there is clipped. The menu's
+ * own `Container` keeps a small horizontal inset, which is what stops dish
+ * names sitting exactly on the cut. Restoring a safe border is a one-value
+ * change here.
+ */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+/**
+ * The band repeated at the top of every printed page of a menu.
+ *
+ * `position: fixed` is how a running header is done in print: Chromium paints a
+ * fixed element once per page rather than once per document. The document then
+ * needs padding of its own so the first page's content starts below the band
+ * instead of underneath it.
+ */
+.print-running-band {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10mm;
+}
+
+.print-document {
+  padding-top: 12mm;
+}
+
+/** A dish, a heading with its first dish, the footer: never split these. */
+.print-avoid-break {
+  break-inside: avoid;
+}
+
+/** A section heading must not be the last thing on a page. */
+.print-keep-with-next {
+  break-after: avoid;
+}
+
+/**
+ * One sheet of stickers: the whole A4, divided by the chosen grid.
+ *
+ * The column and row counts arrive as custom properties because the owner picks
+ * the density at download time — 2 up through 16 up — and a stylesheet cannot
+ * know which. Fixed dimensions rather than content-derived ones, so every cell
+ * on every page is identical, which is what makes one set of cut lines correct
+ * for the whole sheet.
+ */
+.print-page {
+  width: 210mm;
+  height: 297mm;
+  display: grid;
+  grid-template-columns: repeat(var(--sticker-columns), 1fr);
+  grid-template-rows: repeat(var(--sticker-rows), 1fr);
+  break-after: page;
+}
+
+/** The last sheet ends the document; a trailing break would add a blank page. */
+.print-page:last-child {
+  break-after: auto;
+}
+
+/**
+ * Cut guides on the shared edges only. The sheet's outer edge is the paper's
+ * own, so it needs no line — and with a full-bleed page, drawing one there
+ * would sit exactly where a printer stops printing.
+ *
+ * Which edges a cell shares depends on the grid, and `nth-child` cannot express
+ * "not the last column" when the column count is a variable. So the component
+ * marks the cells instead; that keeps the arithmetic in one place, next to the
+ * numbering it already does.
+ *
+ * The padding shrinks with the grid: 6 mm inside a 105 × 148 mm sticker is a
+ * comfortable margin, and inside a 52 × 74 mm one it is a fifth of the width.
+ */
+.print-cell {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--sticker-padding, 6mm);
+}
+
+.print-cell-rule-right {
+  border-right: 1px dashed var(--border);
+}
+
+.print-cell-rule-bottom {
+  border-bottom: 1px dashed var(--border);
+}
+
+/** An unused cell on a partly-filled last sheet draws nothing at all. */
+.print-cell-empty {
+  border: 0;
+}
+
+@media print {
+  /* Chromium prints backgrounds only when asked; the renderer asks. This keeps
+     a themed sheet from losing its ground if someone prints from the browser
+     dialog and forgets the checkbox. */
+  .print-page,
+  .print-document {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

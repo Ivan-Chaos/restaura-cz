@@ -905,5 +905,56 @@
     "confirm": "Použít toto umístění",
     "cancel": "Zrušit",
     "loading": "Připravujeme obrázek…"
+  },
+  "Print": {
+    "downloadMenu": "Stáhnout PDF jídelního lístku",
+    "downloadStickers": "Stáhnout QR samolepky",
+    "menuNeedsDishes": "Nejdřív přidejte do lístku alespoň jedno jídlo.",
+    "stickersNeedPublish": "Samolepky potřebují zveřejněný lístek — QR kódy vedou na veřejnou adresu.",
+    "dialogTitle": {
+      "menu": "Jídelní lístek v PDF",
+      "stickers": "QR samolepky na stoly"
+    },
+    "dialogDescription": {
+      "menu": "Připravené k tisku na A4, ve stylu vašeho lístku.",
+      "stickers": "Čtyři samolepky na stránku. Vytiskněte ve 100 % a rozstřihněte podle vodicích čar."
+    },
+    "countLabel": "Počet samolepek",
+    "countHint": "Jedna na stůl, číslované od jedničky.",
+    "countInvalid": "Zadejte celé číslo od 1 do 200.",
+    "perPageLabel": "Samolepek na stránku",
+    "perPageOption": "{count} na stránku",
+    "perPageHint": "{sheets, plural, one {# list papíru} few {# listy papíru} other {# listů papíru}}. Čím méně na stránku, tím větší samolepky.",
+    "perPageHintPlain": "Čím méně na stránku, tím větší samolepky.",
+    "brandingLabel": "Zobrazit značku Restaura",
+    "brandingHint": "Váš tarif umožňuje řádek „Powered by restaura.cz“ vypnout.",
+    "previewAlt": "Náhled první stránky",
+    "previewLoading": "Připravujeme náhled…",
+    "previewUnavailable": "Náhled se nepodařilo vytvořit. Dokument si přesto můžete stáhnout.",
+    "download": "Stáhnout",
+    "preparing": "Připravujeme dokument…",
+    "retry": "Zkusit znovu",
+    "downloaded": "Dokument je stažený.",
+    "cancel": "Zavřít",
+    "errors": {
+      "UNAUTHENTICATED": "Vaše přihlášení vypršelo. Přihlaste se prosím znovu.",
+      "NOT_FOUND": "Takový lístek jsme nenašli.",
+      "VALIDATION_FAILED": "Zkontrolujte prosím nastavení výše.",
+      "NOT_PUBLISHED": "Nejdřív lístek zveřejněte — QR kódy vedou na veřejnou adresu.",
+      "EMPTY_MENU": "V tomto lístku zatím není co tisknout.",
+      "RENDER_TIMEOUT": "Příprava trvala příliš dlouho. Zkuste to prosím znovu.",
+      "RENDER_FAILED": "Dokument se nepodařilo připravit. Zkuste to prosím znovu."
+    },
+    "scanPrompt": "Naskenujte a zobrazte menu",
+    "table": "Stůl {number}",
+    "fileSuffix": {
+      "menu": "jidelni-listek",
+      "stickers": "stolky"
+    },
+    "metaTitle": {
+      "menu": "Jídelní lístek k tisku",
+      "stickers": "QR samolepky k tisku"
+    },
+    "poweredBy": "Powered by restaura.cz"
   }
 }

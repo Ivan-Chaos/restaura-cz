@@ -11,6 +11,7 @@ import { newLogoKey } from '../images/keys.js';
 import { processImage, type CropRect } from '../images/image-processor.js';
 import { IMAGE_STORAGE, type ImageStorage } from '../images/storage/image-storage.js';
 import { type EmailLocale } from '../mail/email-locale.js';
+import { DEFAULT_PLAN, isPlanId, type PlanId } from './plans.js';
 import { MailService } from '../mail/mail.service.js';
 import {
   CODE_TTL_MS,
@@ -31,6 +32,23 @@ export interface PublicAccount {
    * timestamp because no caller renders the date.
    */
   emailVerified: boolean;
+  /**
+   * Which plan the account is on (feature 007). Always present; `free` until
+   * billing moves it. Entitlements are decided from this, never from what a
+   * request asks for — today that is whether a downloaded document may omit
+   * the Restaura line.
+   */
+  plan: PlanId;
+}
+
+/**
+ * The column is `text` with a CHECK, so the database cannot hold anything else.
+ * This narrows the type without asserting: a row somehow outside the vocabulary
+ * reads as the default rather than as a value the rest of the code would have
+ * to defend against.
+ */
+function toPlanId(value: string): PlanId {
+  return isPlanId(value) ? value : DEFAULT_PLAN;
 }
 
 /**
@@ -113,12 +131,16 @@ export class AuthService {
         const [row] = await tx
           .insert(ownerAccount)
           .values({ email, passwordHash })
-          .returning({ id: ownerAccount.id, email: ownerAccount.email });
+          .returning({
+            id: ownerAccount.id,
+            email: ownerAccount.email,
+            plan: ownerAccount.plan,
+          });
         // The insert either returns a row or throws; this satisfies the type.
         if (!row) throw AppError.emailTaken();
 
         await tx.insert(restaurantProfile).values({ accountId: row.id, ...profile });
-        return { ...row, emailVerified: false };
+        return { ...row, plan: toPlanId(row.plan), emailVerified: false };
       });
     } catch (error) {
       // The unique index on lower(email) is what actually enforces one account
@@ -269,6 +291,7 @@ export class AuthService {
       .select({
         id: ownerAccount.id,
         email: ownerAccount.email,
+        plan: ownerAccount.plan,
         emailVerifiedAt: ownerAccount.emailVerifiedAt,
       })
       .from(ownerAccount)
@@ -294,7 +317,12 @@ export class AuthService {
     }
 
     await this.issueConfirmation(
-      { id: account.id, email: account.email, emailVerified: false },
+      {
+        id: account.id,
+        email: account.email,
+        plan: toPlanId(account.plan),
+        emailVerified: false,
+      },
       locale,
     );
   }
@@ -491,6 +519,7 @@ export class AuthService {
         id: ownerAccount.id,
         email: ownerAccount.email,
         passwordHash: ownerAccount.passwordHash,
+        plan: ownerAccount.plan,
         emailVerifiedAt: ownerAccount.emailVerifiedAt,
       })
       .from(ownerAccount)
@@ -512,6 +541,7 @@ export class AuthService {
       {
         id: account.id,
         email: account.email,
+        plan: toPlanId(account.plan),
         emailVerified: account.emailVerifiedAt !== null,
       },
       profile,
@@ -532,6 +562,7 @@ export class AuthService {
       .select({
         id: ownerAccount.id,
         email: ownerAccount.email,
+        plan: ownerAccount.plan,
         emailVerifiedAt: ownerAccount.emailVerifiedAt,
       })
       .from(session)
@@ -542,7 +573,12 @@ export class AuthService {
     if (!row) return null;
     // Resolved on every guarded request, which is what lets VerifiedGuard
     // decide without a second query.
-    return { id: row.id, email: row.email, emailVerified: row.emailVerifiedAt !== null };
+    return {
+      id: row.id,
+      email: row.email,
+      plan: toPlanId(row.plan),
+      emailVerified: row.emailVerifiedAt !== null,
+    };
   }
 
   private async issueSession(

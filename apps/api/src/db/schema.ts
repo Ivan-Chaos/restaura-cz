@@ -33,10 +33,22 @@ export const ownerAccount = pgTable(
      * unverified, whether a code was used before or after a policy change).
      */
     emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
+    /**
+     * Which plan the account is on (feature 007). The vocabulary is pinned in
+     * `auth/plans.ts` and shared with the frontend; the CHECK below is what
+     * makes it true rather than merely intended.
+     *
+     * Defaulted rather than nullable: every account has a plan, and "none" is
+     * not a state any caller should have to handle. No endpoint writes it yet —
+     * billing will — so today it is set in the database, and read to decide
+     * whether a downloaded document may omit the Restaura line.
+     */
+    plan: text('plan').notNull().default('free'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     uniqueIndex('owner_account_email_lower_idx').on(sql`lower(${table.email})`),
+    check('owner_account_plan_known', sql`${table.plan} in ('free', 'pro', 'proPlus')`),
   ],
 );
 

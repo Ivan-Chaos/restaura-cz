@@ -101,6 +101,13 @@
   --panel-inset: 0px;
   --ambient: none;
   --ambient-motion: none;
+  /* Machine-readable codes (feature 007) ---------------------------------- */
+  /* Dark-on-light in BOTH appearances: a camera reads contrast, not taste, and
+     an inverted QR code is refused by many scanners. Held to 7:1 by
+     CONTRAST_PAIRS. */
+  --qr-foreground: var(--palette-graphite-950);
+  --qr-surface: var(--palette-graphite-50);
+
 }
 
 .dark [data-theme="slate"],
@@ -169,4 +176,11 @@
   --sidebar-accent-foreground: var(--palette-graphite-100);
   --sidebar-border: var(--palette-graphite-700);
   --sidebar-ring: var(--palette-cobalt-400);
+  /* Machine-readable codes (feature 007) ---------------------------------- */
+  /* Dark-on-light in BOTH appearances: a camera reads contrast, not taste, and
+     an inverted QR code is refused by many scanners. Held to 7:1 by
+     CONTRAST_PAIRS. */
+  --qr-foreground: var(--palette-graphite-950);
+  --qr-surface: var(--palette-graphite-50);
+
 }

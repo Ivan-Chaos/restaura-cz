@@ -49,6 +49,8 @@ export const MENU_COLOR_TOKENS = [
   "surface-raised-foreground",
   "overlay",
   "overlay-foreground",
+  "qr-foreground",
+  "qr-surface",
 ] as const;
 
 /** Non-colour tokens every theme must set. */
@@ -183,6 +185,10 @@ export const TOKEN_PURPOSE: Record<RequiredToken, string> = {
     "Dark scrim laid over photography and video so text stays legible; also the background a hero falls back to when its media fails. Deliberately the same in light and dark — a scrim is dark either way.",
   "overlay-foreground":
     "Text and icons on `overlay`, or on media covered by it. Always light, in both appearances.",
+  "qr-foreground":
+    "The modules of a machine-readable code. Always a near-black step, in both appearances: a scanner reads dark-on-light, and an inverted code is refused outright by many phone cameras.",
+  "qr-surface":
+    "The tile a machine-readable code is printed on, including its quiet zone. Always a near-white step, in both appearances — it cannot follow a theme whose ground is dark.",
   radius: "Base corner radius; the sm/md/lg/xl scale derives from it.",
   density: "Unitless spacing multiplier (0.8–1.2). 1 = default rhythm.",
   "font-display": "Headings, establishment name, dish names.",
@@ -240,6 +246,11 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   // Text over photography. The scrim is what makes a hero headline legible on
   // top of an image we do not control, so the pair is held to the text bar.
   { foreground: "overlay-foreground", background: "overlay", min: 4.5 },
+  // A QR code is read by a camera, not an eye, and a printed sticker is read
+  // across a room in whatever light the room has. Held far above the text bar
+  // because the failure mode is not "hard to read" but "does not scan"
+  // (spec 007 FR-011).
+  { foreground: "qr-foreground", background: "qr-surface", min: 7 },
   // Non-text contrast (WCAG 1.4.11).
   { foreground: "ring", background: "background", min: 3 },
   { foreground: "ring", background: "card", min: 3 },

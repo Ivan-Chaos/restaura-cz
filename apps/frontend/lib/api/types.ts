@@ -1,3 +1,5 @@
+import type { PlanId } from "@/lib/landing/plans";
+
 /**
  * The frontend's half of the cross-app contract.
  *
@@ -89,6 +91,15 @@ export interface Account {
    * confirmation screen and nothing else.
    */
   emailVerified: boolean;
+  /**
+   * Which plan the account is on (feature 007). Always sent by the current API
+   * and defaulted to `free` in the database; an older API that omits it is read
+   * as `free` by `planOf`, never as "no plan".
+   *
+   * The one entitlement it currently decides: whether a downloaded PDF may
+   * leave off the Restaura line.
+   */
+  plan: PlanId;
 }
 
 /**

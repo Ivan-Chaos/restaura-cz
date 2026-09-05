@@ -28,7 +28,7 @@ import type {
 describe("response shapes match the contract", () => {
   it("accepts the documented account response, profile and all", () => {
     const payload = {
-      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true },
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true, plan: "free" as const },
       profile: {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567"],
@@ -43,7 +43,7 @@ describe("response shapes match the contract", () => {
 
   it("accepts a null profile, which is how an incomplete account is reported", () => {
     const payload = {
-      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true },
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: true, plan: "free" as const },
       profile: null,
     };
     expectTypeOf(payload).toExtend<AccountResponse>();
@@ -57,7 +57,7 @@ describe("response shapes match the contract", () => {
    */
   it("accepts an unverified account, which is how every new one starts", () => {
     const payload = {
-      account: { id: "8d1c…", email: "owner@example.com", emailVerified: false },
+      account: { id: "8d1c…", email: "owner@example.com", emailVerified: false, plan: "free" as const },
       profile: {
         restaurantName: "U Zlaté Lípy",
         phones: ["+420 601 234 567"],

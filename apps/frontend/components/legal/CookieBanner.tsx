@@ -43,6 +43,7 @@ export function CookieBanner() {
     <div
       role="region"
       aria-label={t("label")}
+      data-slot="cookie-banner"
       className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"
     >
       <div className="bg-card text-card-foreground shadow-overlay ring-border mx-auto flex max-w-3xl flex-col gap-4 rounded-xl p-5 ring-1 sm:flex-row sm:items-center sm:gap-6">

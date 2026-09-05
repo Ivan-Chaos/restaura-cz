@@ -113,6 +113,13 @@
     radial-gradient(60% 55% at 50% 95%, var(--palette-terracotta-200), transparent 70%),
     linear-gradient(180deg, var(--palette-aurora-100), var(--palette-aurora-50));
   --ambient-motion: ambient-drift 32s ease-in-out infinite alternate;
+  /* Machine-readable codes (feature 007) ---------------------------------- */
+  /* Dark-on-light in BOTH appearances: a camera reads contrast, not taste, and
+     an inverted QR code is refused by many scanners. Held to 7:1 by
+     CONTRAST_PAIRS. */
+  --qr-foreground: var(--palette-ink-950);
+  --qr-surface: var(--palette-ink-50);
+
 }
 
 .dark [data-theme="liquid-glass"],
@@ -191,4 +198,11 @@
     radial-gradient(50% 45% at 85% 20%, var(--palette-cobalt-900), transparent 70%),
     radial-gradient(60% 55% at 50% 95%, var(--palette-wine-900), transparent 70%),
     linear-gradient(180deg, var(--palette-aurora-950), var(--palette-ink-950));
+  /* Machine-readable codes (feature 007) ---------------------------------- */
+  /* Dark-on-light in BOTH appearances: a camera reads contrast, not taste, and
+     an inverted QR code is refused by many scanners. Held to 7:1 by
+     CONTRAST_PAIRS. */
+  --qr-foreground: var(--palette-ink-950);
+  --qr-surface: var(--palette-ink-50);
+
 }

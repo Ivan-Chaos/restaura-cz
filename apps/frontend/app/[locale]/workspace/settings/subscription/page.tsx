@@ -12,6 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { routing } from "@/i18n/routing";
+import { getSession } from "@/lib/api/session";
+import { planOf } from "@/lib/plans/entitlements";
 
 export async function generateMetadata({
   params,
@@ -26,11 +28,11 @@ export async function generateMetadata({
 /**
  * The subscription tab, read-only by design.
  *
- * Every account is on the same early-access plan, so there is nothing yet to
- * fetch and nothing to change — inventing an endpoint or a table to serve one
- * constant would be building for a feature that has not been specified. What
- * the tab does deliver now is the place billing will live, so owners learn
- * where to look before there is anything to look at.
+ * It now names the account's actual plan rather than a constant: the API
+ * carries one on every account (feature 007), and an owner whose downloads have
+ * stopped carrying the Restaura line should be able to see why. Changing a plan
+ * is still not possible here — billing is not built — so this remains the place
+ * billing will live, with the one fact that already exists shown honestly.
  */
 export default async function SubscriptionSettingsPage({
   params,
@@ -40,15 +42,19 @@ export default async function SubscriptionSettingsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "Settings.subscriptionTab" });
+  const tPlans = await getTranslations({ locale, namespace: "Landing.plans" });
+
+  const session = await getSession();
+  const plan = planOf(session?.account);
 
   return (
     <Card className="max-w-md">
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <CardTitle>{t("planName")}</CardTitle>
+          <CardTitle>{tPlans(`${plan}.name`)}</CardTitle>
           <Badge variant="secondary">{t("statusActive")}</Badge>
         </div>
-        <CardDescription>{t("planDescription")}</CardDescription>
+        <CardDescription>{tPlans(`${plan}.tagline`)}</CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground text-sm">{t("comingSoon")}</p>

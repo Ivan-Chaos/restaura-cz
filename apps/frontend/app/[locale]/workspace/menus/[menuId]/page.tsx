@@ -8,6 +8,7 @@ import { Container } from "@/components/layout/Container";
 import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
 import { EditableTitle } from "@/components/workspace/EditableTitle";
 import { InlineTextForm } from "@/components/workspace/InlineTextForm";
+import { PrintDownloads } from "@/components/workspace/PrintDownloads";
 import { PublishControls } from "@/components/workspace/PublishControls";
 import { SectionEditor } from "@/components/workspace/SectionEditor";
 import { VariantSwitcher } from "@/components/workspace/VariantSwitcher";
@@ -28,6 +29,8 @@ import {
   updateItemAction,
 } from "@/lib/api/actions/menus";
 import { publishAction, unpublishAction } from "@/lib/api/actions/publish";
+import { getSession } from "@/lib/api/session";
+import { planOf } from "@/lib/plans/entitlements";
 
 export async function generateMetadata({
   params,
@@ -58,6 +61,10 @@ export default async function MenuEditorPage({
 
   if (!result.ok) notFound();
   const { menu } = result.data;
+
+  // Cached for the render pass, so this costs nothing beyond the read the
+  // workspace layout's gate already made.
+  const session = await getSession();
 
   return (
     <div className="flex-1 py-10">
@@ -90,6 +97,15 @@ export default async function MenuEditorPage({
           menuId={menu.id}
           publishAction={publishAction}
           unpublishAction={unpublishAction}
+        />
+
+        <PrintDownloads
+          locale={locale}
+          menuId={menu.id}
+          menuName={menu.name}
+          status={menu.status}
+          hasDishes={menu.sections.some((section) => section.items.length > 0)}
+          plan={planOf(session?.account)}
         />
 
         <VariantSwitcher
